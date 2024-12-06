@@ -130,78 +130,111 @@
             }
         }
 
-        // Список всех регионов, включая области
+        // Список всех городов и регионов
         const cities = [
-            { name: "Москва", region: "Московская область" },
-            { name: "Санкт-Петербург", region: "Ленинградская область" },
-            { name: "Белгород", region: "Белгородская область" },
-            { name: "Великий Новгород", region: "Новгородская область" },
-            { name: "Владимир", region: "Владимирская область" },
-            { name: "Вологда", region: "Вологодская область" },
-            { name: "Воронеж", region: "Воронежская область" },
-            { name: "Екатеринбург", region: "Свердловская область" },
-            { name: "Иваново", region: "Ивановская область" },
-            { name: "Йошкар-Ола", region: "Марий Эл" },
-            { name: "Казань", region: "Татарстан" },
-            { name: "Калуга", region: "Калужская область" },
-            { name: "Кемерово", region: "Кемеровская область" },
-            { name: "Кострома", region: "Костромская область" },
-            { name: "Краснодар", region: "Краснодарский край" },
-            { name: "Курск", region: "Курская область" },
-            { name: "Липецк", region: "Липецкая область" },
-            { name: "Майкоп", region: "Адыгея" },
-            { name: "Набережные Челны", region: "Татарстан" },
-            { name: "Нижний Новгород", region: "Нижегородская область" },
-            { name: "Новосибирск", region: "Новосибирская область" },
-            { name: "Орёл", region: "Орловская область" },
-            { name: "Рязань", region: "Рязанская область" },
-            { name: "Ставрополь", region: "Ставропольский край" },
-            { name: "Тамбов", region: "Тамбовская область" },
-            { name: "Тверь", region: "Тверская область" },
-            { name: "Тула", region: "Тульская область" },
-            { name: "Ульяновск", region: "Ульяновская область" },
-            { name: "Чебоксары", region: "Чувашия" },
-            { name: "Челябинск", region: "Челябинская область" },
-            { name: "Черкесск", region: "Карачаево-Черкесия" },
-            { name: "Ярославль", region: "Ярославская область" }
+            { name: "Москва", region: "Московская область", coords: [55.751244, 37.618423], boundaryDistance: 20 },
+            { name: "Санкт-Петербург", region: "Ленинградская область", coords: [59.934280, 30.335099], boundaryDistance: 20 },
+            { name: "Белгород", region: "Белгородская область", coords: [50.597735, 36.585823], boundaryDistance: 10 },
+            { name: "Великий Новгород", region: "Новгородская область", coords: [58.521400, 31.275505], boundaryDistance: 10 },
+            { name: "Владимир", region: "Владимирская область", coords: [56.129057, 40.407031], boundaryDistance: 12 },
+            { name: "Вологда", region: "Вологодская область", coords: [59.220492, 39.891568], boundaryDistance: 10 },
+            { name: "Воронеж", region: "Воронежская область", coords: [51.661535, 39.200287], boundaryDistance: 15 },
+            { name: "Екатеринбург", region: "Свердловская область", coords: [56.838926, 60.605703], boundaryDistance: 15 },
+            { name: "Иваново", region: "Ивановская область", coords: [57.000348, 40.973921], boundaryDistance: 12 },
+            { name: "Йошкар-Ола", region: "Республика Марий Эл", coords: [56.634431, 47.899888], boundaryDistance: 12 },
+            { name: "Казань", region: "Республика Татарстан", coords: [55.796391, 49.108891], boundaryDistance: 15 },
+            { name: "Калуга", region: "Калужская область", coords: [54.506043, 36.251593], boundaryDistance: 12 },
+            { name: "Кемерово", region: "Кемеровская область", coords: [55.354968, 86.087314], boundaryDistance: 15 },
+            { name: "Кострома", region: "Костромская область", coords: [57.767961, 40.926858], boundaryDistance: 10 },
+            { name: "Краснодар", region: "Краснодарский край", coords: [45.035470, 38.975313], boundaryDistance: 12 },
+            { name: "Курск", region: "Курская область", coords: [51.730361, 36.192647], boundaryDistance: 10 },
+            { name: "Липецк", region: "Липецкая область", coords: [52.610150, 39.594180], boundaryDistance: 12 },
+            { name: "Майкоп", region: "Республика Адыгея", coords: [44.607782, 40.105690], boundaryDistance: 10 },
+            { name: "Набережные Челны", region: "Республика Татарстан", coords: [55.727110, 52.404913], boundaryDistance: 12 },
+            { name: "Нижний Новгород", region: "Нижегородская область", coords: [56.296504, 43.936059], boundaryDistance: 15 },
+            { name: "Новосибирск", region: "Новосибирская область", coords: [55.008352, 82.935733], boundaryDistance: 15 },
+            { name: "Орёл", region: "Орловская область", coords: [52.967257, 36.069647], boundaryDistance: 10 },
+            { name: "Рязань", region: "Рязанская область", coords: [54.629704, 39.741146], boundaryDistance: 12 },
+            { name: "Ставрополь", region: "Ставропольский край", coords: [45.044838, 41.969230], boundaryDistance: 10 },
+            { name: "Тамбов", region: "Тамбовская область", coords: [52.721219, 41.452274], boundaryDistance: 10 },
+            { name: "Тверь", region: "Тверская область", coords: [56.858539, 35.917596], boundaryDistance: 12 },
+            { name: "Тула", region: "Тульская область", coords: [54.193122, 37.617348], boundaryDistance: 12 },
+            { name: "Ульяновск", region: "Ульяновская область", coords: [54.316685, 48.403123], boundaryDistance: 12 },
+            { name: "Чебоксары", region: "Чувашская Республика", coords: [56.146223, 47.251931], boundaryDistance: 12 },
+            { name: "Челябинск", region: "Челябинская область", coords: [55.164442, 61.436843], boundaryDistance: 15 },
+            { name: "Черкесск", region: "Карачаево-Черкесская Республика", coords: [44.226863, 42.046782], boundaryDistance: 10 },
+            { name: "Ярославль", region: "Ярославская область", coords: [57.626559, 39.893813], boundaryDistance: 10 }
         ];
 
         let map;
+        let currentRoute;
 
         ymaps.ready(() => {
             map = new ymaps.Map("map", {
                 center: [55.751244, 37.618423],
                 zoom: 7
             });
+
             new ymaps.SuggestView("address");
         });
 
         async function calculateDelivery() {
-            const address = document.getElementById("address").value;
+            const address = document.getElementById('address').value;
+            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+
             if (!address) {
-                document.getElementById("result").innerText = "Введите адрес!";
+                document.getElementById('result').innerText = "Введите адрес!";
                 return;
             }
 
             ymaps.geocode(address).then((res) => {
                 const geoObject = res.geoObjects.get(0);
                 if (!geoObject) {
-                    document.getElementById("result").innerText = "Адрес не найден!";
+                    document.getElementById('result').innerText = "Адрес не найден!";
                     return;
                 }
 
-                const region = geoObject.getAdministrativeAreas()[0];
-                const matchingCity = cities.find(city => region.includes(city.region) || region.includes(city.name));
+                const addressDetails = geoObject.properties.get("metaDataProperty").GeocoderMetaData.Address;
+                const region = addressDetails.Components.find(comp => comp.kind === "province")?.name;
+                const cityCoords = geoObject.geometry.getCoordinates();
 
-                if (!matchingCity) {
-                    document.getElementById("result").innerText = "В этот регион доставка не осуществляется!";
+                if (!region || !cities.some(city => city.region === region)) {
+                    document.getElementById('result').innerText = "Доставка в данный регион невозможна.";
                     return;
                 }
 
-                document.getElementById("result").innerText = `Доставка возможна: ${matchingCity.region}`;
+                const nearestCity = cities.find(city => city.region === region);
+
+                map.setCenter(nearestCity.coords, 7);
+
+                if (currentRoute) {
+                    map.geoObjects.remove(currentRoute);
+                }
+
+                ymaps.route([nearestCity.coords, cityCoords]).then((route) => {
+                    currentRoute = route;
+                    map.geoObjects.add(route);
+
+                    const distanceInKm = route.getLength() / 1000;
+                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+
+                    let cost;
+                    if (deliveryType === "withoutAssembly") {
+                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                    } else {
+                        cost = Math.max(1000, 40 * distanceFromBoundary);
+                    }
+
+                    const roundedCost = Math.ceil(cost / 50) * 50;
+
+                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                }).catch((error) => {
+                    console.error(error);
+                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                });
             }).catch((error) => {
                 console.error(error);
-                document.getElementById("result").innerText = "Ошибка при расчёте. Попробуйте снова.";
+                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
             });
         }
     </script>
