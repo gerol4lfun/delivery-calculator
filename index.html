@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор доставки</title>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,14 +54,6 @@
         label input {
             margin-right: 5px;
             vertical-align: middle;
-        }
-        .auth-container h2 {
-            margin-bottom: 20px;
-        }
-        .auth-container p {
-            color: red;
-            display: none;
-            margin: 10px 0;
         }
         #map {
             width: 100%;
@@ -125,7 +116,6 @@
             if (user) {
                 document.getElementById("auth-container").classList.add("hidden");
                 document.getElementById("calculator-container").classList.remove("hidden");
-                ymaps.ready(initMap);
             } else {
                 authError.style.display = "block";
             }
@@ -166,18 +156,62 @@
             { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
         ];
 
-        let map;
-
-        function initMap() {
-            map = new ymaps.Map("map", {
-                center: [55.751244, 37.618423],
-                zoom: 7
-            });
+        ymaps.ready(() => {
             new ymaps.SuggestView("address");
-        }
+        });
 
         async function calculateDelivery() {
-            // Остальной код остается прежним
+            const address = document.getElementById("address").value;
+            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+
+            if (!address) {
+                document.getElementById("result").innerText = "Введите адрес!";
+                return;
+            }
+
+            try {
+                const res = await ymaps.geocode(address);
+                const geoObject = res.geoObjects.get(0);
+                if (!geoObject) {
+                    document.getElementById("result").innerText = "Адрес не найден!";
+                    return;
+                }
+
+                const coords = geoObject.geometry.getCoordinates();
+                const destinationLat = coords[0];
+                const destinationLon = coords[1];
+
+                let nearestCity = null;
+                let minDistance = Infinity;
+
+                cities.forEach(city => {
+                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                    if (cityDistance < minDistance) {
+                        minDistance = cityDistance;
+                        nearestCity = city;
+                    }
+                });
+
+                if (!nearestCity) {
+                    document.getElementById("result").innerText = "Ошибка: ближайший город не найден.";
+                    return;
+                }
+
+                const distanceFromBoundary = Math.max(minDistance - nearestCity.boundaryDistance, 0);
+                let cost;
+
+                if (deliveryType === "withoutAssembly") {
+                    cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                } else {
+                    cost = Math.max(1000, 40 * distanceFromBoundary);
+                }
+
+                const roundedCost = Math.ceil(cost / 50) * 50;
+                document.getElementById("result").innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+            } catch (error) {
+                console.error(error);
+                document.getElementById("result").innerText = "Ошибка при расчёте. Попробуйте снова.";
+            }
         }
     </script>
 </body>
