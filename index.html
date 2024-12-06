@@ -146,9 +146,6 @@
                 document.getElementById("auth-container").classList.add("hidden");
                 document.getElementById("calculator-container").classList.remove("hidden");
             }
-
-            // Инициализация автозаполнения для поля "address"
-            new ymaps.SuggestView("address"); // Добавление автозаполнения для поля ввода адреса
         }
 
         // Список пользователей
@@ -240,8 +237,9 @@
             new ymaps.SuggestView("address");
         });
 
+        // Функция расчёта доставки
         async function calculateDelivery() {
-            const address = document.getElementById('address').value;
+            const address = document.getElementById("address").value;
             const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
             if (!address) {
@@ -249,6 +247,7 @@
                 return;
             }
 
+            // Логика для работы с картой и расчётом доставки
             ymaps.geocode(address).then((res) => {
                 const geoObject = res.geoObjects.get(0);
                 if (!geoObject) {
@@ -256,6 +255,20 @@
                     return;
                 }
 
+                const localities = geoObject.getLocalities(); // Местоположение (например: Великий Устюг)
+                const administrativeAreas = geoObject.getAdministrativeAreas(); // Местоположение области (например: Вологодская область)
+
+                // Проверяем, входит ли адрес в список разрешенных регионов
+                const isInDeliveryRegion = deliveryRegions.some(region => 
+                    localities.includes(region.city) || administrativeAreas.includes(region.region)
+                );
+
+                if (!isInDeliveryRegion) {
+                    document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
+                    return;
+                }
+
+                // Существующая логика маршрута и расчета стоимости
                 const coords = geoObject.geometry.getCoordinates();
                 const destinationLat = coords[0];
                 const destinationLon = coords[1];
