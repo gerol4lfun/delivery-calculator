@@ -64,10 +64,13 @@
             display: none;
             margin: 10px 0;
         }
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
     </style>
-    
-    
-    
 </head>
 <body>
     <!-- Авторизация -->
@@ -92,12 +95,13 @@
         </label>
         <button onclick="calculateDelivery()">Рассчитать доставку</button>
         <div id="result"></div>
+        <div id="map"></div>
     </div>
 
     <script>
         // Список пользователей
         const users = [
-            { login: "admin", password: "Admin#2024" }, // Администратор
+            { login: "admin", password: "Admin#2024" },
             { login: "Manager1", password: "Mng1!Secure" },
             { login: "Manager2", password: "Mng2#Strong" },
             { login: "Manager3", password: "Mng3!Complex" },
@@ -161,7 +165,14 @@
             { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
         ];
 
+        let map;
+
         ymaps.ready(() => {
+            map = new ymaps.Map("map", {
+                center: [55.751244, 37.618423],
+                zoom: 7
+            });
+
             const suggestView = new ymaps.SuggestView('address');
         });
 
@@ -200,6 +211,8 @@
                     document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
                     return;
                 }
+
+                map.setCenter(nearestCity.coords, 7);
 
                 ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
                     const distanceInKm = route.getLength() / 1000;
