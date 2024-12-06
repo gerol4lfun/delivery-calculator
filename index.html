@@ -94,7 +94,15 @@
         const users = [
             { login: "admin", password: "Admin#2024" },
             { login: "Manager1", password: "Mng1!Secure" },
-            { login: "Manager2", password: "Mng2#Strong" }
+            { login: "Manager2", password: "Mng2#Strong" },
+            { login: "Manager3", password: "Mng3!Complex" },
+            { login: "Manager4", password: "Mng4#Robust" },
+            { login: "Manager5", password: "Mng5!Power" },
+            { login: "Manager6", password: "Mng6#Safety" },
+            { login: "Manager7", password: "Mng7!Stable" },
+            { login: "Manager8", password: "Mng8#Access" },
+            { login: "Manager9", password: "Mng9!Control" },
+            { login: "Manager10", password: "Mng10#Secure" }
         ];
 
         function authenticate() {
@@ -112,14 +120,51 @@
             }
         }
 
+        const cities = [
+           { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
+            { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
+            { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
+            { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
+            { name: "Владимир", coords: [56.129057, 40.407031], boundaryDistance: 12 },
+            { name: "Вологда", coords: [59.220492, 39.891568], boundaryDistance: 10 },
+            { name: "Воронеж", coords: [51.661535, 39.200287], boundaryDistance: 15 },
+            { name: "Екатеринбург", coords: [56.838926, 60.605703], boundaryDistance: 15 },
+            { name: "Иваново", coords: [57.000348, 40.973921], boundaryDistance: 12 },
+            { name: "Йошкар-Ола", coords: [56.634431, 47.899888], boundaryDistance: 12 },
+            { name: "Казань", coords: [55.796391, 49.108891], boundaryDistance: 15 },
+            { name: "Калуга", coords: [54.506043, 36.251593], boundaryDistance: 12 },
+            { name: "Кемерово", coords: [55.354968, 86.087314], boundaryDistance: 15 },
+            { name: "Кострома", coords: [57.767961, 40.926858], boundaryDistance: 10 },
+            { name: "Краснодар", coords: [45.035470, 38.975313], boundaryDistance: 12 },
+            { name: "Курск", coords: [51.730361, 36.192647], boundaryDistance: 10 },
+            { name: "Липецк", coords: [52.610150, 39.594180], boundaryDistance: 12 },
+            { name: "Майкоп", coords: [44.607782, 40.105690], boundaryDistance: 10 },
+            { name: "Набережные Челны", coords: [55.727110, 52.404913], boundaryDistance: 12 },
+            { name: "Нижний Новгород", coords: [56.296504, 43.936059], boundaryDistance: 15 },
+            { name: "Новосибирск", coords: [55.008352, 82.935733], boundaryDistance: 15 },
+            { name: "Орёл", coords: [52.967257, 36.069647], boundaryDistance: 10 },
+            { name: "Рязань", coords: [54.629704, 39.741146], boundaryDistance: 12 },
+            { name: "Ставрополь", coords: [45.044838, 41.969230], boundaryDistance: 10 },
+            { name: "Тамбов", coords: [52.721219, 41.452274], boundaryDistance: 10 },
+            { name: "Тверь", coords: [56.858539, 35.917596], boundaryDistance: 12 },
+            { name: "Тула", coords: [54.193122, 37.617348], boundaryDistance: 12 },
+            { name: "Ульяновск", coords: [54.316685, 48.403123], boundaryDistance: 12 },
+            { name: "Чебоксары", coords: [56.146223, 47.251931], boundaryDistance: 12 },
+            { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
+            { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
+            { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
+            
+        ];
+
         const deliveryRegions = [
             "Москва", "Московская область",
             "Санкт-Петербург", "Ленинградская область",
-            "Белгород", "Великий Новгород", "Владимир", "Вологда", "Воронеж", "Екатеринбург",
-            "Иваново", "Йошкар-Ола", "Казань", "Калуга", "Кемерово", "Кострома", "Краснодар",
-            "Курск", "Липецк", "Майкоп", "Набережные Челны", "Нижний Новгород", "Новосибирск",
-            "Орел", "Рязань", "Ставрополь", "Тамбов", "Тверь", "Тула", "Ульяновск", "Чебоксары",
-            "Челябинск", "Черкесск", "Ярославль"
+            "Тамбов", "Тамбовская область",
+            "Белгород", "Владимир", "Воронеж", "Екатеринбург", "Казань",
+            "Калуга", "Кострома", "Краснодар", "Курск", "Липецк", "Нижний Новгород",
+            "Новосибирск", "Орел", "Рязань", "Ставрополь", "Тверь", "Тула", "Ульяновск",
+            "Чебоксары", "Челябинск", "Ярославль", "Великий Новгород", "Вологда", "Иваново",
+            "Йошкар-Ола", "Кемерово", "Майкоп", "Набережные Челны", "Череповец", "Черкесск"
         ];
 
         let map;
@@ -158,25 +203,55 @@
                 }
 
                 const coords = geoObject.geometry.getCoordinates();
-                const nearestCity = deliveryRegions.find(city => city.includes(addressDetails[0]));
+                const destinationLat = coords[0];
+                const destinationLon = coords[1];
+
+                let nearestCity = null;
+                let minDistance = Infinity;
+
+                cities.forEach(city => {
+                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                    if (cityDistance < minDistance) {
+                        minDistance = cityDistance;
+                        nearestCity = city;
+                    }
+                });
+
+                if (!nearestCity) {
+                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                    return;
+                }
+
+                map.setCenter(nearestCity.coords, 7);
 
                 if (currentRoute) {
                     map.geoObjects.remove(currentRoute);
                 }
 
-                ymaps.route([nearestCity, coords]).then((route) => {
+                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
                     currentRoute = route;
                     map.geoObjects.add(route);
 
                     const distanceInKm = route.getLength() / 1000;
-                    const cost = deliveryType === "withoutAssembly" 
-                        ? Math.max(1000, 500 + 40 * distanceInKm)
-                        : Math.max(1000, 800 + 50 * distanceInKm);
+                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
 
-                    document.getElementById("result").innerText = `Стоимость доставки: ${Math.ceil(cost / 50) * 50} рублей.`;
+                    let cost;
+                    if (deliveryType === "withoutAssembly") {
+                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                    } else {
+                        cost = Math.max(1000, 40 * distanceFromBoundary);
+                    }
+
+                    const roundedCost = Math.ceil(cost / 50) * 50;
+
+                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                }).catch((error) => {
+                    console.error(error);
+                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
                 });
+            }).catch((error) => {
+                console.error(error);
+                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
             });
         }
     </script>
-</body>
-</html>
