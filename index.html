@@ -95,14 +95,6 @@
             { login: "admin", password: "Admin#2024" },
             { login: "Manager1", password: "Mng1!Secure" },
             { login: "Manager2", password: "Mng2#Strong" },
-            { login: "Manager3", password: "Mng3!Complex" },
-            { login: "Manager4", password: "Mng4#Robust" },
-            { login: "Manager5", password: "Mng5!Power" },
-            { login: "Manager6", password: "Mng6#Safety" },
-            { login: "Manager7", password: "Mng7!Stable" },
-            { login: "Manager8", password: "Mng8#Access" },
-            { login: "Manager9", password: "Mng9!Control" },
-            { login: "Manager10", password: "Mng10#Secure" }
         ];
 
         function authenticate() {
@@ -121,7 +113,7 @@
         }
 
         const cities = [
-           { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
+            { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
             { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
             { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
             { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
@@ -153,30 +145,42 @@
             { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
             { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
             { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
-            
         ];
 
         const deliveryRegions = [
-            "Москва", "Московская область",
-            "Санкт-Петербург", "Ленинградская область",
-            "Тамбов", "Тамбовская область",
-            "Белгород", "Владимир", "Воронеж", "Екатеринбург", "Казань",
-            "Калуга", "Кострома", "Краснодар", "Курск", "Липецк", "Нижний Новгород",
-            "Новосибирск", "Орел", "Рязань", "Ставрополь", "Тверь", "Тула", "Ульяновск",
-            "Чебоксары", "Челябинск", "Ярославль", "Великий Новгород", "Вологда", "Иваново",
-            "Йошкар-Ола", "Кемерово", "Майкоп", "Набережные Челны", "Череповец", "Черкесск"
+            { city: "Москва", region: "Московская область" },
+            { city: "Санкт-Петербург", region: "Ленинградская область" },
+            { city: "Белгород", region: "Белгородская область" },
+            { city: "Великий Новгород", region: "Новгородская область" },
+            { city: "Владимир", region: "Владимирская область" },
+            { city: "Вологда", region: "Вологодская область" },
+            { city: "Воронеж", region: "Воронежская область" },
+            { city: "Екатеринбург", region: "Свердловская область" },
+            { city: "Иваново", region: "Ивановская область" },
+            { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+            { city: "Казань", region: "Республика Татарстан" },
+            { city: "Калуга", region: "Калужская область" },
+            { city: "Кемерово", region: "Кемеровская область" },
+            { city: "Кострома", region: "Костромская область" },
+            { city: "Краснодар", region: "Краснодарский край" },
+            { city: "Курск", region: "Курская область" },
+            { city: "Липецк", region: "Липецкая область" },
+            { city: "Майкоп", region: "Республика Адыгея" },
+            { city: "Набережные Челны", region: "Республика Татарстан" },
+            { city: "Нижний Новгород", region: "Нижегородская область" },
+            { city: "Новосибирск", region: "Новосибирская область" },
+            { city: "Орёл", region: "Орловская область" },
+            { city: "Рязань", region: "Рязанская область" },
+            { city: "Ставрополь", region: "Ставропольский край" },
+            { city: "Тамбов", region: "Тамбовская область" },
+            { city: "Тверь", region: "Тверская область" },
+            { city: "Тула", region: "Тульская область" },
+            { city: "Ульяновск", region: "Ульяновская область" },
+            { city: "Чебоксары", region: "Чувашская Республика" },
+            { city: "Челябинск", region: "Челябинская область" },
+            { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+            { city: "Ярославль", region: "Ярославская область" }
         ];
-
-        let map;
-        let currentRoute;
-
-        ymaps.ready(() => {
-            map = new ymaps.Map("map", {
-                center: [55.751244, 37.618423],
-                zoom: 7
-            });
-            new ymaps.SuggestView("address");
-        });
 
         async function calculateDelivery() {
             const address = document.getElementById("address").value;
@@ -194,10 +198,14 @@
                     return;
                 }
 
-                const addressDetails = geoObject.getLocalities().concat(geoObject.getAdministrativeAreas());
-                const inDeliveryRegion = addressDetails.some(region => deliveryRegions.includes(region));
+                const localities = geoObject.getLocalities(); 
+                const administrativeAreas = geoObject.getAdministrativeAreas();
 
-                if (!inDeliveryRegion) {
+                const isInDeliveryRegion = deliveryRegions.some(region => 
+                    localities.includes(region.city) || administrativeAreas.includes(region.region)
+                );
+
+                if (!isInDeliveryRegion) {
                     document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
                     return;
                 }
@@ -255,3 +263,5 @@
             });
         }
     </script>
+</body>
+</html>
