@@ -101,17 +101,7 @@
     <script>
         // Список пользователей
         const users = [
-            { login: "admin", password: "Admin#2024" },
-            { login: "Manager1", password: "Mng1!Secure" },
-            { login: "Manager2", password: "Mng2#Strong" },
-            { login: "Manager3", password: "Mng3!Complex" },
-            { login: "Manager4", password: "Mng4#Robust" },
-            { login: "Manager5", password: "Mng5!Power" },
-            { login: "Manager6", password: "Mng6#Safety" },
-            { login: "Manager7", password: "Mng7!Stable" },
-            { login: "Manager8", password: "Mng8#Access" },
-            { login: "Manager9", password: "Mng9!Control" },
-            { login: "Manager10", password: "Mng10#Secure" }
+            { login: "admin", password: "Admin#2024" }
         ];
 
         // Функция авторизации
@@ -130,6 +120,7 @@
             }
         }
 
+        // Список городов
         const cities = [
             { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
             { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
@@ -173,7 +164,6 @@
                 zoom: 7
             });
 
-            // Добавляем подсказки
             new ymaps.SuggestView("address");
         });
 
@@ -213,12 +203,9 @@
                     return;
                 }
 
-                map.geoObjects.removeAll();
+                map.setBounds([[nearestCity.coords[0], nearestCity.coords[1]], [destinationLat, destinationLon]]);
 
                 ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
-                    map.geoObjects.add(route);
-                    map.setBounds(route.getBounds(), { checkZoomRange: true });
-
                     const distanceInKm = route.getLength() / 1000;
                     const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
 
@@ -230,6 +217,9 @@
                     }
 
                     const roundedCost = Math.ceil(cost / 50) * 50;
+
+                    map.geoObjects.removeAll();
+                    map.geoObjects.add(route);
 
                     document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
                 }).catch((error) => {
