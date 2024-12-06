@@ -100,61 +100,61 @@
     </div>
 
     <script>
-     // Города и регионы, в которых осуществляется доставка
-const deliveryRegions = [
-    { city: "Москва", region: "Московская область" },
-    { city: "Санкт-Петербург", region: "Ленинградская область" },
-    { city: "Белгород", region: "Белгородская область" },
-    { city: "Великий Новгород", region: "Новгородская область" },
-    { city: "Владимир", region: "Владимирская область" },
-    { city: "Вологда", region: "Вологодская область" },
-    { city: "Воронеж", region: "Воронежская область" },
-    { city: "Екатеринбург", region: "Свердловская область" },
-    { city: "Иваново", region: "Ивановская область" },
-    { city: "Йошкар-Ола", region: "Республика Марий Эл" },
-    { city: "Казань", region: "Республика Татарстан" },
-    { city: "Калуга", region: "Калужская область" },
-    { city: "Кемерово", region: "Кемеровская область" },
-    { city: "Кострома", region: "Костромская область" },
-    { city: "Краснодар", region: "Краснодарский край" },
-    { city: "Курск", region: "Курская область" },
-    { city: "Липецк", region: "Липецкая область" },
-    { city: "Майкоп", region: "Республика Адыгея" },
-    { city: "Набережные Челны", region: "Республика Татарстан" },
-    { city: "Нижний Новгород", region: "Нижегородская область" },
-    { city: "Новосибирск", region: "Новосибирская область" },
-    { city: "Орёл", region: "Орловская область" },
-    { city: "Рязань", region: "Рязанская область" },
-    { city: "Ставрополь", region: "Ставропольский край" },
-    { city: "Тамбов", region: "Тамбовская область" },
-    { city: "Тверь", region: "Тверская область" },
-    { city: "Тула", region: "Тульская область" },
-    { city: "Ульяновск", region: "Ульяновская область" },
-    { city: "Чебоксары", region: "Чувашская Республика" },
-    { city: "Челябинск", region: "Челябинская область" },
-    { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
-    { city: "Ярославль", region: "Ярославская область" }
-];  // Убедитесь, что закрывающая скобка и запятая стоят в конце массива
+        // Города и регионы, в которых осуществляется доставка
+        const deliveryRegions = [
+            { city: "Москва", region: "Московская область" },
+            { city: "Санкт-Петербург", region: "Ленинградская область" },
+            { city: "Белгород", region: "Белгородская область" },
+            { city: "Великий Новгород", region: "Новгородская область" },
+            { city: "Владимир", region: "Владимирская область" },
+            { city: "Вологда", region: "Вологодская область" },
+            { city: "Воронеж", region: "Воронежская область" },
+            { city: "Екатеринбург", region: "Свердловская область" },
+            { city: "Иваново", region: "Ивановская область" },
+            { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+            { city: "Казань", region: "Республика Татарстан" },
+            { city: "Калуга", region: "Калужская область" },
+            { city: "Кемерово", region: "Кемеровская область" },
+            { city: "Кострома", region: "Костромская область" },
+            { city: "Краснодар", region: "Краснодарский край" },
+            { city: "Курск", region: "Курская область" },
+            { city: "Липецк", region: "Липецкая область" },
+            { city: "Майкоп", region: "Республика Адыгея" },
+            { city: "Набережные Челны", region: "Республика Татарстан" },
+            { city: "Нижний Новгород", region: "Нижегородская область" },
+            { city: "Новосибирск", region: "Новосибирская область" },
+            { city: "Орёл", region: "Орловская область" },
+            { city: "Рязань", region: "Рязанская область" },
+            { city: "Ставрополь", region: "Ставропольский край" },
+            { city: "Тамбов", region: "Тамбовская область" },
+            { city: "Тверь", region: "Тверская область" },
+            { city: "Тула", region: "Тульская область" },
+            { city: "Ульяновск", region: "Ульяновская область" },
+            { city: "Чебоксары", region: "Чувашская Республика" },
+            { city: "Челябинск", region: "Челябинская область" },
+            { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+            { city: "Ярославль", region: "Ярославская область" }
+        ];
 
-// Код для автозаполнения логина при загрузке страницы
-window.onload = function() {
-    const savedLogin = localStorage.getItem('savedLogin');  // Получаем логин из LocalStorage
-    if (savedLogin) {
-        document.getElementById("login").value = savedLogin; // Вставляем логин в поле
-        document.getElementById("password").focus(); // Ставим фокус на поле пароля
-        // Если логин сохранён, показываем калькулятор сразу
-        document.getElementById("auth-container").classList.add("hidden");
-        document.getElementById("calculator-container").classList.remove("hidden");
-    }
+        // Код для автозаполнения логина при загрузке страницы
+        window.onload = function() {
+            const savedLogin = localStorage.getItem('savedLogin');  // Получаем логин из LocalStorage
+            if (savedLogin) {
+                document.getElementById("login").value = savedLogin; // Вставляем логин в поле
+                document.getElementById("password").focus(); // Ставим фокус на поле пароля
+                // Если логин сохранён, показываем калькулятор сразу
+                document.getElementById("auth-container").classList.add("hidden");
+                document.getElementById("calculator-container").classList.remove("hidden");
+            }
 
-    // Инициализация автозаполнения для поля "address"
-    new ymaps.SuggestView("address"); // Добавление автозаполнения для поля ввода адреса
-}
+            // Инициализация автозаполнения для поля "address"
+            new ymaps.SuggestView("address"); // Добавление автозаполнения для поля ввода адреса
+        }
 
-// Список пользователей
-const users = [
-    { login: "admin", password: "Admin#2024" },
-    { login: "Manager1", password: "Mng1!Secure" },
+        // Список пользователей
+        const users = [
+            { login: "admin", password: "Admin#2024" },
+            { login: "Manager1", password: "Mng1!Secure" },
             { login: "Manager2", password: "Mng2#Strong" },
             { login: "Manager3", password: "Mng3!Complex" },
             { login: "Manager4", password: "Mng4#Robust" },
@@ -164,6 +164,7 @@ const users = [
             { login: "Manager8", password: "Mng8#Access" },
             { login: "Manager9", password: "Mng9!Control" },
             { login: "Manager10", password: "Mng10#Secure" }
+        ];
 
         // Функция авторизации
         function authenticate() {
@@ -239,93 +240,74 @@ const users = [
             new ymaps.SuggestView("address");
         });
 
-        // Функция расчёта доставки
         async function calculateDelivery() {
-    const address = document.getElementById("address").value;
-    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+            const address = document.getElementById('address').value;
+            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
-    if (!address) {
-        document.getElementById('result').innerText = "Введите адрес!";
-        return;
-    }
-
-    // Логика для работы с картой и расчётом доставки
-    ymaps.geocode(address).then((res) => {
-        const geoObject = res.geoObjects.get(0);
-        if (!geoObject) {
-            document.getElementById('result').innerText = "Адрес не найден!";
-            return;
-        }
-
-        const localities = geoObject.getLocalities(); // Местоположение (например: Великий Устюг)
-        const administrativeAreas = geoObject.getAdministrativeAreas(); // Местоположение области (например: Вологодская область)
-
-        // Проверяем, входит ли адрес в список разрешенных регионов
-        const isInDeliveryRegion = deliveryRegions.some(region => 
-            localities.includes(region.city) || administrativeAreas.includes(region.region)
-        );
-
-        if (!isInDeliveryRegion) {
-            document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
-            return;
-        }
-
-        // Существующая логика маршрута и расчета стоимости
-        const coords = geoObject.geometry.getCoordinates();
-        const destinationLat = coords[0];
-        const destinationLon = coords[1];
-
-        let nearestCity = null;
-        let minDistance = Infinity;
-
-        cities.forEach(city => {
-            const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
-            if (cityDistance < minDistance) {
-                minDistance = cityDistance;
-                nearestCity = city;
-            }
-        });
-
-        if (!nearestCity) {
-            document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
-            return;
-        }
-
-        map.setCenter(nearestCity.coords, 7);
-
-        // Удаляем старые маршруты с карты
-        if (currentRoute) {
-            map.geoObjects.remove(currentRoute);
-        }
-
-        // Строим новый маршрут
-        ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
-            currentRoute = route;
-            map.geoObjects.add(route);
-
-            const distanceInKm = route.getLength() / 1000;
-            const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
-
-            let cost;
-            if (deliveryType === "withoutAssembly") {
-                cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-            } else {
-                cost = Math.max(1000, 40 * distanceFromBoundary);
+            if (!address) {
+                document.getElementById('result').innerText = "Введите адрес!";
+                return;
             }
 
-            const roundedCost = Math.ceil(cost / 50) * 50;
+            ymaps.geocode(address).then((res) => {
+                const geoObject = res.geoObjects.get(0);
+                if (!geoObject) {
+                    document.getElementById('result').innerText = "Адрес не найден!";
+                    return;
+                }
 
-            document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
-        }).catch((error) => {
-            console.error(error);
-            document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-        });
-    }).catch((error) => {
-        console.error(error);
-        document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
-    });
-}
+                const coords = geoObject.geometry.getCoordinates();
+                const destinationLat = coords[0];
+                const destinationLon = coords[1];
 
+                let nearestCity = null;
+                let minDistance = Infinity;
+
+                cities.forEach(city => {
+                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                    if (cityDistance < minDistance) {
+                        minDistance = cityDistance;
+                        nearestCity = city;
+                    }
+                });
+
+                if (!nearestCity) {
+                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                    return;
+                }
+
+                map.setCenter(nearestCity.coords, 7);
+
+                if (currentRoute) {
+                    map.geoObjects.remove(currentRoute);
+                }
+
+                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
+                    currentRoute = route;
+                    map.geoObjects.add(route);
+
+                    const distanceInKm = route.getLength() / 1000;
+                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+
+                    let cost;
+                    if (deliveryType === "withoutAssembly") {
+                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                    } else {
+                        cost = Math.max(1000, 40 * distanceFromBoundary);
+                    }
+
+                    const roundedCost = Math.ceil(cost / 50) * 50;
+
+                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                }).catch((error) => {
+                    console.error(error);
+                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                });
+            }).catch((error) => {
+                console.error(error);
+                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
+            });
+        }
     </script>
 </body>
 </html>
