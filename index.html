@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор доставки</title>
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
-
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -101,7 +100,17 @@
     <script>
         // Список пользователей
         const users = [
-            { login: "admin", password: "Admin#2024" }
+            { login: "admin", password: "Admin#2024" },
+            { login: "Manager1", password: "Mng1!Secure" },
+            { login: "Manager2", password: "Mng2#Strong" },
+            { login: "Manager3", password: "Mng3!Complex" },
+            { login: "Manager4", password: "Mng4#Robust" },
+            { login: "Manager5", password: "Mng5!Power" },
+            { login: "Manager6", password: "Mng6#Safety" },
+            { login: "Manager7", password: "Mng7!Stable" },
+            { login: "Manager8", password: "Mng8#Access" },
+            { login: "Manager9", password: "Mng9!Control" },
+            { login: "Manager10", password: "Mng10#Secure" }
         ];
 
         // Функция авторизации
@@ -120,7 +129,7 @@
             }
         }
 
-        // Список городов
+        // Города
         const cities = [
             { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
             { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
@@ -164,7 +173,8 @@
                 zoom: 7
             });
 
-            new ymaps.SuggestView("address");
+            // Подключаем подсказки
+            const suggestView = new ymaps.SuggestView("address");
         });
 
         async function calculateDelivery() {
@@ -172,64 +182,59 @@
             const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
             if (!address) {
-                document.getElementById('result').innerText = "Введите адрес!";
+                document.getElementById("result").innerText = "Введите адрес!";
                 return;
             }
 
-            ymaps.geocode(address).then((res) => {
+            try {
+                const res = await ymaps.geocode(address);
                 const geoObject = res.geoObjects.get(0);
+
                 if (!geoObject) {
-                    document.getElementById('result').innerText = "Адрес не найден!";
+                    document.getElementById("result").innerText = "Адрес не найден!";
                     return;
                 }
 
                 const coords = geoObject.geometry.getCoordinates();
-                const destinationLat = coords[0];
-                const destinationLon = coords[1];
+                const [destinationLat, destinationLon] = coords;
 
                 let nearestCity = null;
                 let minDistance = Infinity;
 
                 cities.forEach(city => {
-                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
-                    if (cityDistance < minDistance) {
-                        minDistance = cityDistance;
+                    const distance = ymaps.coordSystem.geo.getDistance(city.coords, coords) / 1000;
+                    if (distance < minDistance) {
+                        minDistance = distance;
                         nearestCity = city;
                     }
                 });
 
                 if (!nearestCity) {
-                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                    document.getElementById("result").innerText = "Ошибка: ближайший город не найден.";
                     return;
                 }
 
-                map.setBounds([[nearestCity.coords[0], nearestCity.coords[1]], [destinationLat, destinationLon]]);
+                const route = await ymaps.route([nearestCity.coords, coords]);
 
-                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
-                    const distanceInKm = route.getLength() / 1000;
-                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+                const distanceInKm = route.getLength() / 1000;
+                const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
 
-                    let cost;
-                    if (deliveryType === "withoutAssembly") {
-                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-                    } else {
-                        cost = Math.max(1000, 40 * distanceFromBoundary);
-                    }
+                const cost = deliveryType === "withoutAssembly"
+                    ? Math.max(1000, 500 + 40 * distanceFromBoundary)
+                    : Math.max(1000, 40 * distanceFromBoundary);
 
-                    const roundedCost = Math.ceil(cost / 50) * 50;
+                const roundedCost = Math.ceil(cost / 50) * 50;
 
-                    map.geoObjects.removeAll();
-                    map.geoObjects.add(route);
+                map.geoObjects.removeAll();
+                map.geoObjects.add(route);
 
-                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
-                }).catch((error) => {
-                    console.error(error);
-                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-                });
-            }).catch((error) => {
-                console.error(error);
-                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
-            });
+                map.setBounds(route.getBounds());
+
+                document.getElementById("result").innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+            } catch (error) {
+                console.error("Ошибка при расчёте маршрута:", error);
+                document.getElementById("result").innerText = "Ошибка при расчёте маршрута.";
+            }
         }
     </script>
 </body>
