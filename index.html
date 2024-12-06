@@ -100,58 +100,61 @@
     </div>
 
     <script>
-        // Города и регионы, в которых осуществляется доставка
-        const deliveryRegions = [
-            { city: "Москва", region: "Московская область" },
-            { city: "Санкт-Петербург", region: "Ленинградская область" },
-            { city: "Белгород", region: "Белгородская область" },
-            { city: "Великий Новгород", region: "Новгородская область" },
-            { city: "Владимир", region: "Владимирская область" },
-            { city: "Вологда", region: "Вологодская область" },
-            { city: "Воронеж", region: "Воронежская область" },
-            { city: "Екатеринбург", region: "Свердловская область" },
-            { city: "Иваново", region: "Ивановская область" },
-            { city: "Йошкар-Ола", region: "Республика Марий Эл" },
-            { city: "Казань", region: "Республика Татарстан" },
-            { city: "Калуга", region: "Калужская область" },
-            { city: "Кемерово", region: "Кемеровская область" },
-            { city: "Кострома", region: "Костромская область" },
-            { city: "Краснодар", region: "Краснодарский край" },
-            { city: "Курск", region: "Курская область" },
-            { city: "Липецк", region: "Липецкая область" },
-            { city: "Майкоп", region: "Республика Адыгея" },
-            { city: "Набережные Челны", region: "Республика Татарстан" },
-            { city: "Нижний Новгород", region: "Нижегородская область" },
-            { city: "Новосибирск", region: "Новосибирская область" },
-            { city: "Орёл", region: "Орловская область" },
-            { city: "Рязань", region: "Рязанская область" },
-            { city: "Ставрополь", region: "Ставропольский край" },
-            { city: "Тамбов", region: "Тамбовская область" },
-            { city: "Тверь", region: "Тверская область" },
-            { city: "Тула", region: "Тульская область" },
-            { city: "Ульяновск", region: "Ульяновская область" },
-            { city: "Чебоксары", region: "Чувашская Республика" },
-            { city: "Челябинск", region: "Челябинская область" },
-            { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
-            { city: "Ярославль", region: "Ярославская область" }
-        ];
+     // Города и регионы, в которых осуществляется доставка
+const deliveryRegions = [
+    { city: "Москва", region: "Московская область" },
+    { city: "Санкт-Петербург", region: "Ленинградская область" },
+    { city: "Белгород", region: "Белгородская область" },
+    { city: "Великий Новгород", region: "Новгородская область" },
+    { city: "Владимир", region: "Владимирская область" },
+    { city: "Вологда", region: "Вологодская область" },
+    { city: "Воронеж", region: "Воронежская область" },
+    { city: "Екатеринбург", region: "Свердловская область" },
+    { city: "Иваново", region: "Ивановская область" },
+    { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+    { city: "Казань", region: "Республика Татарстан" },
+    { city: "Калуга", region: "Калужская область" },
+    { city: "Кемерово", region: "Кемеровская область" },
+    { city: "Кострома", region: "Костромская область" },
+    { city: "Краснодар", region: "Краснодарский край" },
+    { city: "Курск", region: "Курская область" },
+    { city: "Липецк", region: "Липецкая область" },
+    { city: "Майкоп", region: "Республика Адыгея" },
+    { city: "Набережные Челны", region: "Республика Татарстан" },
+    { city: "Нижний Новгород", region: "Нижегородская область" },
+    { city: "Новосибирск", region: "Новосибирская область" },
+    { city: "Орёл", region: "Орловская область" },
+    { city: "Рязань", region: "Рязанская область" },
+    { city: "Ставрополь", region: "Ставропольский край" },
+    { city: "Тамбов", region: "Тамбовская область" },
+    { city: "Тверь", region: "Тверская область" },
+    { city: "Тула", region: "Тульская область" },
+    { city: "Ульяновск", region: "Ульяновская область" },
+    { city: "Чебоксары", region: "Чувашская Республика" },
+    { city: "Челябинск", region: "Челябинская область" },
+    { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+    { city: "Ярославль", region: "Ярославская область" }
+];  // Убедитесь, что закрывающая скобка и запятая стоят в конце массива
 
-        // Код для автозаполнения логина при загрузке страницы
-        window.onload = function() {
-            const savedLogin = localStorage.getItem('savedLogin');  // Получаем логин из LocalStorage
-            if (savedLogin) {
-                document.getElementById("login").value = savedLogin; // Вставляем логин в поле
-                document.getElementById("password").focus(); // Ставим фокус на поле пароля
-                // Если логин сохранён, показываем калькулятор сразу
-                document.getElementById("auth-container").classList.add("hidden");
-                document.getElementById("calculator-container").classList.remove("hidden");
-            }
-        }
+// Код для автозаполнения логина при загрузке страницы
+window.onload = function() {
+    const savedLogin = localStorage.getItem('savedLogin');  // Получаем логин из LocalStorage
+    if (savedLogin) {
+        document.getElementById("login").value = savedLogin; // Вставляем логин в поле
+        document.getElementById("password").focus(); // Ставим фокус на поле пароля
+        // Если логин сохранён, показываем калькулятор сразу
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("calculator-container").classList.remove("hidden");
+    }
 
-        // Список пользователей
-        const users = [
-            { login: "admin", password: "Admin#2024" },
-            { login: "Manager1", password: "Mng1!Secure" },
+    // Инициализация автозаполнения для поля "address"
+    new ymaps.SuggestView("address"); // Добавление автозаполнения для поля ввода адреса
+}
+
+// Список пользователей
+const users = [
+    { login: "admin", password: "Admin#2024" },
+    { login: "Manager1", password: "Mng1!Secure" },
             { login: "Manager2", password: "Mng2#Strong" },
             { login: "Manager3", password: "Mng3!Complex" },
             { login: "Manager4", password: "Mng4#Robust" },
@@ -161,7 +164,6 @@
             { login: "Manager8", password: "Mng8#Access" },
             { login: "Manager9", password: "Mng9!Control" },
             { login: "Manager10", password: "Mng10#Secure" }
-        ];
 
         // Функция авторизации
         function authenticate() {
