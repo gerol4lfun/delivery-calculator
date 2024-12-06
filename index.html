@@ -150,17 +150,38 @@
 
         // Функция авторизации
         function authenticate() {
-            const login = document.getElementById("login").value;
-            const password = document.getElementById("password").value;
-            const authError = document.getElementById("auth-error");
+        window.onload = function() {
+    const savedLogin = localStorage.getItem('savedLogin');  // Получаем логин из LocalStorage
+    if (savedLogin) {
+        document.getElementById("login").value = savedLogin; // Вставляем его в поле
+        document.getElementById("password").focus(); // Ставим фокус на поле пароля
+    }
+}
 
-            const user = users.find(u => u.login === login && u.password === password);
+// Новая функция для авторизации, с добавлением логина в LocalStorage
+function authenticate() {
+    const login = document.getElementById("login").value;
+    const password = document.getElementById("password").value;
+    const authError = document.getElementById("auth-error");
 
-            if (user) {
-                document.getElementById("auth-container").classList.add("hidden");
-                document.getElementById("calculator-container").classList.remove("hidden");
-            } else {
-                authError.style.display = "block";
+    const user = users.find(u => u.login === login && u.password === password);
+
+    if (user) {
+        // Сохраняем логин в LocalStorage
+        localStorage.setItem('savedLogin', login);
+
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("calculator-container").classList.remove("hidden");
+    } else {
+        authError.style.display = "block";
+    }
+}
+
+// Функция для выхода (если понадобится)
+function logout() {
+    localStorage.removeItem('savedLogin'); // Удаляем логин из LocalStorage
+    document.getElementById("auth-container").classList.remove("hidden");
+    document.getElementById("calculator-container").classList.add("hidden");
             }
         }
 
