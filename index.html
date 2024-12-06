@@ -239,7 +239,7 @@
 
         // Функция расчёта доставки
        async function calculateDelivery() {
-    const address = document.getElementById("address").value;
+    const address = document.getElementById("address").value.toLowerCase(); // Преобразуем введенный адрес в нижний регистр
     const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
     if (!address) {
@@ -247,7 +247,6 @@
         return;
     }
 
-    // Логика для работы с картой и расчётом доставки
     ymaps.geocode(address).then((res) => {
         const geoObject = res.geoObjects.get(0);
         if (!geoObject) {
@@ -255,12 +254,12 @@
             return;
         }
 
-        const localities = geoObject.getLocalities(); // Местоположение (например: Великий Устюг)
-        const administrativeAreas = geoObject.getAdministrativeAreas(); // Местоположение области (например: Вологодская область)
+        const localities = geoObject.getLocalities().map(locality => locality.toLowerCase()); // Преобразуем все местоположения в нижний регистр
+        const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase()); // Преобразуем области в нижний регистр
 
-        // Проверяем, входит ли адрес в список разрешенных регионов
+        // Проверяем, входит ли адрес в список разрешенных регионов (сравниваем в нижнем регистре)
         const isInDeliveryRegion = deliveryRegions.some(region => 
-            localities.includes(region.city) || administrativeAreas.includes(region.region)
+            localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
         );
 
         if (!isInDeliveryRegion) {
