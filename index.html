@@ -130,6 +130,7 @@
             }
         }
 
+        // Список всех городов
         const cities = [
             { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
             { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
@@ -166,6 +167,7 @@
         ];
 
         let map;
+        let currentRoute;
 
         ymaps.ready(() => {
             map = new ymaps.Map("map", {
@@ -173,7 +175,7 @@
                 zoom: 7
             });
 
-            new ymaps.SuggestView('address');
+            new ymaps.SuggestView("address");
         });
 
         async function calculateDelivery() {
@@ -212,9 +214,14 @@
                     return;
                 }
 
-                map.geoObjects.removeAll();
+                map.setCenter(nearestCity.coords, 7);
 
-                ymaps.route([nearestCity.coords, coords]).then((route) => {
+                if (currentRoute) {
+                    map.geoObjects.remove(currentRoute);
+                }
+
+                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
+                    currentRoute = route;
                     map.geoObjects.add(route);
 
                     const distanceInKm = route.getLength() / 1000;
