@@ -44,6 +44,26 @@
             font-size: 18px;
             color: #007BFF;
         }
+        .hidden {
+            display: none;
+        }
+        label {
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        label input {
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .auth-container h2 {
+            margin-bottom: 20px;
+        }
+        .auth-container p {
+            color: red;
+            display: none;
+            margin: 10px 0;
+        }
         #map {
             width: 100%;
             height: 400px;
@@ -53,7 +73,17 @@
     </style>
 </head>
 <body>
-    <div class="calculator-container" id="calculator-container">
+    <!-- Авторизация -->
+    <div class="auth-container" id="auth-container">
+        <h2>Вход в систему</h2>
+        <input type="text" id="login" placeholder="Введите логин" required>
+        <input type="password" id="password" placeholder="Введите пароль" required>
+        <button onclick="authenticate()">Войти</button>
+        <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
+    </div>
+
+    <!-- Калькулятор -->
+    <div class="calculator-container hidden" id="calculator-container">
         <h1>Калькулятор доставки</h1>
         <p>Введите адрес доставки и выберите тип доставки:</p>
         <input type="text" id="address" placeholder="Например, Санкт-Петербург, Невский пр." required autocomplete="off">
@@ -69,6 +99,37 @@
     </div>
 
     <script>
+        // Список пользователей
+        const users = [
+            { login: "admin", password: "Admin#2024" },
+            { login: "Manager1", password: "Mng1!Secure" },
+            { login: "Manager2", password: "Mng2#Strong" },
+            { login: "Manager3", password: "Mng3!Complex" },
+            { login: "Manager4", password: "Mng4#Robust" },
+            { login: "Manager5", password: "Mng5!Power" },
+            { login: "Manager6", password: "Mng6#Safety" },
+            { login: "Manager7", password: "Mng7!Stable" },
+            { login: "Manager8", password: "Mng8#Access" },
+            { login: "Manager9", password: "Mng9!Control" },
+            { login: "Manager10", password: "Mng10#Secure" }
+        ];
+
+        // Функция авторизации
+        function authenticate() {
+            const login = document.getElementById("login").value;
+            const password = document.getElementById("password").value;
+            const authError = document.getElementById("auth-error");
+
+            const user = users.find(u => u.login === login && u.password === password);
+
+            if (user) {
+                document.getElementById("auth-container").classList.add("hidden");
+                document.getElementById("calculator-container").classList.remove("hidden");
+            } else {
+                authError.style.display = "block";
+            }
+        }
+
         const cities = [
             { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
             { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
@@ -112,59 +173,69 @@
                 zoom: 7
             });
 
-            const suggestView = new ymaps.SuggestView("address");
+            const suggestView = new ymaps.SuggestView('address');
         });
 
         async function calculateDelivery() {
-            const address = document.getElementById("address").value;
-            const deliveryType = document.querySelector("input[name='deliveryType']:checked").value;
+            const address = document.getElementById('address').value;
+            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
             if (!address) {
-                document.getElementById("result").innerText = "Введите адрес!";
+                document.getElementById('result').innerText = "Введите адрес!";
                 return;
             }
 
-            try {
-                const geocodeResult = await ymaps.geocode(address);
-                const geoObject = geocodeResult.geoObjects.get(0);
-
+            ymaps.geocode(address).then((res) => {
+                const geoObject = res.geoObjects.get(0);
                 if (!geoObject) {
-                    document.getElementById("result").innerText = "Адрес не найден!";
+                    document.getElementById('result').innerText = "Адрес не найден!";
                     return;
                 }
 
-                const destinationCoords = geoObject.geometry.getCoordinates();
+                const coords = geoObject.geometry.getCoordinates();
+                const destinationLat = coords[0];
+                const destinationLon = coords[1];
 
                 let nearestCity = null;
                 let minDistance = Infinity;
 
                 cities.forEach(city => {
-                    const distance = ymaps.coordSystem.geo.getDistance(city.coords, destinationCoords);
-                    if (distance < minDistance) {
-                        minDistance = distance;
+                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                    if (cityDistance < minDistance) {
+                        minDistance = cityDistance;
                         nearestCity = city;
                     }
                 });
 
                 if (!nearestCity) {
-                    document.getElementById("result").innerText = "Ошибка: ближайший город не найден.";
+                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
                     return;
                 }
 
-                map.setCenter(destinationCoords, 10);
+                map.setCenter(nearestCity.coords, 7);
 
-                const route = await ymaps.route([nearestCity.coords, destinationCoords]);
-                map.geoObjects.removeAll();
-                map.geoObjects.add(route);
+                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
+                    const distanceInKm = route.getLength() / 1000;
+                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
 
-                const distanceKm = route.getLength() / 1000;
-                const cost = Math.max(1000, 500 + 40 * (distanceKm - nearestCity.boundaryDistance));
+                    let cost;
+                    if (deliveryType === "withoutAssembly") {
+                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                    } else {
+                        cost = Math.max(1000, 40 * distanceFromBoundary);
+                    }
 
-                document.getElementById("result").innerText = `Стоимость доставки: ${Math.ceil(cost / 50) * 50} рублей (${nearestCity.name})`;
-            } catch (error) {
+                    const roundedCost = Math.ceil(cost / 50) * 50;
+
+                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                }).catch((error) => {
+                    console.error(error);
+                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                });
+            }).catch((error) => {
                 console.error(error);
-                document.getElementById("result").innerText = "Ошибка при расчёте маршрута.";
-            }
+                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
+            });
         }
     </script>
 </body>
