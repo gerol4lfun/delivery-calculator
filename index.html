@@ -168,75 +168,90 @@
         let map;
 
         ymaps.ready(() => {
-            map = new ymaps.Map("map", {
-                center: [55.751244, 37.618423],
-                zoom: 7
-            });
+    map = new ymaps.Map("map", {
+        center: [55.751244, 37.618423],
+        zoom: 7
+    });
 
-            const suggestView = new ymaps.SuggestView('address');
+    // Добавляем подсказки в поле ввода
+    new ymaps.SuggestView("address");
+});
+
+async function calculateDelivery() {
+    const address = document.getElementById("address").value;
+    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+
+    if (!address) {
+        document.getElementById("result").innerText = "Введите адрес!";
+        return;
+    }
+
+    ymaps.geocode(address).then((res) => {
+        const geoObject = res.geoObjects.get(0);
+        if (!geoObject) {
+            document.getElementById("result").innerText = "Адрес не найден!";
+            return;
+        }
+
+        const coords = geoObject.geometry.getCoordinates();
+        let nearestCity = null;
+        let minDistance = Infinity;
+
+        // Ищем ближайший город
+        cities.forEach(city => {
+            const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, coords) / 1000;
+            if (cityDistance < minDistance) {
+                minDistance = cityDistance;
+                nearestCity = city;
+            }
         });
 
-        async function calculateDelivery() {
-            const address = document.getElementById('address').value;
-            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
-
-            if (!address) {
-                document.getElementById('result').innerText = "Введите адрес!";
-                return;
-            }
-
-            ymaps.geocode(address).then((res) => {
-                const geoObject = res.geoObjects.get(0);
-                if (!geoObject) {
-                    document.getElementById('result').innerText = "Адрес не найден!";
-                    return;
-                }
-
-                const coords = geoObject.geometry.getCoordinates();
-                const destinationLat = coords[0];
-                const destinationLon = coords[1];
-
-                let nearestCity = null;
-                let minDistance = Infinity;
-
-                cities.forEach(city => {
-                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
-                    if (cityDistance < minDistance) {
-                        minDistance = cityDistance;
-                        nearestCity = city;
-                    }
-                });
-
-                if (!nearestCity) {
-                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
-                    return;
-                }
-
-                map.setCenter(nearestCity.coords, 7);
-
-                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
-                    const distanceInKm = route.getLength() / 1000;
-                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
-
-                    let cost;
-                    if (deliveryType === "withoutAssembly") {
-                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-                    } else {
-                        cost = Math.max(1000, 40 * distanceFromBoundary);
-                    }
-
-                    const roundedCost = Math.ceil(cost / 50) * 50;
-
-                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
-                }).catch((error) => {
-                    console.error(error);
-                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-                });
-            }).catch((error) => {
-                console.error(error);
-                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
-            });
+        if (!nearestCity) {
+            document.getElementById("result").innerText = "Ошибка: ближайший город не найден.";
+            return;
         }
+
+        // Удаляем предыдущий маршрут, если он есть
+        if (route) {
+            map.geoObjects.remove(route);
+        }
+
+        // Строим маршрут
+        ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
+    const distanceInKm = route.getLength() / 1000;
+    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+
+    // Рассчитываем стоимость доставки
+    let cost;
+    if (deliveryType === "withoutAssembly") {
+        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+    } else {
+        cost = Math.max(1000, 40 * distanceFromBoundary);
+    }
+
+    // Округляем стоимость
+    const roundedCost = Math.ceil(cost / 50) * 50;
+
+    // Отображаем стоимость в интерфейсе
+    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+
+    // Очищаем карту от предыдущих объектов, если есть
+    map.geoObjects.removeAll();
+
+    // Добавляем маршрут на карту
+    map.geoObjects.add(route);
+    map.setBounds(route.getBounds());
+}).catch((error) => {
+    console.error(error);
+    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+});
+
+    }).catch((error) => {
+        console.error(error);
+        document.getElementById("result").innerText = "Ошибка при расчёте. Попробуйте снова.";
+    });
+}
+
     </script>
 </body>
 </html>
