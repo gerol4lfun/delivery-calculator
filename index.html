@@ -142,6 +142,9 @@
             if (savedLogin) {
                 document.getElementById("login").value = savedLogin; // Вставляем логин в поле
                 document.getElementById("password").focus(); // Ставим фокус на поле пароля
+                // Если логин сохранён, показываем калькулятор сразу
+                document.getElementById("auth-container").classList.add("hidden");
+                document.getElementById("calculator-container").classList.remove("hidden");
             }
         }
 
