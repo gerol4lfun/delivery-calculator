@@ -96,9 +96,26 @@
         <button onclick="calculateDelivery()">Рассчитать доставку</button>
         <button onclick="logout()">Выйти</button>
         <div id="result"></div>
-        <div id="map"></div>
-    </div>
-    <!-- Калькулятор стоимости теплицы -->
+         <div id="map"></div>
+        
+</div> <!-- Закрытие контейнера для калькулятора доставки -->
+
+<script>
+    function calculateDelivery() {
+        const address = document.getElementById("address").value.toLowerCase(); // Получаем введенный адрес
+        const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value; // Получаем тип доставки
+
+        if (!address) {
+            document.getElementById('result').innerText = "Введите адрес!";
+            return;
+        }
+
+        // После расчета доставки показываем калькулятор теплицы
+        document.getElementById('greenhouse-calculator-container').classList.remove('hidden'); // Показываем калькулятор
+    }
+</script>
+
+<!-- Калькулятор стоимости теплицы -->
     <div class="calculator-container hidden" id="greenhouse-calculator-container">
         <h1>Калькулятор стоимости теплицы</h1>
 
