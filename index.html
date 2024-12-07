@@ -102,6 +102,7 @@
 
 <script>
     function calculateDelivery() {
+        console.log("Функция calculateDelivery вызвана");
         const address = document.getElementById("address").value.toLowerCase(); // Получаем введенный адрес
         const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value; // Получаем тип доставки
 
