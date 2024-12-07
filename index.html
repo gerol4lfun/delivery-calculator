@@ -404,7 +404,16 @@
         console.error(error);
         document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
     });
+
+    // Функция для получения данных о доставке
+function getDeliveryData() {
+    const city = document.getElementById("city").value; // Получаем выбранный город
+    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value; // Получаем тип доставки
+    console.log("Город: ", city); // Для проверки
+    console.log("Тип доставки: ", deliveryType); // Для проверки
+    return { city, deliveryType };
 }
+
     </script>
 </body>
 </html>
