@@ -336,7 +336,6 @@
                 zoom: 7
             });
 
-            new ymaps.SuggestView("address");
         });
 
         // Функция расчёта доставки
@@ -368,6 +367,7 @@
             document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
             return;
         }
+         console.log(document.getElementById('greenhouse-calculator-container'));
 
         // Существующая логика маршрута и расчета стоимости
         const coords = geoObject.geometry.getCoordinates();
