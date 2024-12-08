@@ -23,22 +23,38 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"], input[type="password"], button {
-            padding: 10px;
-            margin: 10px 0;
-            width: calc(100% - 20px);
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            background: #007BFF;
-            color: #fff;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
+        input[type="text"], input[type="password"], select, button {
+    padding: 10px;
+    margin: 10px 0;
+    width: 100%; /* Чтобы элементы занимали всю ширину в колонке */
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background: #007BFF;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    width: 100%; /* Кнопка будет растягиваться на всю ширину */
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block; /* Убедимся, что метки элементов отображаются на новой строке */
+}
+
+h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+        
         #result {
             margin-top: 20px;
             font-size: 18px;
@@ -47,11 +63,7 @@
         .hidden {
             display: none;
         }
-        label {
-            display: inline-block;
-            font-size: 16px;
-            margin: 5px 0;
-        }
+     
         label input {
             margin-right: 5px;
             vertical-align: middle;
@@ -91,9 +103,9 @@
 /* Настроим стили для карты */
 #map {
     width: 100%; /* Карта должна занимать всю ширину */
-    height: 200px; /* Высота карты, можно настроить по вашему желанию */
+    height: 400px; /* Высота карты, можно настроить по вашему желанию */
     margin-top: 20px; /* Отступ сверху для карты */
-    border-radius: 8px; /* Сглаживание углов карты */
+    border-radius: 16px; /* Сглаживание углов карты */
 }
 
     </style>
