@@ -70,6 +70,23 @@
             margin-top: 20px;
             border-radius: 8px;
         }
+        /* Контейнер для трех колонок */
+.container {
+    display: flex; /* Используем Flexbox для распределения колонок */
+    justify-content: space-between; /* Распределяем колонки с отступами между ними */
+    gap: 20px; /* Отступы между колонками */
+}
+
+/* Каждая секция будет занимать 1/3 ширины экрана */
+.section {
+    width: 32%; /* Каждая колонка займет 32% ширины (с отступами) */
+}
+
+/* Добавляем немного отступов между секциями */
+#delivery-section, #greenhouse-section, #result-section {
+    margin-bottom: 20px; /* Отступы между секциями */
+}
+
     </style>
 </head>
 <body>
@@ -82,10 +99,12 @@
         <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
     </div>
 
-    <!-- Калькулятор -->
-    <div class="calculator-container hidden" id="calculator-container">
-        <h1>Калькулятор доставки</h1>
-        <p>Введите адрес доставки и выберите тип доставки:</p>
+    <!-- Контейнер для трех колонок -->
+<div class="container">
+    <!-- Доставка -->
+    <div class="section" id="delivery-section">
+        <h2>ДОСТАВКА</h2>
+        <p>Введите адрес доставки:</p>
         <input type="text" id="address" placeholder="Например, Санкт-Петербург, Невский пр." required autocomplete="off">
         <label>
             <input type="radio" name="deliveryType" value="withoutAssembly" checked> Без сборки
@@ -94,11 +113,112 @@
             <input type="radio" name="deliveryType" value="withAssembly"> Со сборкой
         </label>
         <button onclick="calculateDelivery()">Рассчитать доставку</button>
-        <button onclick="logout()">Выйти</button>
+    </div>
+
+    <!-- Стоимость теплицы -->
+    <div class="section" id="greenhouse-section">
+        <h2>СТОИМОСТЬ ТЕПЛИЦЫ</h2>
+        <label for="city">Город:</label>
+        <select id="city">
+            <option value="Москва">Москва</option>
+            <option value="Санкт-Петербург">Санкт-Петербург</option>
+            <option value="Тамбов">Тамбов</option>
+        </select>
+        <br><br>
+        <label for="form">Форма:</label>
+        <select id="form">
+            <option value="Арочная">Арочная</option>
+            <option value="Каплевидная">Каплевидная</option>
+            <option value="Прямостенная">Прямостенная</option>
+            <option value="Домиком">Домиком</option>
+        </select>
+        <br><br>
+        <button onclick="calculateGreenhouseCost()">Рассчитать стоимость</button>
+    </div>
+
+    <!-- Итоговый расчет -->
+    <div class="section" id="result-section">
+        <h2>Итоговый расчет</h2>
         <div id="result"></div>
-         <div id="map"></div>
-        
-</div> <!-- Закрытие контейнера для калькулятора доставки -->
+        <div id="map"></div>
+    </div>
+</div>
+
+
+    <!-- Стоимость теплицы -->
+    <div class="section" id="greenhouse-section">
+        <h2>СТОИМОСТЬ ТЕПЛИЦЫ</h2>
+        <label for="city">Город:</label>
+        <select id="city">
+            <option value="Москва">Москва</option>
+            <option value="Санкт-Петербург">Санкт-Петербург</option>
+            <option value="Тамбов">Тамбов</option>
+        </select>
+        <br><br>
+
+        <label for="form">Форма:</label>
+        <select id="form">
+            <option value="Арочная">Арочная</option>
+            <option value="Каплевидная">Каплевидная</option>
+            <option value="Прямостенная">Прямостенная</option>
+            <option value="Домиком">Домиком</option>
+        </select>
+        <br><br>
+
+        <label for="width">Ширина:</label>
+        <select id="width">
+            <option value="2.5">2.5 м</option>
+            <option value="3">3 м</option>
+            <option value="4">4 м</option>
+            <option value="5">5 м</option>
+        </select>
+        <br><br>
+
+        <label for="length">Длина:</label>
+        <select id="length">
+            <option value="4">4 м</option>
+            <option value="6">6 м</option>
+            <option value="8">8 м</option>
+            <option value="10">10 м</option>
+        </select>
+        <br><br>
+
+        <label for="section">Сечение каркаса:</label>
+        <select id="section"></select>
+        <br><br>
+
+        <label for="arch-step">Шаг дуги:</label>
+        <select id="arch-step">
+            <option value="1">1 м</option>
+            <option value="0.65">0.65 м</option>
+        </select>
+        <br><br>
+
+        <label for="polycarbonate">Поликарбонат:</label>
+        <select id="polycarbonate">
+            <option value="4 мм стандарт">4 мм стандарт</option>
+            <option value="4 мм люкс">4 мм люкс</option>
+            <option value="6 мм премиум">6 мм премиум</option>
+        </select>
+        <br><br>
+
+        <label>Дополнительные товары:</label>
+        <label><input type="checkbox" id="assembly"> Сборка</label>
+        <label><input type="checkbox" id="bracing"> Брус</label>
+        <label><input type="checkbox" id="ground-hooks"> Грунтозацепы</label>
+        <br><br>
+
+        <button onclick="calculateGreenhouseCost()">Рассчитать стоимость</button>
+    </div>
+
+    <!-- Итоговый расчет -->
+    <div class="section" id="result-section">
+        <h2>Итоговый расчет</h2>
+        <div id="result"></div>
+        <div id="map"></div>
+    </div>
+</div>
+
 
 <script>
     function calculateDelivery() {
@@ -200,6 +320,62 @@
         <button onclick="calculateGreenhouseCost()">Рассчитать стоимость</button>
         <div id="greenhouse-result"></div>
     </div>
+<!-- Добавляем блок для калькулятора теплиц -->
+<div class="calculator-container hidden" id="greenhouse-calculator-container">
+    <h1>Калькулятор стоимости теплицы</h1>
+
+    <!-- Выбор города -->
+    <label for="greenhouse-city">Выберите город:</label>
+    <select id="greenhouse-city">
+        <option value="Москва">Москва</option>
+        <option value="Санкт-Петербург">Санкт-Петербург</option>
+        <option value="Тамбов">Тамбов</option>
+    </select>
+    <br><br>
+
+    <!-- Выбор формы теплицы -->
+    <label for="form">Выберите форму теплицы:</label>
+    <select id="form">
+        <option value="Арочная">Арочная</option>
+        <option value="Каплевидная">Каплевидная</option>
+        <option value="Прямостенная">Прямостенная</option>
+        <option value="Домиком">Домиком</option>
+    </select>
+    <br><br>
+
+    <!-- Выбор размера -->
+    <label for="width">Ширина:</label>
+    <select id="width">
+        <option value="2.5">2.5 м</option>
+        <option value="3">3 м</option>
+        <option value="4">4 м</option>
+        <option value="5">5 м</option>
+    </select>
+    <br><br>
+
+    <label for="length">Длина:</label>
+    <select id="length">
+        <option value="4">4 м</option>
+        <option value="6">6 м</option>
+        <option value="8">8 м</option>
+        <option value="10">10 м</option>
+    </select>
+    <br><br>
+
+    <!-- Дополнительные товары -->
+    <label for="services">Дополнительные товары и услуги:</label>
+    <br>
+    <label><input type="checkbox" id="assembly"> Сборка</label>
+    <br>
+    <label><input type="checkbox" id="bracing"> Брус</label>
+    <br>
+    <label><input type="checkbox" id="ground-hooks"> Грунтозацепы</label>
+    <br><br>
+
+    <!-- Итоговый расчет -->
+    <button onclick="calculateGreenhouseCost()">Рассчитать стоимость</button>
+    <div id="greenhouse-result"></div>
+</div>
 
     <script>
         // Города и регионы, в которых осуществляется доставка
