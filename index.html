@@ -30,6 +30,11 @@
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+        label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+}
 
 button {
     background: #007BFF;
@@ -80,6 +85,7 @@ h2 {
 .section {
     width: 32%; /* Каждая колонка займет 32% ширины (с отступами) */
     box-sizing: border-box; /* Чтобы отступы учитывались в ширине */
+    margin-bottom: 20px; /* Добавить отступы между секциями */
 }
 
 /* Убираем лишние отступы в секциях */
@@ -99,14 +105,15 @@ h2 {
     </style>
 </head>
 <body>
-    <!-- Авторизация -->
-    <div class="auth-container" id="auth-container">
-        <h2>Вход в систему</h2>
-        <input type="text" id="login" placeholder="Введите логин" required>
-        <input type="password" id="password" placeholder="Введите пароль" required>
-        <button onclick="authenticate()">Войти</button>
-        <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
-    </div>
+   <!-- Авторизация -->
+<div class="auth-container" id="auth-container">
+    <h2>Вход в систему</h2>
+    <input type="text" id="login" placeholder="Введите логин" required>
+    <input type="password" id="password" placeholder="Введите пароль" required>
+    <button onclick="authenticate()">Войти</button>
+    <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
+</div>
+
 
  <!-- Контейнер для 3 колонок -->
 <div class="container">
