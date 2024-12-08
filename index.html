@@ -367,6 +367,9 @@
             document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
             return;
         }
+        // Показать калькулятор теплиц
+document.getElementById('greenhouse-calculator-container').classList.remove('hidden'); // Показываем калькулятор
+        
          console.log(document.getElementById('greenhouse-calculator-container'));
 
         // Существующая логика маршрута и расчета стоимости
