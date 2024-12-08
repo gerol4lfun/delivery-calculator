@@ -44,12 +44,6 @@ button:hover {
     background: #0056b3;
 }
 
-label {
-    font-size: 14px;
-    margin-bottom: 5px;
-    display: block; /* Убедимся, что метки элементов отображаются на новой строке */
-}
-
 h2 {
     font-size: 18px;
     margin-bottom: 10px;
@@ -76,12 +70,6 @@ h2 {
             display: none;
             margin: 10px 0;
         }
-        #map {
-            width: 100%;
-            height: 400px;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
         /* Контейнер для трех колонок */
 .container {
     display: flex; /* Используем Flexbox для распределения колонок */
@@ -95,16 +83,12 @@ h2 {
     box-sizing: border-box; /* Чтобы отступы учитывались в ширине */
 }
 
-/* Убираем лишние отступы в секциях */
-#delivery-section, #greenhouse-section, #result-section {
-    margin-bottom: 20px;
-}
 
 /* Настроим стили для карты */
 #map {
-    width: 100%; /* Карта должна занимать всю ширину */
-    height: 400px; /* Высота карты, можно настроить по вашему желанию */
-    margin-top: 20px; /* Отступ сверху для карты */
+    width: 100%;
+    height: 400px; /* Высота карты */
+    margin-top: 20px;
     border-radius: 16px; /* Сглаживание углов карты */
 }
 
@@ -120,14 +104,13 @@ h2 {
         <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
     </div>
 
-  <!-- Контейнер для 3 колонок -->
+ <!-- Контейнер для 3 колонок -->
 <div class="container">
     <!-- Колонка 1: Доставка -->
     <div class="section" id="delivery-section">
         <h2>ДОСТАВКА</h2>
         <p>Введите адрес доставки:</p>
         <input type="text" id="address" placeholder="Например, Санкт-Петербург, Невский пр." required autocomplete="off">
-        
         <label>
             <input type="radio" name="deliveryType" value="withoutAssembly" checked> Без сборки
         </label>
@@ -135,17 +118,11 @@ h2 {
             <input type="radio" name="deliveryType" value="withAssembly"> Со сборкой
         </label>
         <button onclick="calculateDelivery()">Рассчитать доставку</button>
-
-        <!-- Карта должна быть тут, в колонке с доставкой -->
-        <div id="map"></div>
-
-        <div id="result"></div> <!-- Здесь будет результат доставки -->
     </div>
 
     <!-- Колонка 2: Стоимость теплицы -->
     <div class="section" id="greenhouse-section">
         <h2>СТОИМОСТЬ ТЕПЛИЦЫ</h2>
-        <!-- Сюда идут формы калькулятора стоимости теплицы -->
         <label for="city">Город:</label>
         <select id="city">
             <option value="Москва">Москва</option>
@@ -212,7 +189,8 @@ h2 {
     <!-- Колонка 3: Итоговый расчет -->
     <div class="section" id="result-section">
         <h2>Итоговый расчет</h2>
-        <div id="greenhouse-result"></div> <!-- Здесь будет выводиться итоговая информация о стоимости теплицы -->
+        <div id="result"></div>
+        <div id="map"></div>
     </div>
 </div>
 
