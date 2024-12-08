@@ -24,9 +24,8 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         input[type="text"], input[type="password"], select, button {
-    padding: 10px;
-    margin: 10px 0;
-    width: 100%; /* Чтобы элементы занимали всю ширину в колонке */
+    padding: 12px; /* Увеличиваем отступы */
+    margin: 8px 0;
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -46,8 +45,7 @@ button:hover {
 
 h2 {
     font-size: 18px;
-    margin-bottom: 10px;
-}
+    margin-bottom: 15px; /* Уменьшаем отступ */
         
         #result {
             margin-top: 20px;
@@ -72,9 +70,10 @@ h2 {
         }
         /* Контейнер для трех колонок */
 .container {
-    display: flex; /* Используем Flexbox для распределения колонок */
+    display: flex;
     justify-content: space-between; /* Распределяем колонки с отступами между ними */
     gap: 20px; /* Отступы между колонками */
+    margin: 20px 0; /* Добавляем отступы сверху и снизу для всего контейнера */
 }
 
 /* Каждая секция будет занимать 1/3 ширины экрана */
@@ -83,13 +82,18 @@ h2 {
     box-sizing: border-box; /* Чтобы отступы учитывались в ширине */
 }
 
+/* Убираем лишние отступы в секциях */
+#delivery-section, #greenhouse-section, #result-section {
+    margin-bottom: 20px;
+}
+
 
 /* Настроим стили для карты */
 #map {
     width: 100%;
-    height: 400px; /* Высота карты */
+    height: 300px;  /* Уменьшаем высоту карты */
     margin-top: 20px;
-    border-radius: 16px; /* Сглаживание углов карты */
+    border-radius: 8px; /* Сглаживание углов */
 }
 
     </style>
