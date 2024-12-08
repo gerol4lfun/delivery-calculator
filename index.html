@@ -99,13 +99,14 @@
         <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
     </div>
 
-    <!-- Контейнер для 3 колонок -->
+  <!-- Контейнер для 3 колонок -->
 <div class="container">
     <!-- Колонка 1: Доставка -->
     <div class="section" id="delivery-section">
         <h2>ДОСТАВКА</h2>
         <p>Введите адрес доставки:</p>
         <input type="text" id="address" placeholder="Например, Санкт-Петербург, Невский пр." required autocomplete="off">
+        
         <label>
             <input type="radio" name="deliveryType" value="withoutAssembly" checked> Без сборки
         </label>
@@ -113,11 +114,17 @@
             <input type="radio" name="deliveryType" value="withAssembly"> Со сборкой
         </label>
         <button onclick="calculateDelivery()">Рассчитать доставку</button>
+
+        <!-- Карта должна быть тут, в колонке с доставкой -->
+        <div id="map"></div>
+
+        <div id="result"></div> <!-- Здесь будет результат доставки -->
     </div>
 
     <!-- Колонка 2: Стоимость теплицы -->
     <div class="section" id="greenhouse-section">
         <h2>СТОИМОСТЬ ТЕПЛИЦЫ</h2>
+        <!-- Сюда идут формы калькулятора стоимости теплицы -->
         <label for="city">Город:</label>
         <select id="city">
             <option value="Москва">Москва</option>
@@ -184,8 +191,7 @@
     <!-- Колонка 3: Итоговый расчет -->
     <div class="section" id="result-section">
         <h2>Итоговый расчет</h2>
-        <div id="result"></div>
-        <div id="map"></div>
+        <div id="greenhouse-result"></div> <!-- Здесь будет выводиться итоговая информация о стоимости теплицы -->
     </div>
 </div>
 
