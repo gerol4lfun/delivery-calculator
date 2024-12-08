@@ -97,7 +97,7 @@
         <button onclick="logout()">Выйти</button>
         <div id="result"></div>
          <div id="map"></div>
-        
+
 </div> <!-- Закрытие контейнера для калькулятора доставки -->
 
 <script>
@@ -417,7 +417,7 @@ document.getElementById('greenhouse-calculator-container').classList.remove('hid
 
             const roundedCost = Math.ceil(cost / 50) * 50;
 
-            document.getElementById('result').innerText = Стоимость доставки: ${roundedCost} рублей (${nearestCity.name});
+            document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
         }).catch((error) => {
             console.error(error);
             document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
