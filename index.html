@@ -99,9 +99,9 @@
         <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
     </div>
 
-    <!-- Контейнер для трех колонок -->
+    <!-- Контейнер для 3 колонок -->
 <div class="container">
-    <!-- Доставка -->
+    <!-- Колонка 1: Доставка -->
     <div class="section" id="delivery-section">
         <h2>ДОСТАВКА</h2>
         <p>Введите адрес доставки:</p>
@@ -115,37 +115,7 @@
         <button onclick="calculateDelivery()">Рассчитать доставку</button>
     </div>
 
-    <!-- Стоимость теплицы -->
-    <div class="section" id="greenhouse-section">
-        <h2>СТОИМОСТЬ ТЕПЛИЦЫ</h2>
-        <label for="city">Город:</label>
-        <select id="city">
-            <option value="Москва">Москва</option>
-            <option value="Санкт-Петербург">Санкт-Петербург</option>
-            <option value="Тамбов">Тамбов</option>
-        </select>
-        <br><br>
-        <label for="form">Форма:</label>
-        <select id="form">
-            <option value="Арочная">Арочная</option>
-            <option value="Каплевидная">Каплевидная</option>
-            <option value="Прямостенная">Прямостенная</option>
-            <option value="Домиком">Домиком</option>
-        </select>
-        <br><br>
-        <button onclick="calculateGreenhouseCost()">Рассчитать стоимость</button>
-    </div>
-
-    <!-- Итоговый расчет -->
-    <div class="section" id="result-section">
-        <h2>Итоговый расчет</h2>
-        <div id="result"></div>
-        <div id="map"></div>
-    </div>
-</div>
-
-
-    <!-- Стоимость теплицы -->
+    <!-- Колонка 2: Стоимость теплицы -->
     <div class="section" id="greenhouse-section">
         <h2>СТОИМОСТЬ ТЕПЛИЦЫ</h2>
         <label for="city">Город:</label>
@@ -211,14 +181,13 @@
         <button onclick="calculateGreenhouseCost()">Рассчитать стоимость</button>
     </div>
 
-    <!-- Итоговый расчет -->
+    <!-- Колонка 3: Итоговый расчет -->
     <div class="section" id="result-section">
         <h2>Итоговый расчет</h2>
         <div id="result"></div>
         <div id="map"></div>
     </div>
 </div>
-
 
 <script>
     function calculateDelivery() {
