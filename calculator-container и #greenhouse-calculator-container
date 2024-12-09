@@ -100,107 +100,6 @@
 
 </div> <!-- Закрытие контейнера для калькулятора доставки -->
 
-<script>
-    function calculateDelivery() {
-        console.log("Функция calculateDelivery вызвана");
-        const address = document.getElementById("address").value.toLowerCase(); // Получаем введенный адрес
-        const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value; // Получаем тип доставки
-
-        if (!address) {
-            document.getElementById('result').innerText = "Введите адрес!";
-            return;
-        }
-        document.getElementById('result').innerText = "Калькулятор должен появиться!";
-
-        // После расчета доставки показываем калькулятор теплицы
-        document.getElementById('greenhouse-calculator-container').classList.remove('hidden'); // Показываем калькулятор
-    }
-</script>
-
-<!-- Калькулятор стоимости теплицы -->
-    <div class="calculator-container hidden" id="greenhouse-calculator-container">
-        <h1>Калькулятор стоимости теплицы</h1>
-
-        <!-- Выбор города -->
-        <label for="city">Выберите город:</label>
-        <select id="city">
-            <option value="Москва">Москва</option>
-            <option value="Санкт-Петербург">Санкт-Петербург</option>
-            <option value="Тамбов">Тамбов</option>
-            <!-- Добавь другие города -->
-        </select>
-        <br><br>
-
-        <!-- Выбор формы теплицы -->
-        <label for="form">Выберите форму теплицы:</label>
-        <select id="form">
-            <option value="Арочная">Арочная</option>
-            <option value="Каплевидная">Каплевидная</option>
-            <option value="Прямостенная">Прямостенная</option>
-            <option value="Домиком">Домиком</option>
-            <!-- Добавь другие формы -->
-        </select>
-        <br><br>
-
-        <!-- Выбор размера -->
-        <label for="width">Ширина:</label>
-        <select id="width">
-            <option value="2.5">2.5 м</option>
-            <option value="3">3 м</option>
-            <option value="4">4 м</option>
-            <option value="5">5 м</option>
-            <!-- Добавь другие размеры -->
-        </select>
-        <br><br>
-        <label for="length">Длина:</label>
-        <select id="length">
-            <option value="4">4 м</option>
-            <option value="6">6 м</option>
-            <option value="8">8 м</option>
-            <option value="10">10 м</option>
-            <!-- Добавь другие размеры -->
-        </select>
-        <br><br>
-
-        <!-- Выбор сечения каркаса -->
-        <label for="section">Выберите сечение каркаса:</label>
-        <select id="section">
-            <!-- Это будет зависеть от выбранной формы -->
-        </select>
-        <br><br>
-
-        <!-- Выбор шага дуги -->
-        <label for="arch-step">Шаг дуги:</label>
-        <select id="arch-step">
-            <option value="1">1 м</option>
-            <option value="0.65">0.65 м</option>
-        </select>
-        <br><br>
-
-        <!-- Выбор поликарбоната -->
-        <label for="polycarbonate">Выберите поликарбонат:</label>
-        <select id="polycarbonate">
-            <option value="4 мм стандарт">4 мм стандарт</option>
-            <option value="4 мм люкс">4 мм люкс</option>
-            <option value="6 мм премиум">6 мм премиум</option>
-        </select>
-        <br><br>
-
-        <!-- Дополнительные товары -->
-        <label for="services">Дополнительные товары и услуги:</label>
-        <br>
-        <label><input type="checkbox" id="assembly"> Сборка</label>
-        <br>
-        <label><input type="checkbox" id="bracing"> Брус</label>
-        <br>
-        <label><input type="checkbox" id="ground-hooks"> Грунтозацепы</label>
-        <br><br>
-
-        <!-- Итоговый расчет -->
-        <button onclick="calculateGreenhouseCost()">Рассчитать стоимость</button>
-        <div id="greenhouse-result"></div>
-    </div>
-
     <script>
         // Города и регионы, в которых осуществляется доставка
         const deliveryRegions = [
@@ -367,10 +266,6 @@
             document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
             return;
         }
-        // Показать калькулятор теплиц
-document.getElementById('greenhouse-calculator-container').classList.remove('hidden'); // Показываем калькулятор
-        
-         console.log(document.getElementById('greenhouse-calculator-container'));
 
         // Существующая логика маршрута и расчета стоимости
         const coords = geoObject.geometry.getCoordinates();
@@ -427,6 +322,7 @@ document.getElementById('greenhouse-calculator-container').classList.remove('hid
         document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
     });
 }
-    </script>
+  
+</script>
 </body>
 </html>
