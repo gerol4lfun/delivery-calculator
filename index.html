@@ -71,11 +71,14 @@
         .container {
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
         }
         .block {
-            flex: 1;
+            flex: 1 1 30%;
             padding: 20px;
             border-right: 1px solid #ddd;
+            box-sizing: border-box;
+            min-width: 300px;
         }
         .block:last-child {
             border-right: none;
@@ -108,11 +111,16 @@
         .parameters label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
         }
-        #result {
+        .parameters select {
+            width: 100%;
+        }
+        #delivery-result, #summary {
             margin-top: 20px;
             font-size: 16px;
             color: #007BFF;
+            text-align: center;
         }
         #map {
             width: 100%;
@@ -244,9 +252,42 @@
                     Здесь будет выводиться итоговая сумма и детали расчета.
                 </div>
             </div>
-        </div>
-    </div>
 
+            <!-- Существующие блоки additional-services и additional-products остаются без изменений -->
+            <!-- Если эти блоки находятся внутри "Стоимость теплицы", убедитесь, что они добавлены после кнопки расчета -->
+            <!-- Например: -->
+            <div class="block">
+                <div class="additional-services">
+                    <div class="checkbox-group-large">
+                        <label><input type="checkbox" id="bracing"> Брус</label>
+                        <label><input type="checkbox" id="assembly"> Сборка</label>
+                        <label><input type="checkbox" id="ground-hooks"> Штыри</label>
+                    </div>
+                    <p>Монтаж на фундамент клиента</p>
+                    <div class="checkbox-group-large">
+                        <label><input type="checkbox" id="on-wood"> На брус</label>
+                        <label><input type="checkbox" id="on-concrete"> На бетон</label>
+                    </div>
+                </div>
+
+                <div class="additional-products">
+                    <h3>Дополнительные товары:</h3>
+                    <label>
+                        Капельный полив
+                        <input type="checkbox" id="drip-irrigation">
+                    </label>
+                    <label>
+                        Автомат для форточки
+                        <input type="checkbox" id="window-automation">
+                    </label>
+                    <label>
+                        Оцинкованная лента
+                        <input type="checkbox" id="galvanized-tape">
+                    </label>
+                </div>
+            </div>
+        </div>
+    
     <script>
         // Города и регионы, в которых осуществляется доставка
         const deliveryRegions = [
