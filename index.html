@@ -46,6 +46,7 @@
             color: #fff;
             cursor: pointer;
             border: none;
+            width: 100%;
         }
         button:hover {
             background: #0056b3;
@@ -62,7 +63,11 @@
         .auth-container h2, .block h2 {
             margin-bottom: 20px;
             font-size: 18px;
-            color: #333;
+            color: #fff;
+            background-color: #6c757d; /* Нейтральный серый фон */
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
         }
         .auth-container p {
             color: red;
@@ -109,12 +114,23 @@
         .parameters label {
             width: 40%;
             margin-right: 10px;
-            text-align: right;
+            text-align: left;
             padding-right: 10px;
             box-sizing: border-box;
         }
         .parameters select {
             width: 60%;
+            text-align: center; /* Центрирование текста внутри select */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-position: right 10px center;
+            background-repeat: no-repeat;
+            background-size: 10px;
+        }
+        /* Стили для центрирования текста в опциях select */
+        select option {
+            text-align: center;
         }
         .additional-services, .additional-products {
             margin-top: 20px;
@@ -405,18 +421,13 @@
                 .flatMap(g => g.Каркас)
                 .filter((value, index, self) => self.indexOf(value) === index); // Уникальные значения
 
-            // Если только один вариант, выбираем его автоматически
-            if (availableFrames.length === 1) {
-                frameSelect.value = availableFrames[0];
-            } else {
-                // Добавляем опции
-                availableFrames.forEach(frame => {
-                    const option = document.createElement("option");
-                    option.value = frame;
-                    option.text = frame;
-                    frameSelect.add(option);
-                });
-            }
+            // Добавляем опции
+            availableFrames.forEach(frame => {
+                const option = document.createElement("option");
+                option.value = frame;
+                option.text = frame;
+                frameSelect.add(option);
+            });
         }
 
         // Функция для аутентификации пользователя
