@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор доставки</title>
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
+    <title>Калькулятор доставки и стоимости теплиц</title>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=YOUR_API_KEY&lang=ru_RU" type="text/javascript"></script>
     <style>
+        /* Ваши существующие стили */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -102,28 +103,11 @@
             color: #000;
         }
         .parameters {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-        .parameters span {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .checkbox-group-large {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 10px;
-        }
-        .additional-products h3 {
-            margin-top: 20px;
-            font-size: 16px;
-        }
-        .additional-products label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+        .parameters label {
+            display: block;
+            margin-bottom: 5px;
         }
         #result {
             margin-top: 20px;
@@ -138,8 +122,9 @@
         }
         .summary {
             margin-top: 20px;
-            font-size: 14px;
+            font-size: 16px;
             text-align: center;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -150,10 +135,10 @@
         <input type="text" id="login" placeholder="Введите логин" required>
         <input type="password" id="password" placeholder="Введите пароль" required>
         <button onclick="authenticate()">Войти</button>
-        <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
+        <p id="auth-error">Неверный логин или пароль!</p>
     </div>
 
-    <!-- Новый дизайн калькулятора -->
+    <!-- Калькулятор -->
     <div class="calculator-container hidden" id="calculator-container">
         <div class="container">
             <button class="logout" onclick="logout()">Выйти</button>
@@ -168,7 +153,7 @@
                 <label><input type="radio" name="deliveryType" value="withAssembly"> Со сборкой</label>
 
                 <button onclick="calculateDelivery()">Рассчитать доставку</button>
-                <div id="result"></div>
+                <div id="delivery-result"></div>
                 <div id="map"></div>
             </div>
 
@@ -177,65 +162,76 @@
                 <h2>Стоимость теплицы</h2>
                 
                 <div class="parameters">
-                    <span>Город:</span>
-                    <select id="city">
-                        <option value="Москва">Москва</option>
-                        <option value="Санкт-Петербург">Санкт-Петербург</option>
-                        <option value="Тамбов">Тамбов</option>
+                    <label for="city">Город:</label>
+                    <select id="city" onchange="updateFrameOptions()">
+                        <option value="">Выберите город</option>
+                        <!-- Опции будут загружены через JavaScript -->
                     </select>
                 </div>
 
                 <div class="parameters">
-                    <span>Форма:</span>
-                    <select id="form">
+                    <label for="form">Форма теплицы:</label>
+                    <select id="form" onchange="updateFrameOptions()">
+                        <option value="">Выберите форму</option>
                         <option value="Арочная">Арочная</option>
                         <option value="Каплевидная">Каплевидная</option>
+                        <option value="Прямостенная">Прямостенная</option>
+                        <option value="Домиком">Домиком</option>
+                        <option value="По митлайдеру">По митлайдеру</option>
+                        <option value="Пристенная">Пристенная</option>
+                        <option value="Промышленная">Промышленная</option>
                     </select>
                 </div>
 
                 <div class="parameters">
-                    <span>Ширина:</span>
+                    <label for="width">Ширина (м):</label>
                     <select id="width">
+                        <option value="">Выберите ширину</option>
                         <option value="2.5">2.5 м</option>
                         <option value="3">3 м</option>
+                        <option value="3.5">3.5 м</option>
+                        <option value="4">4 м</option>
+                        <option value="5">5 м</option>
+                        <option value="6">6 м</option>
+                        <option value="7">7 м</option>
                     </select>
                 </div>
 
                 <div class="parameters">
-                    <span>Длина:</span>
+                    <label for="length">Длина (м):</label>
                     <select id="length">
+                        <option value="">Выберите длину</option>
                         <option value="4">4 м</option>
                         <option value="6">6 м</option>
+                        <option value="8">8 м</option>
+                        <option value="10">10 м</option>
+                        <option value="12">12 м</option>
                     </select>
                 </div>
 
-                <div class="additional-services">
-                    <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="bracing"> Брус</label>
-                        <label><input type="checkbox" id="assembly"> Сборка</label>
-                        <label><input type="checkbox" id="ground-hooks"> Штыри</label>
-                    </div>
-                    <p>Монтаж на фундамент клиента</p>
-                    <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="on-wood"> На брус</label>
-                        <label><input type="checkbox" id="on-concrete"> На бетон</label>
-                    </div>
+                <div class="parameters">
+                    <label for="frame">Каркас:</label>
+                    <select id="frame">
+                        <option value="">Выберите каркас</option>
+                        <!-- Опции будут загружены через JavaScript -->
+                    </select>
                 </div>
 
-                <div class="additional-products">
-                    <h3>Дополнительные товары:</h3>
-                    <label>
-                        Капельный полив
-                        <input type="checkbox" id="drip-irrigation">
-                    </label>
-                    <label>
-                        Автомат для форточки
-                        <input type="checkbox" id="window-automation">
-                    </label>
-                    <label>
-                        Оцинкованная лента
-                        <input type="checkbox" id="galvanized-tape">
-                    </label>
+                <div class="parameters">
+                    <label for="polycarbonate">Поликарбонат:</label>
+                    <select id="polycarbonate">
+                        <option value="Стандарт">Стандарт</option>
+                        <option value="Люкс">Люкс</option>
+                        <option value="Премиум">Премиум</option>
+                    </select>
+                </div>
+
+                <div class="parameters">
+                    <label for="arcStep">Шаг между дугами:</label>
+                    <select id="arcStep">
+                        <option value="1">1 м</option>
+                        <option value="0.65">0.65 м</option>
+                    </select>
                 </div>
 
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
@@ -288,16 +284,74 @@
             { city: "Ярославль", region: "Ярославская область" }
         ];
 
-        window.onload = function() {
-            const savedLogin = localStorage.getItem('savedLogin');
-            if (savedLogin) {
-                document.getElementById("login").value = savedLogin;
-                document.getElementById("password").focus();
-                document.getElementById("auth-container").classList.add("hidden");
-                document.getElementById("calculator-container").classList.remove("hidden");
+        // Инициализация карты Яндекс
+        let map;
+        let currentRoute;
+
+        ymaps.ready(() => {
+            map = new ymaps.Map("map", {
+                center: [55.751244, 37.618423], // Москва
+                zoom: 7
+            });
+        });
+
+        // Функция для загрузки данных о теплицах из JSON-файла
+        let greenhouses = [];
+
+        async function loadGreenhouses() {
+            try {
+                const response = await fetch('greenhouses.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                greenhouses = await response.json();
+                loadCities(); // После загрузки данных, загрузить города
+            } catch (error) {
+                console.error('Ошибка при загрузке данных о теплицах:', error);
             }
         }
 
+        // Функция для загрузки городов в выпадающий список
+        function loadCities() {
+            const citySelect = document.getElementById("city");
+            const uniqueCities = [...new Set(greenhouses.map(g => g.Город))];
+            uniqueCities.forEach(city => {
+                const option = document.createElement("option");
+                option.value = city;
+                option.text = city;
+                citySelect.add(option);
+            });
+        }
+
+        // Функция для обновления опций каркаса на основе выбранной формы
+        function updateFrameOptions() {
+            const form = document.getElementById("form").value;
+            const frameSelect = document.getElementById("frame");
+            frameSelect.innerHTML = '<option value="">Выберите каркас</option>'; // Сброс опций
+
+            if (!form) return;
+
+            // Собираем доступные каркасы для выбранной формы
+            const availableFrames = greenhouses
+                .filter(g => g.Форма === form)
+                .flatMap(g => g.Каркас)
+                .filter((value, index, self) => self.indexOf(value) === index); // Уникальные значения
+
+            // Если только один вариант, выбираем его автоматически
+            if (availableFrames.length === 1) {
+                frameSelect.value = availableFrames[0];
+            } else {
+                // Добавляем опции
+                availableFrames.forEach(frame => {
+                    const option = document.createElement("option");
+                    option.value = frame;
+                    option.text = frame;
+                    frameSelect.add(option);
+                });
+            }
+        }
+
+        // Функция для аутентификации пользователя
         const users = [
             { login: "admin", password: "Admin#2024" },
             { login: "Manager1", password: "Mng1!Secure" },
@@ -334,64 +388,20 @@
             document.getElementById("calculator-container").classList.add("hidden");
         }
 
-        const cities = [
-            { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
-            { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
-            { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
-            { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
-            { name: "Владимир", coords: [56.129057, 40.407031], boundaryDistance: 12 },
-            { name: "Вологда", coords: [59.220492, 39.891568], boundaryDistance: 10 },
-            { name: "Воронеж", coords: [51.661535, 39.200287], boundaryDistance: 15 },
-            { name: "Екатеринбург", coords: [56.838926, 60.605703], boundaryDistance: 15 },
-            { name: "Иваново", coords: [57.000348, 40.973921], boundaryDistance: 12 },
-            { name: "Йошкар-Ола", coords: [56.634431, 47.899888], boundaryDistance: 12 },
-            { name: "Казань", coords: [55.796391, 49.108891], boundaryDistance: 15 },
-            { name: "Калуга", coords: [54.506043, 36.251593], boundaryDistance: 12 },
-            { name: "Кемерово", coords: [55.354968, 86.087314], boundaryDistance: 15 },
-            { name: "Кострома", coords: [57.767961, 40.926858], boundaryDistance: 10 },
-            { name: "Краснодар", coords: [45.035470, 38.975313], boundaryDistance: 12 },
-            { name: "Курск", coords: [51.730361, 36.192647], boundaryDistance: 10 },
-            { name: "Липецк", coords: [52.610150, 39.594180], boundaryDistance: 12 },
-            { name: "Майкоп", coords: [44.607782, 40.105690], boundaryDistance: 10 },
-            { name: "Набережные Челны", coords: [55.727110, 52.404913], boundaryDistance: 12 },
-            { name: "Нижний Новгород", coords: [56.296504, 43.936059], boundaryDistance: 15 },
-            { name: "Новосибирск", coords: [55.008352, 82.935733], boundaryDistance: 15 },
-            { name: "Орёл", coords: [52.967257, 36.069647], boundaryDistance: 10 },
-            { name: "Рязань", coords: [54.629704, 39.741146], boundaryDistance: 12 },
-            { name: "Ставрополь", coords: [45.044838, 41.969230], boundaryDistance: 10 },
-            { name: "Тамбов", coords: [52.721219, 41.452274], boundaryDistance: 10 },
-            { name: "Тверь", coords: [56.858539, 35.917596], boundaryDistance: 12 },
-            { name: "Тула", coords: [54.193122, 37.617348], boundaryDistance: 12 },
-            { name: "Ульяновск", coords: [54.316685, 48.403123], boundaryDistance: 12 },
-            { name: "Чебоксары", coords: [56.146223, 47.251931], boundaryDistance: 12 },
-            { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
-            { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
-            { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
-        ];
-
-        let map;
-        let currentRoute;
-
-        ymaps.ready(() => {
-            map = new ymaps.Map("map", {
-                center: [55.751244, 37.618423],
-                zoom: 7
-            });
-        });
-
+        // Функция для расчёта стоимости доставки
         async function calculateDelivery() {
             const address = document.getElementById("address").value.toLowerCase();
             const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
             if (!address) {
-                document.getElementById('result').innerText = "Введите адрес!";
+                document.getElementById('delivery-result').innerText = "Введите адрес!";
                 return;
             }
 
             ymaps.geocode(address).then((res) => {
                 const geoObject = res.geoObjects.get(0);
                 if (!geoObject) {
-                    document.getElementById('result').innerText = "Адрес не найден!";
+                    document.getElementById('delivery-result').innerText = "Адрес не найден!";
                     return;
                 }
 
@@ -403,7 +413,7 @@
                 );
 
                 if (!isInDeliveryRegion) {
-                    document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
+                    document.getElementById('delivery-result').innerText = "Доставка в этот регион не осуществляется.";
                     return;
                 }
 
@@ -414,26 +424,29 @@
                 let nearestCity = null;
                 let minDistance = Infinity;
 
-                cities.forEach(city => {
-                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
-                    if (cityDistance < minDistance) {
-                        minDistance = cityDistance;
-                        nearestCity = city;
+                deliveryRegions.forEach(region => {
+                    const cityCoords = getCityCoords(region.city);
+                    if (cityCoords) {
+                        const cityDistance = ymaps.coordSystem.geo.getDistance(cityCoords, [destinationLat, destinationLon]) / 1000;
+                        if (cityDistance < minDistance) {
+                            minDistance = cityDistance;
+                            nearestCity = region;
+                        }
                     }
                 });
 
                 if (!nearestCity) {
-                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                    document.getElementById('delivery-result').innerText = "Ошибка: ближайший город не найден.";
                     return;
                 }
 
-                map.setCenter(nearestCity.coords, 7);
+                map.setCenter(getCityCoords(nearestCity.city), 7);
 
                 if (currentRoute) {
                     map.geoObjects.remove(currentRoute);
                 }
 
-                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
+                ymaps.route([getCityCoords(nearestCity.city), [destinationLat, destinationLon]]).then((route) => {
                     currentRoute = route;
                     map.geoObjects.add(route);
 
@@ -449,20 +462,91 @@
 
                     const roundedCost = Math.ceil(cost / 50) * 50;
 
-                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                    document.getElementById('delivery-result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.city})`;
                 }).catch((error) => {
                     console.error(error);
-                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                    document.getElementById('delivery-result').innerText = "Ошибка при расчёте маршрута.";
                 });
             }).catch((error) => {
                 console.error(error);
-                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
+                document.getElementById('delivery-result').innerText = "Ошибка при расчёте. Попробуйте снова.";
             });
         }
 
+        // Вспомогательная функция для получения координат города
+        function getCityCoords(cityName) {
+            const matchedGreenhouse = greenhouses.find(g => g.Город === cityName);
+            if (!matchedGreenhouse) return null;
+            return matchedGreenhouse.coords || null;
+        }
+
+        // Функция для расчёта стоимости теплицы
         function calculateGreenhouseCost() {
-            // Здесь будет ваша логика расчёта теплицы, когда вы её добавите.
-            // Сейчас функция пустая, но кнопка есть, и все id проставлены.
+            // Получаем выбранные значения
+            const city = document.getElementById("city").value;
+            const form = document.getElementById("form").value;
+            const width = parseFloat(document.getElementById("width").value);
+            const length = parseFloat(document.getElementById("length").value);
+            const frame = document.getElementById("frame").value;
+            const polycarbonate = document.getElementById("polycarbonate").value;
+            const arcStep = parseFloat(document.getElementById("arcStep").value);
+
+            // Валидация обязательных полей
+            if (!city || !form || !width || !length || !frame || !polycarbonate || !arcStep) {
+                alert("Пожалуйста, заполните все обязательные поля.");
+                return;
+            }
+
+            // Поиск соответствующей теплицы в данных
+            const selectedGreenhouse = greenhouses.find(g => 
+                g.Город === city &&
+                g.Форма === form &&
+                g.Ширина === width &&
+                g.Длина.includes(length) &&
+                g.Каркас.includes(frame)
+            );
+
+            if (!selectedGreenhouse) {
+                alert("Теплица с заданными параметрами не найдена.");
+                return;
+            }
+
+            // Расчёт базовой стоимости
+            let basePrice = 0;
+
+            // Формируем ключ для поиска цены
+            const thickness = polycarbonate === "Премиум" ? "6мм" : "4мм";
+            const priceKey = `${polycarbonate}_${thickness}_${length}`;
+
+            if (selectedGreenhouse.Цена[priceKey]) {
+                basePrice = selectedGreenhouse.Цена[priceKey];
+            } else {
+                alert("Цена для выбранных параметров не найдена.");
+                return;
+            }
+
+            // Расчёт итоговой стоимости с учётом шага дуг
+            basePrice += arcStep * 1000; // Пример: 1000 руб. за каждый метр шага дуг
+
+            // Округление до ближайших 50 рублей
+            const roundedPrice = Math.ceil(basePrice / 50) * 50;
+
+            // Вывод результата, включая название теплицы
+            document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб. (${selectedGreenhouse.Название})`;
+        }
+
+        // Загрузка данных о теплицах при загрузке страницы
+        window.onload = function() {
+            loadGreenhouses();
+
+            // Проверка авторизации
+            const savedLogin = localStorage.getItem('savedLogin');
+            if (savedLogin) {
+                document.getElementById("login").value = savedLogin;
+                document.getElementById("password").focus();
+                document.getElementById("auth-container").classList.add("hidden");
+                document.getElementById("calculator-container").classList.remove("hidden");
+            }
         }
     </script>
 </body>
