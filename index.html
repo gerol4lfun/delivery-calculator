@@ -376,39 +376,36 @@
     const polycarbonateDropdown = document.getElementById('polycarbonate');
     const cityDropdown = document.getElementById('city');
 
-    // Очистка текущих опций, кроме первого
+    // Очистка текущих опций, кроме первой
     frameDropdown.innerHTML = '<option value="">Выберите каркас</option>';
     polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
     cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
-    // Заполнение выпадающего списка каркасов
-    const frames = [...new Set(greenhouses.map(g => g.frame).filter(Boolean))];
-    frames.forEach(frame => {
-        const option = document.createElement('option');
-        option.value = frame;
-        const displayName = frame
-            ? frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '')
-            : 'Неизвестный каркас';
-        option.textContent = displayName;
-        frameDropdown.appendChild(option);
-    });
-
-    // Заполнение выпадающего списка поликарбонатов
-    const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate).filter(Boolean))];
-    polycarbons.forEach(poly => {
-        const option = document.createElement('option');
-        option.value = poly;
-        option.textContent = poly;
-        polycarbonateDropdown.appendChild(option);
-    });
-
     // Заполнение выпадающего списка городов
-    const cities = [...new Set(greenhouses.map(g => g.Город).filter(Boolean))];
+    const cities = [...new Set(greenhouses.map(g => g.city_name).filter(Boolean))];
     cities.forEach(city => {
         const option = document.createElement('option');
         option.value = city;
         option.textContent = city;
         cityDropdown.appendChild(option);
+    });
+
+    // Заполнение выпадающего списка каркасов
+    const frames = [...new Set(greenhouses.map(g => g.frame_description).filter(Boolean))];
+    frames.forEach(frame => {
+        const option = document.createElement('option');
+        option.value = frame;
+        option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
+        frameDropdown.appendChild(option);
+    });
+
+    // Заполнение выпадающего списка поликарбонатов
+    const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate_type).filter(Boolean))];
+    polycarbons.forEach(poly => {
+        const option = document.createElement('option');
+        option.value = poly;
+        option.textContent = poly;
+        polycarbonateDropdown.appendChild(option);
     });
 }
             // Функция для обновления опций каркаса на основе выбранной формы
