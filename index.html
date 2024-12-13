@@ -350,6 +350,27 @@
                 { login: "Manager9", password: "Mng9!Control" },
                 { login: "Manager10", password: "Mng10#Secure" }
             ];
+            
+// Таблица соответствий: название теплицы, форма, каркас и ширина
+const greenhouseData = {
+    "БОЯРСКАЯ": { form: "Арочная", frames: ["20х20"], widths: ["2.5м", "3м"] },
+    "БОЯРСКАЯ ЛЮКС": { form: "Арочная", frames: ["40х20"], widths: ["2.5м", "3м", "3.5м"] },
+    "БОЯРСКАЯ ДЕЛЮКС": { form: "Арочная", frames: ["20х20+20х20"], widths: ["2.5м", "3м"] },
+    "БОЯРСКАЯ ПРЕМИУМ": { form: "Арочная", frames: ["40х20+20х20"], widths: ["2.5м", "3м", "3.5м", "4м"] },
+    "ЦАРСКАЯ ЛЮКС": { form: "Прямостенная", frames: ["40х20"], widths: ["2.5м", "3м", "3.5м"] },
+    "ЦАРСКАЯ ПРЕМИУМ": { form: "Прямостенная", frames: ["40х20"], widths: ["2.5м", "3м", "3.5м", "4м"] },
+    "КАПЛЕВИДНАЯ СТРЕЛЕЦКАЯ": { form: "Каплевидная", frames: ["40х20"], widths: ["2.5м", "3м", "3.5м"] },
+    "ДОМИКОМ ЛЮКС": { form: "Домиком", frames: ["40х20"], widths: ["2.5м", "3м", "3.5м"] },
+    "ДОМИКОМ ПРЕМИУМ": { form: "Домиком", frames: ["40х20+20х20"], widths: ["2.5м", "3м", "3.5м", "4м"] },
+    "МИТЛАЙДЕР ЛЮКС": { form: "Митлайдер арочная", frames: ["40х20"], widths: ["3м", "3.5м"] },
+    "МИТЛАЙДЕР ПРЕМИУМ": { form: "Митлайдер арочная", frames: ["40х20+20х20"], widths: ["3м", "3.5м"] },
+    "МИТЛАЙДЕР ЭЛИТ": { form: "Митлайдер Прямостенная", frames: ["40х20+40х20"], widths: ["3м", "3.5м"] },
+    "ПРИСТЕННАЯ ЛЮКС": { form: "Пристенная", frames: ["40х20"], widths: ["2.5м", "3м"] },
+    "ПРИСТЕННАЯ ПРЕМИУМ": { form: "Пристенная", frames: ["40х20+20х20"], widths: ["2.5м", "3м"] },
+    "ПРОМЫШЛЕННАЯ ПРЕМЬЕР": { form: "Промышленная прямостенная", frames: ["40х20+40х20"], widths: ["5м", "6м"] },
+    "ПРОМЫШЛЕННАЯ МОНАРХ": { form: "Промышленная домиком", frames: ["40х20+40х20"], widths: ["7м", "8м"] },
+    "НАВЕС ЛЮКС": { form: "Навес", frames: ["40х20+20х20"], widths: ["3.5м", "4м", "5м", "6м"] }
+};
 
             // Функция для получения данных о теплицах
 async function fetchGreenhouses() {
@@ -426,9 +447,6 @@ function populateDropdowns(greenhouses) {
     const frameSelect = document.getElementById("frame");
 
     console.log("Выбранная форма теплицы:", form);
-                
-                const matchingGreenhouses = greenhouses.filter(g => g.form_name === form);
-console.log("Теплицы с формой:", form, matchingGreenhouses);
 
     // Сброс текущих опций
     frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
@@ -436,23 +454,22 @@ console.log("Теплицы с формой:", form, matchingGreenhouses);
     // Если форма не выбрана, выходим
     if (!form) return;
 
-    // Фильтруем доступные каркасы
-    const availableFrames = greenhouses
-        .filter(g => g.form_name === form) // Сравниваем форму из данных
-        .map(g => g.frame_description) // Получаем только описания каркасов
-        .filter((value, index, self) => self.indexOf(value) === index); // Убираем дубликаты
+    // Ищем данные по форме
+    const matchingGreenhouses = Object.entries(greenhouseData).find(
+        ([name, data]) => data.form === form
+    );
 
-    console.log("Все каркасы (без фильтра):", greenhouses.map(g => g.frame_description));
-    console.log("Доступные каркасы для формы", form, ":", availableFrames);
-
-    // Если доступных каркасов нет
-    if (availableFrames.length === 0) {
-        console.warn("Нет доступных каркасов для выбранной формы:", form);
+    if (!matchingGreenhouses) {
+        console.warn("Нет данных для формы:", form);
         return;
     }
 
+    const [, { frames }] = matchingGreenhouses;
+
+    console.log("Доступные каркасы для формы", form, ":", frames);
+
     // Заполняем выпадающий список каркасов
-    availableFrames.forEach(frame => {
+    frames.forEach(frame => {
         const option = document.createElement("option");
         option.value = frame;
         option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
