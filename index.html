@@ -352,17 +352,21 @@
             ];
 
             // Функция для получения данных о теплицах
-            async function fetchGreenhouses() {
-                let { data, error } = await supabaseClient
-                    .from('prices')
-                    .select('*');
+async function fetchGreenhouses() {
+    let { data, error } = await supabaseClient
+        .from('prices')
+        .select('*');
 
-                if (error) {
-                    console.error('Ошибка при получении данных:', error);
-return [];
-}
-console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
-return data;
+    if (error) {
+        console.error('Ошибка при получении данных:', error);
+        return [];
+    }
+
+    // Лог доступных форм теплиц
+    console.log("Доступные формы теплиц:", [...new Set(data.map(g => g.form_name))]);
+    console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
+
+    return data;
 }
 
 // Функция для загрузки данных и заполнения выпадающих списков
