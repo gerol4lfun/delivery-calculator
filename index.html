@@ -381,6 +381,9 @@
     polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
     cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
+            console.log("Данные для городов:", greenhouses.map(g => g.city_name));
+
+
     // Заполнение выпадающего списка городов
     const cities = [...new Set(greenhouses.map(g => g.city_name).filter(Boolean))];
     cities.forEach(city => {
