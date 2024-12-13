@@ -465,8 +465,8 @@ function populateDropdowns(greenhouses) {
     });
 }
             function updateFrameOptions() {
-    const form = document.getElementById("form").value; // Получаем выбранную форму
-    const frameSelect = document.getElementById("frame"); // Выпадающий список для каркасов
+    const form = document.getElementById("form").value;
+    const frameSelect = document.getElementById("frame");
 
     console.log("Выбранная форма теплицы:", form);
 
@@ -474,35 +474,41 @@ function populateDropdowns(greenhouses) {
     frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
     // Если форма не выбрана, выходим
-    if (!form) return;
+    if (!form) {
+        console.warn("Форма теплицы не выбрана!");
+        return;
+    }
 
     // Ищем данные по форме
     const matchingGreenhouses = Object.entries(greenhouseData).filter(
         ([name, data]) => data.form === form
     );
 
-    // Если соответствующих теплиц нет
+    console.log("Найденные теплицы для формы:", form, matchingGreenhouses);
+
     if (matchingGreenhouses.length === 0) {
-        console.warn("Нет данных для формы:", form);
+        console.warn("Нет доступных данных для выбранной формы:", form);
         return;
     }
 
-    // Получаем уникальные каркасы
+    // Извлекаем все доступные каркасы для формы
     const uniqueFrames = [
-        ...new Set(matchingGreenhouses.flatMap(([name, data]) => data.frames))
+        ...new Set(
+            matchingGreenhouses.flatMap(([name, data]) => data.frames)
+        ),
     ];
 
     console.log("Доступные каркасы для формы", form, ":", uniqueFrames);
 
     // Заполняем выпадающий список каркасов
-    uniqueFrames.forEach(frame => {
+    uniqueFrames.forEach((frame) => {
         const option = document.createElement("option");
         option.value = frame;
-        option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
+        option.textContent = frame;
         frameSelect.add(option);
     });
 
-    // Если доступен только один каркас, выбираем его автоматически
+    // Если доступен только один вариант, выбираем его автоматически
     if (uniqueFrames.length === 1) {
         frameSelect.value = uniqueFrames[0];
         console.log("Автоматически выбран каркас:", uniqueFrames[0]);
