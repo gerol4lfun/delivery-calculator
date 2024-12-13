@@ -417,29 +417,39 @@ function populateDropdowns(greenhouses) {
         polycarbonateDropdown.appendChild(option);
     });
 }
-            // Функция для обновления опций каркаса на основе выбранной формы
             function updateFrameOptions() {
-                const form = document.getElementById("form").value;
-                const frameSelect = document.getElementById("frame");
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>'; // Сброс опций
+    const form = document.getElementById("form").value;
+    const frameSelect = document.getElementById("frame");
 
-                if (!form) return;
+    // Сброс опций каркасов
+    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-                // Собираем доступные каркасы для выбранной формы
-                const availableFrames = greenhouses
-                    .filter(g => g.Форма === form)
-                    .map(g => g.frame)
-                    .filter((value, index, self) => self.indexOf(value) === index); // Уникальные значения
+    // Если форма теплицы не выбрана, показываем все каркасы
+    if (!form) {
+        const allFrames = [...new Set(greenhouses.map(g => g.frame_description).filter(Boolean))];
+        allFrames.forEach(frame => {
+            const option = document.createElement("option");
+            option.value = frame;
+            option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
+            frameSelect.add(option);
+        });
+        return;
+    }
 
-                // Добавляем опции
-                availableFrames.forEach(frame => {
-                    const option = document.createElement("option");
-                    option.value = frame;
-                    const displayName = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
-                    option.textContent = displayName;
-                    frameSelect.add(option);
-                });
-            }
+    // Фильтруем доступные каркасы по выбранной форме теплицы
+    const availableFrames = greenhouses
+        .filter(g => g.form_name === form)
+        .map(g => g.frame_description)
+        .filter((value, index, self) => self.indexOf(value) === index); // Уникальные значения
+
+    // Заполняем выпадающий список доступными каркасами
+    availableFrames.forEach(frame => {
+        const option = document.createElement("option");
+        option.value = frame;
+        option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
+        frameSelect.add(option);
+    });
+}
 
             // Функция Авторизации
             function authenticate() {
