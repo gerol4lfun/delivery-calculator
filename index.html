@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор доставки и стоимости теплиц</title>
+    <!-- Яндекс.Карты -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
     <!-- Supabase JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
@@ -185,7 +186,7 @@
         <input type="text" id="login" placeholder="Введите логин" required>
         <input type="password" id="password" placeholder="Введите пароль" required>
         <button onclick="authenticate()">Войти</button>
-        <p id="auth-error" style="color: red; display: none;">Неверный логин или пароль!</p>
+        <p id="auth-error">Неверный логин или пароль!</p>
     </div>
 
     <!-- Калькулятор -->
@@ -325,486 +326,478 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        // Инициализация Supabase
-        const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Замените на ваш Anon Public Key
+        <script>
+            // Инициализация Supabase
+            const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Замените на ваш Anon Public Key
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let greenhouses = [];
+            let greenhouses = [];
 
-        // Функция для получения данных о теплицах
-        async function fetchGreenhouses() {
-            let { data, error } = await supabase
-                .from('prices')
-                .select('*');
+            // Пользователи
+            const users = [
+                { login: "admin", password: "Admin#2024" },
+                { login: "Manager1", password: "Mng1!Secure" },
+                { login: "Manager2", password: "Mng2#Strong" },
+                { login: "Manager3", password: "Mng3!Complex" },
+                { login: "Manager4", password: "Mng4#Robust" },
+                { login: "Manager5", password: "Mng5!Power" },
+                { login: "Manager6", password: "Mng6#Safety" },
+                { login: "Manager7", password: "Mng7!Stable" },
+                { login: "Manager8", password: "Mng8#Access" },
+                { login: "Manager9", password: "Mng9!Control" },
+                { login: "Manager10", password: "Mng10#Secure" }
+            ];
 
-            if (error) {
-                console.error('Ошибка при получении данных:', error);
-                return [];
+            // Функция для получения данных о теплицах
+            async function fetchGreenhouses() {
+                let { data, error } = await supabaseClient
+                    .from('prices')
+                    .select('*');
+
+                if (error) {
+                    console.error('Ошибка при получении данных:', error);
+                    return [];
+                }
+                return data;
             }
-            return data;
-        }
 
-        // Функция для загрузки данных и заполнения выпадающих списков
-        async function loadGreenhouses() {
-            greenhouses = await fetchGreenhouses();
-            populateDropdowns(greenhouses);
-        }
-
-        // Функция для заполнения выпадающих списков
-        function populateDropdowns(greenhouses) {
-            const frameDropdown = document.getElementById('frame');
-            const polycarbonateDropdown = document.getElementById('polycarbonate');
-            const cityDropdown = document.getElementById('city');
-
-            // Заполнение выпадающего списка каркасов
-            const frames = [...new Set(greenhouses.map(g => g.frame))];
-            frames.forEach(frame => {
-                const option = document.createElement('option');
-                option.value = frame;
-                // Преобразование названия каркаса, например, из "оцинкованная труба 40х20 мм" в "40х20"
-                const displayName = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
-                option.textContent = displayName;
-                frameDropdown.appendChild(option);
-            });
-
-            // Заполнение выпадающего списка поликарбонатов
-            const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate))];
-            polycarbons.forEach(poly => {
-                const option = document.createElement('option');
-                option.value = poly;
-                option.textContent = poly;
-                polycarbonateDropdown.appendChild(option);
-            });
-
-            // Заполнение выпадающего списка городов
-            const cities = [...new Set(greenhouses.map(g => g.Город))];
-            cities.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                cityDropdown.add(option);
-            });
-        }
-
-        // Функция для обновления опций каркаса на основе выбранной формы
-        function updateFrameOptions() {
-            const form = document.getElementById("form").value;
-            const frameSelect = document.getElementById("frame");
-            frameSelect.innerHTML = '<option value="">Выберите каркас</option>'; // Сброс опций
-
-            if (!form) return;
-
-            // Собираем доступные каркасы для выбранной формы
-            const availableFrames = greenhouses
-                .filter(g => g.Форма === form)
-                .map(g => g.frame)
-                .filter((value, index, self) => self.indexOf(value) === index); // Уникальные значения
-
-            // Добавляем опции
-            availableFrames.forEach(frame => {
-                const option = document.createElement("option");
-                option.value = frame;
-                const displayName = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
-                option.textContent = displayName;
-                frameSelect.add(option);
-            });
-        }
-
-        // Функция Авторизации
-        document.getElementById('login').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                authenticate();
+            // Функция для загрузки данных и заполнения выпадающих списков
+            async function loadGreenhouses() {
+                greenhouses = await fetchGreenhouses();
+                populateDropdowns(greenhouses);
             }
-        });
 
-        function authenticate() {
-            const login = document.getElementById("login").value;
-            const password = document.getElementById("password").value;
-            const authError = document.getElementById("auth-error");
+            // Функция для заполнения выпадающих списков
+            function populateDropdowns(greenhouses) {
+                const frameDropdown = document.getElementById('frame');
+                const polycarbonateDropdown = document.getElementById('polycarbonate');
+                const cityDropdown = document.getElementById('city');
 
-            const user = users.find(u => u.login === login && u.password === password);
+                // Очистка текущих опций, кроме первого
+                frameDropdown.innerHTML = '<option value="">Выберите каркас</option>';
+                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
+                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
-            if (user) {
-                localStorage.setItem('savedLogin', login);
-                document.getElementById("auth-container").classList.add("hidden");
-                document.getElementById("calculator-container").classList.remove("hidden");
-                initializeCalculator();
-            } else {
-                authError.style.display = "block";
+                // Заполнение выпадающего списка каркасов
+                const frames = [...new Set(greenhouses.map(g => g.frame))];
+                frames.forEach(frame => {
+                    const option = document.createElement('option');
+                    option.value = frame;
+                    // Преобразование названия каркаса, например, из "оцинкованная труба 40х20 мм" в "40х20"
+                    const displayName = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
+                    option.textContent = displayName;
+                    frameDropdown.appendChild(option);
+                });
+
+                // Заполнение выпадающего списка поликарбонатов
+                const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate))];
+                polycarbons.forEach(poly => {
+                    const option = document.createElement('option');
+                    option.value = poly;
+                    option.textContent = poly;
+                    polycarbonateDropdown.appendChild(option);
+                });
+
+                // Заполнение выпадающего списка городов
+                const cities = [...new Set(greenhouses.map(g => g.Город))];
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    cityDropdown.add(option);
+                });
             }
-        }
 
-        function logout() {
-            localStorage.removeItem('savedLogin');
-            document.getElementById("auth-container").classList.remove("hidden");
-            document.getElementById("calculator-container").classList.add("hidden");
-        }
+            // Функция для обновления опций каркаса на основе выбранной формы
+            function updateFrameOptions() {
+                const form = document.getElementById("form").value;
+                const frameSelect = document.getElementById("frame");
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>'; // Сброс опций
 
-        // Пользователи
-        const users = [
-            { login: "admin", password: "Admin#2024" },
-            { login: "Manager1", password: "Mng1!Secure" },
-            { login: "Manager2", password: "Mng2#Strong" },
-            { login: "Manager3", password: "Mng3!Complex" },
-            { login: "Manager4", password: "Mng4#Robust" },
-            { login: "Manager5", password: "Mng5!Power" },
-            { login: "Manager6", password: "Mng6#Safety" },
-            { login: "Manager7", password: "Mng7!Stable" },
-            { login: "Manager8", password: "Mng8#Access" },
-            { login: "Manager9", password: "Mng9!Control" },
-            { login: "Manager10", password: "Mng10#Secure" }
-        ];
+                if (!form) return;
 
-        // Функция для инициализации калькулятора после авторизации
-        async function initializeCalculator() {
-            // Если данные еще не загружены, загрузите их
-            if (greenhouses.length === 0) {
+                // Собираем доступные каркасы для выбранной формы
+                const availableFrames = greenhouses
+                    .filter(g => g.Форма === form)
+                    .map(g => g.frame)
+                    .filter((value, index, self) => self.indexOf(value) === index); // Уникальные значения
+
+                // Добавляем опции
+                availableFrames.forEach(frame => {
+                    const option = document.createElement("option");
+                    option.value = frame;
+                    const displayName = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
+                    option.textContent = displayName;
+                    frameSelect.add(option);
+                });
+            }
+
+            // Функция Авторизации
+            function authenticate() {
+                const loginInput = document.getElementById("login");
+                const passwordInput = document.getElementById("password");
+                const login = loginInput.value.trim();
+                const password = passwordInput.value.trim();
+                const authError = document.getElementById("auth-error");
+
+                // Скрыть сообщение об ошибке при каждом новом вводе
+                authError.style.display = "none";
+
+                const user = users.find(u => u.login === login && u.password === password);
+
+                if (user) {
+                    localStorage.setItem('savedLogin', login);
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    initializeCalculator();
+                } else {
+                    authError.style.display = "block";
+                }
+            }
+
+            // Функция Logout
+            function logout() {
+                localStorage.removeItem('savedLogin');
+                document.getElementById("auth-container").classList.remove("hidden");
+                document.getElementById("calculator-container").classList.add("hidden");
+            }
+
+            // Функция Расчета Стоимости Теплицы
+            async function calculateGreenhouseCost() {
+                // Получаем выбранные значения
+                const city = document.getElementById("city").value;
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+                const frame = document.getElementById("frame").value;
+                const polycarbonate = document.getElementById("polycarbonate").value;
+                const arcStep = parseFloat(document.getElementById("arcStep").value);
+
+                // Валидация обязательных полей
+                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+                    alert("Пожалуйста, заполните все обязательные поля.");
+                    return;
+                }
+
+                // Преобразование названий, если необходимо
+                // Например, из "40х20" обратно в "оцинкованная труба 40х20 мм"
+                const fullFrameName = `оцинкованная труба ${frame} мм`;
+
+                // Получение данных из Supabase, соответствующих выбранным параметрам
+                let { data, error } = await supabaseClient
+                    .from('prices')
+                    .select('*')
+                    .eq('Город', city)
+                    .eq('Форма', form)
+                    .eq('Ширина', width)
+                    .eq('Длина', length)
+                    .eq('frame', fullFrameName)
+                    .eq('polycarbonate', polycarbonate)
+                    .single();
+
+                if (error || !data) {
+                    console.error('Ошибка при получении данных для расчета:', error);
+                    alert("Теплица с заданными параметрами не найдена.");
+                    return;
+                }
+
+                // Расчет базовой стоимости
+                let basePrice = data.base_price; // Убедитесь, что такое поле существует
+
+                // Расчет стоимости дополнительных услуг
+                const assembly = document.getElementById('assembly').checked ? 5000 : 0;
+                const bracing = document.getElementById('bracing').checked ? 2000 : 0;
+                const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
+
+                // Расчет стоимости дополнительных товаров
+                const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
+                const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
+                const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
+
+                const additionalServices = assembly + bracing + groundHooks;
+                const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
+
+                // Расчет стоимости шага дуг
+                const arcCost = arcStep * 1000; // Пример: 1000 руб. за каждый метр шага дуг
+
+                // Итоговая стоимость
+                const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
+
+                // Округление до ближайших 50 рублей
+                const roundedPrice = Math.ceil(totalPrice / 50) * 50;
+
+                // Вывод результата
+                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб. (${data.Название})`;
+            }
+
+            // Загрузка данных о теплицах при загрузке страницы
+            window.onload = async function() {
+                // Проверка авторизации
+                const savedLogin = localStorage.getItem('savedLogin');
+                if (savedLogin) {
+                    document.getElementById("login").value = savedLogin;
+                    document.getElementById("password").focus();
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    await initializeCalculator();
+                }
                 await loadGreenhouses();
             }
-        }
 
-        // Функция расчета доставки уже работает корректно
+            // Города и регионы, в которых осуществляется доставка
+            const deliveryRegions = [
+                { city: "Москва", region: "Московская область" },
+                { city: "Санкт-Петербург", region: "Ленинградская область" },
+                { city: "Белгород", region: "Белгородская область" },
+                { city: "Великий Новгород", region: "Новгородская область" },
+                { city: "Владимир", region: "Владимирская область" },
+                { city: "Вологда", region: "Вологодская область" },
+                { city: "Воронеж", region: "Воронежская область" },
+                { city: "Екатеринбург", region: "Свердловская область" },
+                { city: "Иваново", region: "Ивановская область" },
+                { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+                { city: "Казань", region: "Республика Татарстан" },
+                { city: "Калуга", region: "Калужская область" },
+                { city: "Кемерово", region: "Кемеровская область" },
+                { city: "Кострома", region: "Костромская область" },
+                { city: "Краснодар", region: "Краснодарский край" },
+                { city: "Курск", region: "Курская область" },
+                { city: "Липецк", region: "Липецкая область" },
+                { city: "Майкоп", region: "Республика Адыгея" },
+                { city: "Набережные Челны", region: "Республика Татарстан" },
+                { city: "Нижний Новгород", region: "Нижегородская область" },
+                { city: "Новосибирск", region: "Новосибирская область" },
+                { city: "Орёл", region: "Орловская область" },
+                { city: "Рязань", region: "Рязанская область" },
+                { city: "Ставрополь", region: "Ставропольский край" },
+                { city: "Тамбов", region: "Тамбовская область" },
+                { city: "Тверь", region: "Тверская область" },
+                { city: "Тула", region: "Тульская область" },
+                { city: "Ульяновск", region: "Ульяновская область" },
+                { city: "Чебоксары", region: "Чувашская Республика" },
+                { city: "Челябинск", region: "Челябинская область" },
+                { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+                { city: "Ярославль", region: "Ярославская область" }
+            ];
 
-        // Функция Расчета Стоимости Теплицы
-        async function calculateGreenhouseCost() {
-            // Получаем выбранные значения
-            const city = document.getElementById("city").value;
-            const form = document.getElementById("form").value;
-            const width = parseFloat(document.getElementById("width").value);
-            const length = parseFloat(document.getElementById("length").value);
-            const frame = document.getElementById("frame").value;
-            const polycarbonate = document.getElementById("polycarbonate").value;
-            const arcStep = parseFloat(document.getElementById("arcStep").value);
+            const cities = [
+                { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
+                { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
+                { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
+                { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
+                { name: "Владимир", coords: [56.129057, 40.407031], boundaryDistance: 12 },
+                { name: "Вологда", coords: [59.220492, 39.891568], boundaryDistance: 10 },
+                { name: "Воронеж", coords: [51.661535, 39.200287], boundaryDistance: 15 },
+                { name: "Екатеринбург", coords: [56.838926, 60.605703], boundaryDistance: 15 },
+                { name: "Иваново", coords: [57.000348, 40.973921], boundaryDistance: 12 },
+                { name: "Йошкар-Ола", coords: [56.634431, 47.899888], boundaryDistance: 12 },
+                { name: "Казань", coords: [55.796391, 49.108891], boundaryDistance: 15 },
+                { name: "Калуга", coords: [54.506043, 36.251593], boundaryDistance: 12 },
+                { name: "Кемерово", coords: [55.354968, 86.087314], boundaryDistance: 15 },
+                { name: "Кострома", coords: [57.767961, 40.926858], boundaryDistance: 10 },
+                { name: "Краснодар", coords: [45.035470, 38.975313], boundaryDistance: 12 },
+                { name: "Курск", coords: [51.730361, 36.192647], boundaryDistance: 10 },
+                { name: "Липецк", coords: [52.610150, 39.594180], boundaryDistance: 12 },
+                { name: "Майкоп", coords: [44.607782, 40.105690], boundaryDistance: 10 },
+                { name: "Набережные Челны", coords: [55.727110, 52.404913], boundaryDistance: 12 },
+                { name: "Нижний Новгород", coords: [56.296504, 43.936059], boundaryDistance: 15 },
+                { name: "Новосибирск", coords: [55.008352, 82.935733], boundaryDistance: 15 },
+                { name: "Орёл", coords: [52.967257, 36.069647], boundaryDistance: 10 },
+                { name: "Рязань", coords: [54.629704, 39.741146], boundaryDistance: 12 },
+                { name: "Ставрополь", coords: [45.044838, 41.969230], boundaryDistance: 10 },
+                { name: "Тамбов", coords: [52.721219, 41.452274], boundaryDistance: 10 },
+                { name: "Тверь", coords: [56.858539, 35.917596], boundaryDistance: 12 },
+                { name: "Тула", coords: [54.193122, 37.617348], boundaryDistance: 12 },
+                { name: "Ульяновск", coords: [54.316685, 48.403123], boundaryDistance: 12 },
+                { name: "Чебоксары", coords: [56.146223, 47.251931], boundaryDistance: 12 },
+                { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
+                { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
+                { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
+            ];
 
-            // Валидация обязательных полей
-            if (!city || !form || !width || !length || !frame || !polycarbonate || !arcStep) {
-                alert("Пожалуйста, заполните все обязательные поля.");
-                return;
-            }
+            let mapInstance;
+            let currentRoute;
 
-            // Преобразование названий, если необходимо
-            // Например, из "40х20" обратно в "оцинкованная труба 40х20 мм"
-            const fullFrameName = `оцинкованная труба ${frame} мм`;
-
-            // Получение данных из Supabase, соответствующих выбранным параметрам
-            let { data, error } = await supabase
-                .from('prices')
-                .select('*')
-                .eq('Город', city)
-                .eq('Форма', form)
-                .eq('Ширина', width)
-                .eq('Длина', length)
-                .eq('frame', fullFrameName)
-                .eq('polycarbonate', polycarbonate)
-                .single();
-
-            if (error || !data) {
-                console.error('Ошибка при получении данных для расчета:', error);
-                alert("Теплица с заданными параметрами не найдена.");
-                return;
-            }
-
-            // Расчет базовой стоимости
-            let basePrice = data.base_price; // Убедитесь, что такое поле существует
-
-            // Расчет стоимости дополнительных услуг
-            const assembly = document.getElementById('assembly').checked ? 5000 : 0;
-            const bracing = document.getElementById('bracing').checked ? 2000 : 0;
-            const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
-
-            // Расчет стоимости дополнительных товаров
-            const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
-            const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
-            const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
-
-            const additionalServices = assembly + bracing + groundHooks;
-            const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
-
-            // Расчет стоимости шага дуг
-            const arcCost = arcStep * 1000; // Пример: 1000 руб. за каждый метр шага дуг
-
-            // Итоговая стоимость
-            const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
-
-            // Округление до ближайших 50 рублей
-            const roundedPrice = Math.ceil(totalPrice / 50) * 50;
-
-            // Вывод результата
-            document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб. (${data.Название})`;
-        }
-
-        // Загрузка данных о теплицах при загрузке страницы
-        window.onload = async function() {
-            // Проверка авторизации
-            const savedLogin = localStorage.getItem('savedLogin');
-            if (savedLogin) {
-                document.getElementById("login").value = savedLogin;
-                document.getElementById("password").focus();
-                document.getElementById("auth-container").classList.add("hidden");
-                document.getElementById("calculator-container").classList.remove("hidden");
-                await initializeCalculator();
-            }
-            await loadGreenhouses();
-        }
-
-        // Города и регионы, в которых осуществляется доставка
-        const deliveryRegions = [
-            { city: "Москва", region: "Московская область" },
-            { city: "Санкт-Петербург", region: "Ленинградская область" },
-            { city: "Белгород", region: "Белгородская область" },
-            { city: "Великий Новгород", region: "Новгородская область" },
-            { city: "Владимир", region: "Владимирская область" },
-            { city: "Вологда", region: "Вологодская область" },
-            { city: "Воронеж", region: "Воронежская область" },
-            { city: "Екатеринбург", region: "Свердловская область" },
-            { city: "Иваново", region: "Ивановская область" },
-            { city: "Йошкар-Ола", region: "Республика Марий Эл" },
-            { city: "Казань", region: "Республика Татарстан" },
-            { city: "Калуга", region: "Калужская область" },
-            { city: "Кемерово", region: "Кемеровская область" },
-            { city: "Кострома", region: "Костромская область" },
-            { city: "Краснодар", region: "Краснодарский край" },
-            { city: "Курск", region: "Курская область" },
-            { city: "Липецк", region: "Липецкая область" },
-            { city: "Майкоп", region: "Республика Адыгея" },
-            { city: "Набережные Челны", region: "Республика Татарстан" },
-            { city: "Нижний Новгород", region: "Нижегородская область" },
-            { city: "Новосибирск", region: "Новосибирская область" },
-            { city: "Орёл", region: "Орловская область" },
-            { city: "Рязань", region: "Рязанская область" },
-            { city: "Ставрополь", region: "Ставропольский край" },
-            { city: "Тамбов", region: "Тамбовская область" },
-            { city: "Тверь", region: "Тверская область" },
-            { city: "Тула", region: "Тульская область" },
-            { city: "Ульяновск", region: "Ульяновская область" },
-            { city: "Чебоксары", region: "Чувашская Республика" },
-            { city: "Челябинск", region: "Челябинская область" },
-            { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
-            { city: "Ярославль", region: "Ярославская область" }
-        ];
-
-        let map;
-        let currentRoute;
-
-        ymaps.ready(() => {
-            map = new ymaps.Map("map", {
-                center: [55.751244, 37.618423],
-                zoom: 7
-            });
-        });
-
-        async function calculateDelivery() {
-            const address = document.getElementById("address").value.toLowerCase();
-            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
-
-            if (!address) {
-                document.getElementById('result').innerText = "Введите адрес!";
-                return;
-            }
-
-            ymaps.geocode(address).then((res) => {
-                const geoObject = res.geoObjects.get(0);
-                if (!geoObject) {
-                    document.getElementById('result').innerText = "Адрес не найден!";
-                    return;
-                }
-
-                const localities = geoObject.getLocalities().map(locality => locality.toLowerCase());
-                const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
-
-                const isInDeliveryRegion = deliveryRegions.some(region => 
-                    localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
-                );
-
-                if (!isInDeliveryRegion) {
-                    document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
-                    return;
-                }
-
-                const coords = geoObject.geometry.getCoordinates();
-                const destinationLat = coords[0];
-                const destinationLon = coords[1];
-
-                let nearestCity = null;
-                let minDistance = Infinity;
-
-                cities.forEach(city => {
-                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
-                    if (cityDistance < minDistance) {
-                        minDistance = cityDistance;
-                        nearestCity = city;
-                    }
+            ymaps.ready(() => {
+                mapInstance = new ymaps.Map("map", {
+                    center: [55.751244, 37.618423],
+                    zoom: 7
                 });
+            });
 
-                if (!nearestCity) {
-                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+            // Функция Расчета Доставки
+            async function calculateDelivery() {
+                const addressInput = document.getElementById("address");
+                const address = addressInput.value.trim().toLowerCase();
+                const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+
+                if (!address) {
+                    document.getElementById('result').innerText = "Введите адрес!";
                     return;
                 }
 
-                map.setCenter(nearestCity.coords, 7);
-
-                if (currentRoute) {
-                    map.geoObjects.remove(currentRoute);
-                }
-
-                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
-                    currentRoute = route;
-                    map.geoObjects.add(route);
-
-                    const distanceInKm = route.getLength() / 1000;
-                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
-
-                    let cost;
-                    if (deliveryType === "withoutAssembly") {
-                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-                    } else {
-                        cost = Math.max(1000, 40 * distanceFromBoundary);
+                try {
+                    const res = await ymaps.geocode(address);
+                    const geoObject = res.geoObjects.get(0);
+                    if (!geoObject) {
+                        document.getElementById('result').innerText = "Адрес не найден!";
+                        return;
                     }
 
-                    const roundedCost = Math.ceil(cost / 50) * 50;
+                    const localities = geoObject.getLocalities().map(locality => locality.toLowerCase());
+                    const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
 
-                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.city})`;
-                }).catch((error) => {
-                    console.error(error);
-                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-                });
-            }).catch((error) => {
-                console.error(error);
-                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
-            });
-        }
+                    const isInDeliveryRegion = deliveryRegions.some(region => 
+                        localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
+                    );
 
-        // Города и регионы, в которых осуществляется доставка
-        const cities = [
-            { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
-            { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
-            { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
-            { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
-            { name: "Владимир", coords: [56.129057, 40.407031], boundaryDistance: 12 },
-            { name: "Вологда", coords: [59.220492, 39.891568], boundaryDistance: 10 },
-            { name: "Воронеж", coords: [51.661535, 39.200287], boundaryDistance: 15 },
-            { name: "Екатеринбург", coords: [56.838926, 60.605703], boundaryDistance: 15 },
-            { name: "Иваново", coords: [57.000348, 40.973921], boundaryDistance: 12 },
-            { name: "Йошкар-Ола", coords: [56.634431, 47.899888], boundaryDistance: 12 },
-            { name: "Казань", coords: [55.796391, 49.108891], boundaryDistance: 15 },
-            { name: "Калуга", coords: [54.506043, 36.251593], boundaryDistance: 12 },
-            { name: "Кемерово", coords: [55.354968, 86.087314], boundaryDistance: 15 },
-            { name: "Кострома", coords: [57.767961, 40.926858], boundaryDistance: 10 },
-            { name: "Краснодар", coords: [45.035470, 38.975313], boundaryDistance: 12 },
-            { name: "Курск", coords: [51.730361, 36.192647], boundaryDistance: 10 },
-            { name: "Липецк", coords: [52.610150, 39.594180], boundaryDistance: 12 },
-            { name: "Майкоп", coords: [44.607782, 40.105690], boundaryDistance: 10 },
-            { name: "Набережные Челны", coords: [55.727110, 52.404913], boundaryDistance: 12 },
-            { name: "Нижний Новгород", coords: [56.296504, 43.936059], boundaryDistance: 15 },
-            { name: "Новосибирск", coords: [55.008352, 82.935733], boundaryDistance: 15 },
-            { name: "Орёл", coords: [52.967257, 36.069647], boundaryDistance: 10 },
-            { name: "Рязань", coords: [54.629704, 39.741146], boundaryDistance: 12 },
-            { name: "Ставрополь", coords: [45.044838, 41.969230], boundaryDistance: 10 },
-            { name: "Тамбов", coords: [52.721219, 41.452274], boundaryDistance: 10 },
-            { name: "Тверь", coords: [56.858539, 35.917596], boundaryDistance: 12 },
-            { name: "Тула", coords: [54.193122, 37.617348], boundaryDistance: 12 },
-            { name: "Ульяновск", coords: [54.316685, 48.403123], boundaryDistance: 12 },
-            { name: "Чебоксары", coords: [56.146223, 47.251931], boundaryDistance: 12 },
-            { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
-            { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
-            { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
-        ];
+                    if (!isInDeliveryRegion) {
+                        document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
+                        return;
+                    }
 
-        let map;
-        let currentRoute;
+                    const coords = geoObject.geometry.getCoordinates();
+                    const destinationLat = coords[0];
+                    const destinationLon = coords[1];
 
-        ymaps.ready(() => {
-            map = new ymaps.Map("map", {
-                center: [55.751244, 37.618423],
-                zoom: 7
-            });
-        });
+                    let nearestCity = null;
+                    let minDistance = Infinity;
 
-        async function calculateDelivery() {
-            const address = document.getElementById("address").value.toLowerCase();
-            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+                    cities.forEach(city => {
+                        const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                        if (cityDistance < minDistance) {
+                            minDistance = cityDistance;
+                            nearestCity = city;
+                        }
+                    });
 
-            if (!address) {
-                document.getElementById('result').innerText = "Введите адрес!";
-                return;
+                    if (!nearestCity) {
+                        document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                        return;
+                    }
+
+                    mapInstance.setCenter(nearestCity.coords, 7);
+
+                    if (currentRoute) {
+                        mapInstance.geoObjects.remove(currentRoute);
+                    }
+
+                    try {
+                        const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
+                        currentRoute = route;
+                        mapInstance.geoObjects.add(route);
+
+                        const distanceInKm = route.getLength() / 1000;
+                        const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+
+                        let cost;
+                        if (deliveryType === "withoutAssembly") {
+                            cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                        } else {
+                            cost = Math.max(1000, 40 * distanceFromBoundary);
+                        }
+
+                        const roundedCost = Math.ceil(cost / 50) * 50;
+
+                        document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                    } catch (routeError) {
+                        console.error(routeError);
+                        document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                    }
+
+                } catch (geocodeError) {
+                    console.error(geocodeError);
+                    document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
+                }
             }
 
-            ymaps.geocode(address).then((res) => {
-                const geoObject = res.geoObjects.get(0);
-                if (!geoObject) {
-                    document.getElementById('result').innerText = "Адрес не найден!";
+            // Функция Расчета Стоимости Теплицы
+            async function calculateGreenhouseCost() {
+                // Получаем выбранные значения
+                const city = document.getElementById("city").value;
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+                const frame = document.getElementById("frame").value;
+                const polycarbonate = document.getElementById("polycarbonate").value;
+                const arcStep = parseFloat(document.getElementById("arcStep").value);
+
+                // Валидация обязательных полей
+                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+                    alert("Пожалуйста, заполните все обязательные поля.");
                     return;
                 }
 
-                const localities = geoObject.getLocalities().map(locality => locality.toLowerCase());
-                const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
+                // Преобразование названий, если необходимо
+                // Например, из "40х20" обратно в "оцинкованная труба 40х20 мм"
+                const fullFrameName = `оцинкованная труба ${frame} мм`;
 
-                const isInDeliveryRegion = deliveryRegions.some(region => 
-                    localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
-                );
+                try {
+                    // Получение данных из Supabase, соответствующих выбранным параметрам
+                    let { data, error } = await supabaseClient
+                        .from('prices')
+                        .select('*')
+                        .eq('Город', city)
+                        .eq('Форма', form)
+                        .eq('Ширина', width)
+                        .eq('Длина', length)
+                        .eq('frame', fullFrameName)
+                        .eq('polycarbonate', polycarbonate)
+                        .single();
 
-                if (!isInDeliveryRegion) {
-                    document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
-                    return;
-                }
-
-                const coords = geoObject.geometry.getCoordinates();
-                const destinationLat = coords[0];
-                const destinationLon = coords[1];
-
-                let nearestCity = null;
-                let minDistance = Infinity;
-
-                cities.forEach(city => {
-                    const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
-                    if (cityDistance < minDistance) {
-                        minDistance = cityDistance;
-                        nearestCity = city;
-                    }
-                });
-
-                if (!nearestCity) {
-                    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
-                    return;
-                }
-
-                map.setCenter(nearestCity.coords, 7);
-
-                if (currentRoute) {
-                    map.geoObjects.remove(currentRoute);
-                }
-
-                ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]).then((route) => {
-                    currentRoute = route;
-                    map.geoObjects.add(route);
-
-                    const distanceInKm = route.getLength() / 1000;
-                    const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
-
-                    let cost;
-                    if (deliveryType === "withoutAssembly") {
-                        cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-                    } else {
-                        cost = Math.max(1000, 40 * distanceFromBoundary);
+                    if (error || !data) {
+                        console.error('Ошибка при получении данных для расчета:', error);
+                        document.getElementById("summary").innerText = "Теплица с заданными параметрами не найдена.";
+                        return;
                     }
 
-                    const roundedCost = Math.ceil(cost / 50) * 50;
+                    // Расчет базовой стоимости
+                    let basePrice = data.base_price; // Убедитесь, что такое поле существует
 
-                    document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
-                }).catch((error) => {
-                    console.error(error);
-                    document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-                });
-            }).catch((error) => {
-                console.error(error);
-                document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
-            });
-        }
-    </script>
-</body>
+                    // Расчет стоимости дополнительных услуг
+                    const assembly = document.getElementById('assembly').checked ? 5000 : 0;
+                    const bracing = document.getElementById('bracing').checked ? 2000 : 0;
+                    const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
+
+                    // Расчет стоимости дополнительных товаров
+                    const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
+                    const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
+                    const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
+
+                    const additionalServices = assembly + bracing + groundHooks;
+                    const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
+
+                    // Расчет стоимости шага дуг
+                    const arcCost = arcStep * 1000; // Пример: 1000 руб. за каждый метр шага дуг
+
+                    // Итоговая стоимость
+                    const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
+
+                    // Округление до ближайших 50 рублей
+                    const roundedPrice = Math.ceil(totalPrice / 50) * 50;
+
+                    // Вывод результата
+                    document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб. (${data.Название})`;
+                } catch (fetchError) {
+                    console.error('Ошибка при получении данных для расчета:', fetchError);
+                    document.getElementById("summary").innerText = "Произошла ошибка при расчёте.";
+                }
+            }
+
+            // Функция для инициализации калькулятора после авторизации
+            async function initializeCalculator() {
+                // Если данные еще не загружены, загрузите их
+                if (greenhouses.length === 0) {
+                    await loadGreenhouses();
+                }
+            }
+
+            // Функция Расчета Доставки (переопределена один раз)
+            // Уже определена выше
+
+        </script>
+    </body>
 </html>
