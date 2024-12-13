@@ -826,48 +826,8 @@ function populateDropdowns(greenhouses) {
                     document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
                 }
             }
-
-            // Функция Расчета Стоимости Теплицы
-            async function calculateGreenhouseCost() {
-                // Получаем выбранные значения
-                const city = document.getElementById("city").value;
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
-                const frame = document.getElementById("frame").value;
-                const polycarbonate = document.getElementById("polycarbonate").value;
-                const arcStep = parseFloat(document.getElementById("arcStep").value);
-
-                // Валидация обязательных полей
-                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
-                    alert("Пожалуйста, заполните все обязательные поля.");
-                    return;
-                }
-
-                // Преобразование названий, если необходимо
-                // Например, из "40х20" обратно в "оцинкованная труба 40х20 мм"
-                const fullFrameName = `оцинкованная труба ${frame} мм`;
-
-                try {
-                    // Получение данных из Supabase, соответствующих выбранным параметрам
-                    let { data, error } = await supabaseClient
-                        .from('prices')
-                        .select('*')
-                        .eq('Город', city)
-                        .eq('Форма', form)
-                        .eq('Ширина', width)
-                        .eq('Длина', length)
-                        .eq('frame', fullFrameName)
-                        .eq('polycarbonate', polycarbonate)
-                        .single();
-
-                    if (error || !data) {
-                        console.error('Ошибка при получении данных для расчета:', error);
-                        document.getElementById("summary").innerText = "Теплица с заданными параметрами не найдена.";
-                        return;
-                    }
-
-                    // Расчет базовой стоимости
+            
+         // Расчет базовой стоимости
                     let basePrice = data.base_price; // Убедитесь, что такое поле существует
 
                     // Расчет стоимости дополнительных услуг
