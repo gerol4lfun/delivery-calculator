@@ -424,25 +424,27 @@ async function loadGreenhouses() {
     populateDropdowns(greenhouses);
 
     // Добавляем обработчик для изменения города
-    document.getElementById('city').addEventListener('change', function () {
-        const selectedCity = this.value;
-        const formDropdown = document.getElementById('form');
-        
-        formDropdown.innerHTML = '<option value="">Выберите форму</option>';
+ document.getElementById('city').addEventListener('change', function () {
+    const selectedCity = this.value;
+    const formDropdown = document.getElementById('form');
+    
+    formDropdown.innerHTML = '<option value="">Выберите форму</option>';
 
-        if (selectedCity) {
-            const availableForms = [...new Set(greenhouses
-                .filter(g => g.city_name === selectedCity)
-                .map(g => g.form_name))];
+    if (selectedCity) {
+        // Группируем данные по форме
+        const availableForms = [...new Set(greenhouses
+            .filter(g => g.city_name === selectedCity)
+            .map(g => greenhouseData[g.form_name]?.form)
+            .filter(Boolean))];
 
-            availableForms.forEach(form => {
-                const option = document.createElement('option');
-                option.value = form;
-                option.textContent = form;
-                formDropdown.appendChild(option);
-            });
-        }
-    });
+        availableForms.forEach(form => {
+            const option = document.createElement('option');
+            option.value = form;
+            option.textContent = form;
+            formDropdown.appendChild(option);
+        });
+    }
+});
 }
 
 function populateDropdowns(greenhouses) {
