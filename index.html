@@ -361,7 +361,7 @@
                     console.error('Ошибка при получении данных:', error);
                     return [];
                 }
-                console.log('Данные из Supabase:', data); // Добавлен вывод данных в консоль
+                console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
                     return data;
             }
 
