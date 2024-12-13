@@ -336,6 +336,12 @@
 
             let greenhouses = [];
 
+            // Загружаем данные теплиц при загрузке страницы
+window.onload = async function() {
+    allGreenhouses = await fetchGreenhouses();
+    console.log("Загруженные данные теплиц:", allGreenhouses);
+};
+
             // Пользователи
             const users = [
                 { login: "admin", password: "Admin#2024" },
