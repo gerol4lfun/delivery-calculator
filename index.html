@@ -421,33 +421,30 @@ function populateDropdowns(greenhouses) {
     const form = document.getElementById("form").value;
     const frameSelect = document.getElementById("frame");
 
-    // Сброс опций каркасов
-    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
-
     console.log("Выбранная форма теплицы:", form);
 
-    // Если форма теплицы не выбрана, показываем все каркасы
-    if (!form) {
-        const allFrames = [...new Set(greenhouses.map(g => g.frame_description).filter(Boolean))];
-        console.log("Все каркасы (без фильтра):", allFrames);
-        allFrames.forEach(frame => {
-            const option = document.createElement("option");
-            option.value = frame;
-            option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
-            frameSelect.add(option);
-        });
+    // Сброс текущих опций
+    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+
+    // Если форма не выбрана, выходим
+    if (!form) return;
+
+    // Фильтруем доступные каркасы
+    const availableFrames = greenhouses
+        .filter(g => g.form_name === form) // Сравниваем форму из данных
+        .map(g => g.frame_description) // Получаем только описания каркасов
+        .filter((value, index, self) => self.indexOf(value) === index); // Убираем дубликаты
+
+    console.log("Все каркасы (без фильтра):", greenhouses.map(g => g.frame_description));
+    console.log("Доступные каркасы для формы", form, ":", availableFrames);
+
+    // Если доступных каркасов нет
+    if (availableFrames.length === 0) {
+        console.warn("Нет доступных каркасов для выбранной формы:", form);
         return;
     }
 
-    // Фильтруем доступные каркасы по выбранной форме теплицы
-    const availableFrames = greenhouses
-        .filter(g => g.form_name === form)
-        .map(g => g.frame_description)
-        .filter((value, index, self) => self.indexOf(value) === index); // Уникальные значения
-
-    console.log("Доступные каркасы для формы", form, ":", availableFrames);
-
-    // Заполняем выпадающий список доступными каркасами
+    // Заполняем выпадающий список каркасов
     availableFrames.forEach(frame => {
         const option = document.createElement("option");
         option.value = frame;
