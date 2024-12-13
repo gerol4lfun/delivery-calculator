@@ -422,25 +422,43 @@ async function fetchGreenhouses() {
 async function loadGreenhouses() {
     greenhouses = await fetchGreenhouses();
     populateDropdowns(greenhouses);
+
+    // Добавляем обработчик для изменения города
+    document.getElementById('city').addEventListener('change', function () {
+        const selectedCity = this.value;
+        const formDropdown = document.getElementById('form');
+        
+        formDropdown.innerHTML = '<option value="">Выберите форму</option>';
+
+        if (selectedCity) {
+            const availableForms = [...new Set(greenhouses
+                .filter(g => g.city_name === selectedCity)
+                .map(g => g.form_name))];
+
+            availableForms.forEach(form => {
+                const option = document.createElement('option');
+                option.value = form;
+                option.textContent = form;
+                formDropdown.appendChild(option);
+            });
+        }
+    });
 }
 
 function populateDropdowns(greenhouses) {
+    const cityDropdown = document.getElementById('city');
+    const formDropdown = document.getElementById('form');
     const frameDropdown = document.getElementById('frame');
     const polycarbonateDropdown = document.getElementById('polycarbonate');
-    const cityDropdown = document.getElementById('city');
 
     // Очистка текущих опций, кроме первой
+    cityDropdown.innerHTML = '<option value="">Выберите город</option>';
+    formDropdown.innerHTML = '<option value="">Выберите форму</option>';
     frameDropdown.innerHTML = '<option value="">Выберите каркас</option>';
     polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
-    cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
-    console.log("Данные для городов:", greenhouses.map(g => g.city_name));
-
-    // Уникальные города
+    // Добавляем уникальные города в список
     const cities = [...new Set(greenhouses.map(g => g.city_name).filter(Boolean))];
-    console.log("Уникальные города:", cities);
-
-    // Заполнение выпадающего списка городов
     cities.forEach(city => {
         const option = document.createElement('option');
         option.value = city;
@@ -448,10 +466,17 @@ function populateDropdowns(greenhouses) {
         cityDropdown.appendChild(option);
     });
 
-    // Заполнение выпадающего списка каркасов
-    const frames = [...new Set(greenhouses.map(g => g.frame_description).filter(Boolean))];
-    console.log("Уникальные каркасы:", frames);
+    // Добавляем уникальные формы теплиц
+    const forms = [...new Set(greenhouses.map(g => g.form_name).filter(Boolean))];
+    forms.forEach(form => {
+        const option = document.createElement('option');
+        option.value = form;
+        option.textContent = form;
+        formDropdown.appendChild(option);
+    });
 
+    // Добавляем уникальные каркасы
+    const frames = [...new Set(greenhouses.map(g => g.frame_description).filter(Boolean))];
     frames.forEach(frame => {
         const option = document.createElement('option');
         option.value = frame;
@@ -459,10 +484,8 @@ function populateDropdowns(greenhouses) {
         frameDropdown.appendChild(option);
     });
 
-    // Заполнение выпадающего списка поликарбонатов
+    // Добавляем уникальные типы поликарбоната
     const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate_type).filter(Boolean))];
-    console.log("Уникальные поликарбонаты:", polycarbons);
-
     polycarbons.forEach(poly => {
         const option = document.createElement('option');
         option.value = poly;
@@ -470,6 +493,7 @@ function populateDropdowns(greenhouses) {
         polycarbonateDropdown.appendChild(option);
     });
 }
+            
             function updateFrameOptions() {
     const form = document.getElementById("form").value;
     const frameSelect = document.getElementById("frame");
