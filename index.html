@@ -388,10 +388,17 @@
                     const option = document.createElement('option');
                     option.value = frame;
                     // Преобразование названия каркаса, например, из "оцинкованная труба 40х20 мм" в "40х20"
-                    const displayName = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
-                    option.textContent = displayName;
-                    frameDropdown.appendChild(option);
-                });
+                    const frames = [...new Set(greenhouses.map(g => g.frame).filter(Boolean))];
+                    frames.forEach(frame => {
+                        const option = document.createElement('option');
+                        option.value = frame;
+                        const displayName = frame
+                            ? frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '')
+                            : 'Неизвестный каркас';
+                        option.textContent = displayName;
+                        frameDropdown.appendChild(option);
+                    });
+
 
                 // Заполнение выпадающего списка поликарбонатов
                 const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate))];
