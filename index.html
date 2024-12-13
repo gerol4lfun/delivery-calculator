@@ -465,34 +465,48 @@ function populateDropdowns(greenhouses) {
     });
 }
             function updateFrameOptions() {
-    const form = document.getElementById("form").value;
-    const frameSelect = document.getElementById("frame");
+    const form = document.getElementById("form").value; // Получаем выбранную форму
+    const frameSelect = document.getElementById("frame"); // Выпадающий список для каркасов
 
     console.log("Выбранная форма теплицы:", form);
 
     // Сброс текущих опций
     frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-    // Фильтруем по форме
+    // Если форма не выбрана, выходим
+    if (!form) return;
+
+    // Ищем данные по форме
     const matchingGreenhouses = Object.entries(greenhouseData).filter(
         ([name, data]) => data.form === form
     );
 
-    if (!matchingGreenhouses.length) {
-        console.warn("Нет доступных каркасов для выбранной формы:", form);
+    // Если соответствующих теплиц нет
+    if (matchingGreenhouses.length === 0) {
+        console.warn("Нет данных для формы:", form);
         return;
     }
 
-    const uniqueFrames = [...new Set(matchingGreenhouses.flatMap(([name, data]) => data.frames))];
+    // Получаем уникальные каркасы
+    const uniqueFrames = [
+        ...new Set(matchingGreenhouses.flatMap(([name, data]) => data.frames))
+    ];
+
     console.log("Доступные каркасы для формы", form, ":", uniqueFrames);
 
-    // Заполняем выпадающий список
+    // Заполняем выпадающий список каркасов
     uniqueFrames.forEach(frame => {
         const option = document.createElement("option");
         option.value = frame;
-        option.textContent = frame;
+        option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
         frameSelect.add(option);
     });
+
+    // Если доступен только один каркас, выбираем его автоматически
+    if (uniqueFrames.length === 1) {
+        frameSelect.value = uniqueFrames[0];
+        console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+    }
 }
             // Функция Авторизации
             function authenticate() {
