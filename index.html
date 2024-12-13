@@ -426,6 +426,9 @@ function populateDropdowns(greenhouses) {
     const frameSelect = document.getElementById("frame");
 
     console.log("Выбранная форма теплицы:", form);
+                
+                const matchingGreenhouses = greenhouses.filter(g => g.form_name === form);
+console.log("Теплицы с формой:", form, matchingGreenhouses);
 
     // Сброс текущих опций
     frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
