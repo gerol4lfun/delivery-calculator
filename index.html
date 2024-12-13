@@ -443,36 +443,43 @@ function populateDropdowns(greenhouses) {
     });
 }
             function updateFrameOptions() {
-    const form = document.getElementById("form").value;
-    const frameSelect = document.getElementById("frame");
+    const form = document.getElementById("form").value; // Выбранная форма
+    const frameSelect = document.getElementById("frame"); // Список каркасов
 
     console.log("Выбранная форма теплицы:", form);
 
-    // Сброс текущих опций
+    // Сбрасываем текущие опции
     frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-    // Если форма не выбрана, выходим
+    // Если форма не выбрана, ничего не делаем
     if (!form) return;
 
-    // Ищем данные по форме
-    const matchingGreenhouses = Object.entries(greenhouseData).find(
+    // Ищем соответствующую запись в greenhouseData
+    const matchingEntry = Object.entries(greenhouseData).find(
         ([name, data]) => data.form === form
     );
 
-    if (!matchingGreenhouses) {
+    if (!matchingEntry) {
         console.warn("Нет данных для формы:", form);
         return;
     }
 
-    const [, { frames }] = matchingGreenhouses;
+    const [, { frames }] = matchingEntry;
 
     console.log("Доступные каркасы для формы", form, ":", frames);
 
-    // Заполняем выпадающий список каркасов
+    // Если только один вариант каркаса, выбираем его автоматически
+    if (frames.length === 1) {
+        frameSelect.innerHTML = `<option value="${frames[0]}">${frames[0]}</option>`;
+        console.log("Автоматически выбран каркас:", frames[0]);
+        return;
+    }
+
+    // Если вариантов больше одного, заполняем список
     frames.forEach(frame => {
         const option = document.createElement("option");
         option.value = frame;
-        option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
+        option.textContent = frame;
         frameSelect.add(option);
     });
 }
