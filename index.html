@@ -359,19 +359,19 @@
 
                 if (error) {
                     console.error('Ошибка при получении данных:', error);
-                    return [];
-                }
-                console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
-                    return data;
-            }
+return [];
+}
+console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
+return data;
+}
 
-            // Функция для загрузки данных и заполнения выпадающих списков
-            async function loadGreenhouses() {
-                greenhouses = await fetchGreenhouses();
-                populateDropdowns(greenhouses);
-            }
+// Функция для загрузки данных и заполнения выпадающих списков
+async function loadGreenhouses() {
+    greenhouses = await fetchGreenhouses();
+    populateDropdowns(greenhouses);
+}
 
-            function populateDropdowns(greenhouses) {
+function populateDropdowns(greenhouses) {
     const frameDropdown = document.getElementById('frame');
     const polycarbonateDropdown = document.getElementById('polycarbonate');
     const cityDropdown = document.getElementById('city');
@@ -381,11 +381,13 @@
     polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
     cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
-            console.log("Данные для городов:", greenhouses.map(g => g.city_name));
+    console.log("Данные для городов:", greenhouses.map(g => g.city_name));
 
+    // Уникальные города
+    const cities = [...new Set(greenhouses.map(g => g.city_name).filter(Boolean))];
+    console.log("Уникальные города:", cities);
 
     // Заполнение выпадающего списка городов
-    const cities = [...new Set(greenhouses.map(g => g.city_name).filter(Boolean))];
     cities.forEach(city => {
         const option = document.createElement('option');
         option.value = city;
@@ -395,6 +397,8 @@
 
     // Заполнение выпадающего списка каркасов
     const frames = [...new Set(greenhouses.map(g => g.frame_description).filter(Boolean))];
+    console.log("Уникальные каркасы:", frames);
+
     frames.forEach(frame => {
         const option = document.createElement('option');
         option.value = frame;
@@ -404,6 +408,8 @@
 
     // Заполнение выпадающего списка поликарбонатов
     const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate_type).filter(Boolean))];
+    console.log("Уникальные поликарбонаты:", polycarbons);
+
     polycarbons.forEach(poly => {
         const option = document.createElement('option');
         option.value = poly;
