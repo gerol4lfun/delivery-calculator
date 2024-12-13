@@ -411,28 +411,6 @@
         cityDropdown.appendChild(option);
     });
 }
-±
-
-
-                // Заполнение выпадающего списка поликарбонатов
-                const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate))];
-                polycarbons.forEach(poly => {
-                    const option = document.createElement('option');
-                    option.value = poly;
-                    option.textContent = poly;
-                    polycarbonateDropdown.appendChild(option);
-                });
-
-                // Заполнение выпадающего списка городов
-                const cities = [...new Set(greenhouses.map(g => g.Город))];
-                cities.forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.textContent = city;
-                    cityDropdown.add(option);
-                });
-            }
-
             // Функция для обновления опций каркаса на основе выбранной формы
             function updateFrameOptions() {
                 const form = document.getElementById("form").value;
@@ -459,26 +437,27 @@
 
             // Функция Авторизации
             function authenticate() {
-                const loginInput = document.getElementById("login");
-                const passwordInput = document.getElementById("password");
-                const login = loginInput.value.trim();
-                const password = passwordInput.value.trim();
-                const authError = document.getElementById("auth-error");
+    const loginInput = document.getElementById("login");
+    const passwordInput = document.getElementById("password");
+    const login = loginInput.value.trim();
+    const password = passwordInput.value.trim();
+    const authError = document.getElementById("auth-error");
 
-                // Скрыть сообщение об ошибке при каждом новом вводе
-                authError.style.display = "none";
+    // Скрыть сообщение об ошибке при каждом новом вводе
+    authError.style.display = "none";
 
-                const user = users.find(u => u.login === login && u.password === password);
+    const user = users.find(u => u.login === login && u.password === password);
 
-                if (user) {
-                    localStorage.setItem('savedLogin', login);
-                    document.getElementById("auth-container").classList.add("hidden");
-                    document.getElementById("calculator-container").classList.remove("hidden");
-                    initializeCalculator();
-                } else {
-                    authError.style.display = "block";
-                }
-            }
+    if (user) {
+        localStorage.setItem('savedLogin', login);
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("calculator-container").classList.remove("hidden");
+        initializeCalculator();
+    } else {
+        authError.style.display = "block";
+    }
+}
+
 
             // Функция Logout
             function logout() {
