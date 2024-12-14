@@ -827,38 +827,6 @@ function populateDropdowns(greenhouses) {
                 }
             }
             
-         // Расчет базовой стоимости
-                    let basePrice = data.base_price; // Убедитесь, что такое поле существует
-
-                    // Расчет стоимости дополнительных услуг
-                    const assembly = document.getElementById('assembly').checked ? 5000 : 0;
-                    const bracing = document.getElementById('bracing').checked ? 2000 : 0;
-                    const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
-
-                    // Расчет стоимости дополнительных товаров
-                    const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
-                    const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
-                    const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
-
-                    const additionalServices = assembly + bracing + groundHooks;
-                    const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
-
-                    // Расчет стоимости шага дуг
-                    const arcCost = arcStep * 1000; // Пример: 1000 руб. за каждый метр шага дуг
-
-                    // Итоговая стоимость
-                    const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
-
-                    // Округление до ближайших 50 рублей
-                    const roundedPrice = Math.ceil(totalPrice / 50) * 50;
-
-                    // Вывод результата
-                    document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб. (${data.Название})`;
-                } catch (fetchError) {
-                    console.error('Ошибка при получении данных для расчета:', fetchError);
-                    document.getElementById("summary").innerText = "Произошла ошибка при расчёте.";
-                }
-            }
 
             // Функция для инициализации калькулятора после авторизации
             async function initializeCalculator() {
