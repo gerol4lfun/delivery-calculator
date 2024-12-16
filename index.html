@@ -214,7 +214,7 @@
                 
                 <div class="parameters">
                     <label for="city">Город:</label>
-                    <select id="city" onchange="updateFrameOptions()">
+                    <select id="city">
                         <option value="">Выберите город</option>
                         <!-- Опции будут загружены через JavaScript -->
                     </select>
@@ -222,15 +222,9 @@
 
                 <div class="parameters">
                     <label for="form">Форма теплицы:</label>
-                    <select id="form" onchange="updateFrameOptions()">
+                    <select id="form">
                         <option value="">Выберите форму</option>
-                        <option value="Арочная">Арочная</option>
-                        <option value="Каплевидная">Каплевидная</option>
-                        <option value="Прямостенная">Прямостенная</option>
-                        <option value="Домиком">Домиком</option>
-                        <option value="По митлайдеру">По митлайдеру</option>
-                        <option value="Пристенная">Пристенная</option>
-                        <option value="Промышленная">Промышленная</option>
+                        <!-- Опции будут загружены через JavaScript -->
                     </select>
                 </div>
 
@@ -336,12 +330,6 @@
 
             let greenhouses = [];
 
-            // Загружаем данные теплиц при загрузке страницы
-window.onload = async function() {
-    allGreenhouses = await fetchGreenhouses();
-    console.log("Загруженные данные теплиц:", allGreenhouses);
-};
-
             // Пользователи
             const users = [
                 { login: "admin", password: "Admin#2024" },
@@ -356,219 +344,225 @@ window.onload = async function() {
                 { login: "Manager9", password: "Mng9!Control" },
                 { login: "Manager10", password: "Mng10#Secure" }
             ];
-            
-// Таблица соответствий: название теплицы, форма, каркас
-const greenhouseData = {
-    "ТЕПЛИЦА БОЯРСКАЯ 2.5М": { form: "Арочная", frames: ["20х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ 3М": { form: "Арочная", frames: ["20х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М": { form: "Арочная", frames: ["40х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М": { form: "Арочная", frames: ["40х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М": { form: "Арочная", frames: ["40х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М": { form: "Арочная", frames: ["20х20+20х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М": { form: "Арочная", frames: ["20х20+20х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М": { form: "Арочная", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М": { form: "Арочная", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М": { form: "Арочная", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М": { form: "Арочная", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА КАПЛЕВИДНАЯ СТРЕЛЕЦКАЯ 2.5М": { form: "Каплевидная", frames: ["40х20"] },
-    "ТЕПЛИЦА КАПЛЕВИДНАЯ СТРЕЛЕЦКАЯ 3М": { form: "Каплевидная", frames: ["40х20"] },
-    "ТЕПЛИЦА КАПЛЕВИДНАЯ СТРЕЛЕЦКАЯ 3.5М": { form: "Каплевидная", frames: ["40х20"] },
-    "ТЕПЛИЦА ДОМИКОМ ЛЮКС 2.5М": { form: "Домиком", frames: ["40х20"] },
-    "ТЕПЛИЦА ДОМИКОМ ЛЮКС 3М": { form: "Домиком", frames: ["40х20"] },
-    "ТЕПЛИЦА ДОМИКОМ ЛЮКС 3.5М": { form: "Домиком", frames: ["40х20"] },
-    "ТЕПЛИЦА ДОМИКОМ ПРЕМИУМ 2.5М": { form: "Домиком", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА ДОМИКОМ ПРЕМИУМ 3М": { form: "Домиком", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА ДОМИКОМ ПРЕМИУМ 3.5М": { form: "Домиком", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА ДОМИКОМ ПРЕМИУМ 4М": { form: "Домиком", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М": { form: "Митлайдер арочная", frames: ["40х20"] },
-    "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М": { form: "Митлайдер арочная", frames: ["40х20"] },
-    "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М": { form: "Митлайдер арочная", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М": { form: "Митлайдер арочная", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М": { form: "Митлайдер прямостенная", frames: ["40х20+40х20"] },
-    "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М": { form: "Митлайдер прямостенная", frames: ["40х20+40х20"] },
-    "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М": { form: "Пристенная", frames: ["40х20"] },
-    "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М": { form: "Пристенная", frames: ["40х20"] },
-    "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М": { form: "Пристенная", frames: ["40х20+20х20"] },
-    "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М": { form: "Пристенная", frames: ["40х20+20х20"] },
-    "НАВЕС ЛЮКС 3.5М": { form: "Навес", frames: ["40х20+20х20"] },
-    "НАВЕС ЛЮКС 4М": { form: "Навес", frames: ["40х20+20х20"] },
-    "НАВЕС ЛЮКС 5М": { form: "Навес", frames: ["40х20+20х20"] },
-    "НАВЕС ЛЮКС 6М": { form: "Навес", frames: ["40х20+20х20"] },
-    "ПРОМЫШЛЕННАЯ ПРЕМЬЕР 5М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
-    "ПРОМЫШЛЕННАЯ ПРЕМЬЕР 6М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
-    "ПРОМЫШЛЕННАЯ МОНАРХ 7М": { form: "Промышленная домиком", frames: ["40х20+40х20"] },
-    "ПРОМЫШЛЕННАЯ МОНАРХ 8М": { form: "Промышленная домиком", frames: ["40х20+40х20"] }
-};
+
+            // Таблица соответствий: название теплицы, форма, каркас
+            const greenhouseData = {
+                "ТЕПЛИЦА БОЯРСКАЯ 2.5М": { form: "Арочная", frames: ["20х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ 3М": { form: "Арочная", frames: ["20х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М": { form: "Арочная", frames: ["40х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М": { form: "Арочная", frames: ["40х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М": { form: "Арочная", frames: ["40х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М": { form: "Арочная", frames: ["20х20+20х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М": { form: "Арочная", frames: ["20х20+20х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М": { form: "Арочная", frames: ["40х20+20х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М": { form: "Арочная", frames: ["40х20+20х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М": { form: "Арочная", frames: ["40х20+20х20"] },
+                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М": { form: "Арочная", frames: ["40х20+20х20"] },
+
+                // КАПЛЕВИДНАЯ
+                "ТЕПЛИЦА КАПЛЕВИДНАЯ СТРЕЛЕЦКАЯ 2.5М": { form: "Каплевидная", frames: ["40х20"] },
+                "ТЕПЛИЦА КАПЛЕВИДНАЯ СТРЕЛЕЦКАЯ 3М": { form: "Каплевидная", frames: ["40х20"] },
+                "ТЕПЛИЦА КАПЛЕВИДНАЯ СТРЕЛЕЦКАЯ 3.5М": { form: "Каплевидная", frames: ["40х20"] },
+
+                // ЦАРСКАЯ
+                "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М": { form: "Прямостенная", frames: ["40х20"] },
+                "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М": { form: "Прямостенная", frames: ["40х20"] },
+                "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М": { form: "Прямостенная", frames: ["40х20"] },
+                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М": { form: "Прямостенная", frames: ["40х20"] },
+                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М": { form: "Прямостенная", frames: ["40х20"] },
+                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М": { form: "Прямостенная", frames: ["40х20"] },
+                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М": { form: "Прямостенная", frames: ["40х20"] },
+
+                // МИТЛАЙДЕР
+                "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М": { form: "Митлайдер арочная", frames: ["40х20"] },
+                "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М": { form: "Митлайдер арочная", frames: ["40х20"] },
+                "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М": { form: "Митлайдер арочная", frames: ["40х20+20х20"] },
+                "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М": { form: "Митлайдер арочная", frames: ["40х20+20х20"] },
+                "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М": { form: "Митлайдер прямостенная", frames: ["40х20+40х20"] },
+                "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М": { form: "Митлайдер прямостенная", frames: ["40х20+40х20"] },
+
+                // ПРОМЫШЛЕННЫЕ
+                "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
+                "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
+                "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М": { form: "Промышленная домиком", frames: ["40х20+40х20"] },
+                "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М": { form: "Промышленная домиком", frames: ["40х20+40х20"] },
+
+                // НАВЕСЫ
+                "НАВЕС ЛЮКС 3.5М": { form: "Навес", frames: ["40х20+20х20"] },
+                "НАВЕС ЛЮКС 4М": { form: "Навес", frames: ["40х20+20х20"] },
+                "НАВЕС ЛЮКС 5М": { form: "Навес", frames: ["40х20+20х20"] },
+                "НАВЕС ЛЮКС 6М": { form: "Навес", frames: ["40х20+20х20"] }
+            };
 
             // Функция для получения данных о теплицах
-async function fetchGreenhouses() {
-    let { data, error } = await supabaseClient
-        .from('prices')
-        .select('*');
+            async function fetchGreenhouses() {
+                let { data, error } = await supabaseClient
+                    .from('prices')
+                    .select('*');
 
-    if (error) {
-        console.error('Ошибка при получении данных:', error);
-        return [];
-    }
+                if (error) {
+                    console.error('Ошибка при получении данных:', error);
+                    return [];
+                }
 
-// Лог доступных форм теплиц
-console.log("Доступные формы теплиц:", [...new Set(data.map(g => g.form_name))]);
-console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
+                // Лог доступных форм теплиц
+                console.log("Доступные формы теплиц:", [...new Set(data.map(g => g.form_name))]);
+                console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
 
-return data;
-}
+                return data;
+            }
 
-// Функция для загрузки данных и заполнения выпадающих списков
-async function loadGreenhouses() {
-    greenhouses = await fetchGreenhouses();
-    populateDropdowns(greenhouses);
+            // Функция для загрузки данных и заполнения выпадающих списков
+            async function loadGreenhouses() {
+                greenhouses = await fetchGreenhouses();
+                populateDropdowns(greenhouses);
 
-    // Добавляем обработчик для изменения города
-    document.getElementById('city').addEventListener('change', function () {
-        const selectedCity = this.value;
-        const formDropdown = document.getElementById('form');
-        
-        formDropdown.innerHTML = '<option value="">Выберите форму</option>';
+                // Добавляем обработчик для изменения города
+                document.getElementById('city').addEventListener('change', function () {
+                    const selectedCity = this.value;
+                    const formDropdown = document.getElementById('form');
+                    
+                    formDropdown.innerHTML = '<option value="">Выберите форму</option>';
 
-        if (selectedCity) {
-            // Группируем данные по форме
-            const availableForms = [...new Set(greenhouses
-                .filter(g => g.city_name === selectedCity)
-                .map(g => greenhouseData[g.form_name]?.form)
-                .filter(Boolean))];
+                    if (selectedCity) {
+                        // Группируем данные по форме
+                        const availableForms = [...new Set(greenhouses
+                            .filter(g => g.city_name === selectedCity)
+                            .map(g => greenhouseData[g.form_name]?.form)
+                            .filter(Boolean))];
 
-            availableForms.forEach(form => {
-                const option = document.createElement('option');
-                option.value = form;
-                option.textContent = form;
-                formDropdown.appendChild(option);
-            });
-        }
-    }); // Закрываем обработчик addEventListener
-} // Закрываем функцию loadGreenhouses
+                        availableForms.forEach(form => {
+                            const option = document.createElement('option');
+                            option.value = form;
+                            option.textContent = form;
+                            formDropdown.appendChild(option);
+                        });
+                    }
+                }); // Закрываем обработчик addEventListener
+            } // Закрываем функцию loadGreenhouses
 
-function populateDropdowns(greenhouses) {
-    const cityDropdown = document.getElementById('city');
-    const formDropdown = document.getElementById('form');
-    const frameDropdown = document.getElementById('frame');
-    const polycarbonateDropdown = document.getElementById('polycarbonate');
+            function populateDropdowns(greenhouses) {
+                const cityDropdown = document.getElementById('city');
+                const formDropdown = document.getElementById('form');
+                const frameDropdown = document.getElementById('frame');
+                const polycarbonateDropdown = document.getElementById('polycarbonate');
 
+                // Очистка текущих опций, кроме первой
+                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
+                formDropdown.innerHTML = '<option value="">Выберите форму</option>';
+                frameDropdown.innerHTML = '<option value="">Выберите каркас</option>';
+                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
 
-    // Очистка текущих опций, кроме первой
-    cityDropdown.innerHTML = '<option value="">Выберите город</option>';
-    formDropdown.innerHTML = '<option value="">Выберите форму</option>';
-    frameDropdown.innerHTML = '<option value="">Выберите каркас</option>';
-    polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
+                // Добавляем уникальные города в список
+                const cities = [...new Set(greenhouses.map(g => g.city_name).filter(Boolean))];
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    cityDropdown.appendChild(option);
+                });
 
-    // Добавляем уникальные города в список
-    const cities = [...new Set(greenhouses.map(g => g.city_name).filter(Boolean))];
-    cities.forEach(city => {
-        const option = document.createElement('option');
-        option.value = city;
-        option.textContent = city;
-        cityDropdown.appendChild(option);
-    });
+                // Добавляем уникальные формы теплиц из greenhouseData
+                const forms = [...new Set(Object.values(greenhouseData).map(g => g.form))];
+                forms.forEach(form => {
+                    const option = document.createElement('option');
+                    option.value = form;
+                    option.textContent = form;
+                    formDropdown.appendChild(option);
+                });
 
-    // Добавляем уникальные формы теплиц
-    const forms = [...new Set(greenhouses.map(g => g.form_name).filter(Boolean))];
-    forms.forEach(form => {
-        const option = document.createElement('option');
-        option.value = form;
-        option.textContent = form;
-        formDropdown.appendChild(option);
-    });
+                // Добавляем уникальные каркасы из greenhouseData
+                const frames = [...new Set(Object.values(greenhouseData).flatMap(g => g.frames))];
+                frames.forEach(frame => {
+                    const option = document.createElement('option');
+                    option.value = frame;
+                    option.textContent = frame;
+                    frameDropdown.appendChild(option);
+                });
 
-    // Добавляем уникальные каркасы
-    const frames = [...new Set(greenhouses.map(g => g.frame_description).filter(Boolean))];
-    frames.forEach(frame => {
-        const option = document.createElement('option');
-        option.value = frame;
-        option.textContent = frame.replace(/оцинкованная труба\s*/, '').replace(/\s*мм$/, '');
-        frameDropdown.appendChild(option);
-    });
+                // Добавляем уникальные типы поликарбоната из Supabase
+                const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate_type).filter(Boolean))];
+                polycarbons.forEach(poly => {
+                    const option = document.createElement('option');
+                    option.value = poly;
+                    option.textContent = poly;
+                    polycarbonateDropdown.appendChild(option);
+                });
+            }
 
-    // Добавляем уникальные типы поликарбоната
-    const polycarbons = [...new Set(greenhouses.map(g => g.polycarbonate_type).filter(Boolean))];
-    polycarbons.forEach(poly => {
-        const option = document.createElement('option');
-        option.value = poly;
-        option.textContent = poly;
-        polycarbonateDropdown.appendChild(option);
-    });
-}
-            
             function updateFrameOptions() {
-    const form = document.getElementById("form").value;
-    const frameSelect = document.getElementById("frame");
+                const form = document.getElementById("form").value;
+                const frameSelect = document.getElementById("frame");
 
-    console.log("Выбранная форма теплицы:", form);
+                console.log("Выбранная форма теплицы:", form);
 
-    // Сброс текущих опций
-    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+                // Сброс текущих опций
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-    // Если форма не выбрана, выходим
-    if (!form) {
-        console.warn("Форма теплицы не выбрана!");
-        return;
-    }
+                // Если форма не выбрана, выходим
+                if (!form) {
+                    console.warn("Форма теплицы не выбрана!");
+                    return;
+                }
 
-    // Ищем данные по форме
-    const matchingGreenhouses = Object.entries(greenhouseData).filter(
-        ([name, data]) => data.form === form
-    );
+                // Извлекаем доступные каркасы из greenhouseData на основе выбранной формы
+                const matchingGreenhouses = Object.entries(greenhouseData).filter(
+                    ([name, data]) => data.form === form
+                );
 
-    console.log("Найденные теплицы для формы:", form, matchingGreenhouses);
+                console.log("Найденные теплицы для формы:", form, matchingGreenhouses);
 
-    if (matchingGreenhouses.length === 0) {
-        console.warn("Нет доступных данных для выбранной формы:", form);
-        return;
-    }
+                if (matchingGreenhouses.length === 0) {
+                    console.warn("Нет доступных данных для выбранной формы:", form);
+                    return;
+                }
 
-    // Извлекаем все доступные каркасы для формы
-    const uniqueFrames = [
-        ...new Set(
-            matchingGreenhouses.flatMap(([name, data]) => data.frames)
-        ),
-    ];
+                // Извлекаем все доступные каркасы для формы
+                const uniqueFrames = [
+                    ...new Set(
+                        matchingGreenhouses.flatMap(([name, data]) => data.frames)
+                    ),
+                ];
 
-    console.log("Доступные каркасы для формы", form, ":", uniqueFrames);
+                console.log("Доступные каркасы для формы", form, ":", uniqueFrames);
 
-    // Заполняем выпадающий список каркасов
-    uniqueFrames.forEach((frame) => {
-        const option = document.createElement("option");
-        option.value = frame;
-        option.textContent = frame;
-        frameSelect.add(option);
-    });
+                // Заполняем выпадающий список каркасов
+                uniqueFrames.forEach((frame) => {
+                    const option = document.createElement("option");
+                    option.value = frame;
+                    option.textContent = frame;
+                    frameSelect.add(option);
+                });
 
-    // Если доступен только один вариант, выбираем его автоматически
-    if (uniqueFrames.length === 1) {
-        frameSelect.value = uniqueFrames[0];
-        console.log("Автоматически выбран каркас:", uniqueFrames[0]);
-    }
-}
+                // Если доступен только один вариант, выбираем его автоматически
+                if (uniqueFrames.length === 1) {
+                    frameSelect.value = uniqueFrames[0];
+                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+                }
+            }
+
             // Функция Авторизации
             function authenticate() {
-    const loginInput = document.getElementById("login");
-    const passwordInput = document.getElementById("password");
-    const login = loginInput.value.trim();
-    const password = passwordInput.value.trim();
-    const authError = document.getElementById("auth-error");
+                const loginInput = document.getElementById("login");
+                const passwordInput = document.getElementById("password");
+                const login = loginInput.value.trim();
+                const password = passwordInput.value.trim();
+                const authError = document.getElementById("auth-error");
 
-    // Скрыть сообщение об ошибке при каждом новом вводе
-    authError.style.display = "none";
+                // Скрыть сообщение об ошибке при каждом новом вводе
+                authError.style.display = "none";
 
-    const user = users.find(u => u.login === login && u.password === password);
+                const user = users.find(u => u.login === login && u.password === password);
 
-    if (user) {
-        localStorage.setItem('savedLogin', login);
-        document.getElementById("auth-container").classList.add("hidden");
-        document.getElementById("calculator-container").classList.remove("hidden");
-        initializeCalculator();
-    } else {
-        authError.style.display = "block";
-    }
-}
+                if (user) {
+                    localStorage.setItem('savedLogin', login);
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    initializeCalculator();
+                } else {
+                    authError.style.display = "block";
+                }
+            }
 
 
             // Функция Logout
@@ -595,20 +589,19 @@ function populateDropdowns(greenhouses) {
                     return;
                 }
 
-                // Преобразование названий, если необходимо
-                // Например, из "40х20" обратно в "оцинкованная труба 40х20 мм"
+                // Преобразование названий каркаса для запроса к Supabase
                 const fullFrameName = `оцинкованная труба ${frame} мм`;
 
                 // Получение данных из Supabase, соответствующих выбранным параметрам
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('*')
-                    .eq('Город', city)
-                    .eq('Форма', form)
-                    .eq('Ширина', width)
-                    .eq('Длина', length)
-                    .eq('frame', fullFrameName)
-                    .eq('polycarbonate', polycarbonate)
+                    .eq('city_name', city)
+                    .eq('form_name', form)
+                    .eq('width', width)
+                    .eq('length', length)
+                    .eq('frame_description', fullFrameName)
+                    .eq('polycarbonate_type', polycarbonate)
                     .single();
 
                 if (error || !data) {
@@ -618,7 +611,7 @@ function populateDropdowns(greenhouses) {
                 }
 
                 // Расчет базовой стоимости
-                let basePrice = data.base_price; // Убедитесь, что такое поле существует
+                let basePrice = data.price; // Убедитесь, что поле называется 'price'
 
                 // Расчет стоимости дополнительных услуг
                 const assembly = document.getElementById('assembly').checked ? 5000 : 0;
@@ -643,7 +636,7 @@ function populateDropdowns(greenhouses) {
                 const roundedPrice = Math.ceil(totalPrice / 50) * 50;
 
                 // Вывод результата
-                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб. (${data.Название})`;
+                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
             }
 
             // Загрузка данных о теплицах при загрузке страницы
@@ -826,7 +819,6 @@ function populateDropdowns(greenhouses) {
                     document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
                 }
             }
-            
 
             // Функция для инициализации калькулятора после авторизации
             async function initializeCalculator() {
@@ -836,9 +828,7 @@ function populateDropdowns(greenhouses) {
                 }
             }
 
-            // Функция Расчета Доставки (переопределена один раз)
-            // Уже определена выше
-
         </script>
-    </body>
+    </div>
+</body>
 </html>
