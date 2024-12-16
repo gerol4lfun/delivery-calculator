@@ -341,39 +341,6 @@
                 { login: "Manager10", password: "Mng10#Secure" }
             ];
 
-            // Функция аутентификации
-            function authenticate() {
-                const loginInput = document.getElementById("login");
-                const passwordInput = document.getElementById("password");
-                const authError = document.getElementById("auth-error");
-
-                const login = loginInput.value.trim();
-                const password = passwordInput.value.trim();
-
-                // Проверяем логин и пароль
-                const user = users.find(u => u.login === login && u.password === password);
-
-                if (user) {
-                    // Если пользователь найден, скрываем окно авторизации и показываем калькулятор
-                    authError.style.display = "none";
-                    localStorage.setItem('savedLogin', login); // Сохраняем логин
-                    document.getElementById("auth-container").classList.add("hidden");
-                    document.getElementById("calculator-container").classList.remove("hidden");
-                    // Дополнительно вы можете вызвать initializeCalculator(), если это требуется
-                    initializeCalculator();
-                } else {
-                    // Если пользователь не найден — показываем ошибку
-                    authError.style.display = "block";
-                }
-            }
-
-            // Функция выхода
-            function logout() {
-                localStorage.removeItem('savedLogin');
-                document.getElementById("auth-container").classList.remove("hidden");
-                document.getElementById("calculator-container").classList.add("hidden");
-            }
-
             // Объект greenhouseData
             const greenhouseData = {
                 "ТЕПЛИЦА БОЯРСКАЯ 2.5М": { form: "Арочная", frames: ["20х20"] },
@@ -433,6 +400,38 @@
                 "Навес": 10
                 // "Грядки": 11 (добавим позже)
             };
+
+            // Функция аутентификации
+            function authenticate() {
+                const loginInput = document.getElementById("login");
+                const passwordInput = document.getElementById("password");
+                const authError = document.getElementById("auth-error");
+
+                const login = loginInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                // Проверяем логин и пароль
+                const user = users.find(u => u.login === login && u.password === password);
+
+                if (user) {
+                    // Если пользователь найден, скрываем окно авторизации и показываем калькулятор
+                    authError.style.display = "none";
+                    localStorage.setItem('savedLogin', login); // Сохраняем логин
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    initializeCalculator();
+                } else {
+                    // Если пользователь не найден — показываем ошибку
+                    authError.style.display = "block";
+                }
+            }
+
+            // Функция выхода
+            function logout() {
+                localStorage.removeItem('savedLogin');
+                document.getElementById("auth-container").classList.remove("hidden");
+                document.getElementById("calculator-container").classList.add("hidden");
+            }
 
             // Функция загрузки городов
             async function loadCities() {
@@ -514,9 +513,20 @@
 
                 currentCityData = data;
 
-                // Получение доступных форм из greenhouseData, присутствующих в currentCityData
-                const availableFormsSet = new Set(currentCityData.map(g => greenhouseData[g.form_name]?.form));
-                const availableForms = Array.from(availableFormsSet).filter(Boolean);
+                // Проверяем, являются ли form_name моделями или формами
+                // Попробуем определить по наличию ключа в greenhouseData
+                const formNamesFromData = currentCityData.map(g => g.form_name);
+                const isModel = formNamesFromData.every(fn => greenhouseData.hasOwnProperty(fn));
+
+                let availableForms = [];
+
+                if (isModel) {
+                    // form_name — это модель, получаем форму через greenhouseData
+                    availableForms = [...new Set(currentCityData.map(g => greenhouseData[g.form_name]?.form))].filter(Boolean);
+                } else {
+                    // form_name — это форма, используем напрямую
+                    availableForms = [...new Set(currentCityData.map(g => g.form_name))].filter(Boolean);
+                }
 
                 console.log("Доступные формы для города:", city, availableForms);
 
@@ -723,7 +733,7 @@
             ];
 
             // Города для карты
-            const cities = [
+            const citiesForMap = [
                 { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
                 { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
                 { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
@@ -806,7 +816,7 @@
                     let nearestCity = null;
                     let minDistance = Infinity;
 
-                    cities.forEach(city => {
+                    citiesForMap.forEach(city => {
                         const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
                         if (cityDistance < minDistance) {
                             minDistance = cityDistance;
