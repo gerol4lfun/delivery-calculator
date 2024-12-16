@@ -391,7 +391,9 @@
                     .select('city_name')
                     .limit(30000);
                 
-                console.log("Города получены:", cityData, "Ошибка:", error);
+                console.log("Данные по городам (cityData):", cityData);
+                console.log("Ошибка при получении городов:", error);
+
 
                 if (error) {
                     console.error('Ошибка при получении городов:', error);
@@ -401,7 +403,7 @@
                 // Извлекаем уникальные названия городов
                 const cityNames = [...new Set(cityData.map(item => item.city_name).filter(Boolean))];
 
-                console.log("Уникальные города:", cityNames); // Добавить лог городов
+                console.log("Уникальные города:", cityNames);
                 
                 const cityDropdown = document.getElementById('city');
                 cityDropdown.innerHTML = '<option value="">Выберите город</option>';
@@ -427,6 +429,9 @@
                     .select('form_name, polycarbonate_type')
                     .eq('city_name', city)
                     .limit(30000);
+                
+                console.log("Данные для выбранного города:", data);
+                console.log("Ошибка при получении данных по городу:", error);
 
                 if (error) {
                     console.error('Ошибка при получении данных по городу:', error);
@@ -438,6 +443,8 @@
                 const availableForms = [...new Set(currentCityData
                     .map(g => greenhouseData[g.form_name]?.form)
                     .filter(Boolean))];
+
+                console.log("Доступные формы для города:", city, availableForms);
 
                 const formDropdown = document.getElementById('form');
                 formDropdown.innerHTML = '<option value="">Выберите форму</option>';
@@ -474,6 +481,7 @@
                 }
 
                 const filtered = currentCityData.filter(g => greenhouseData[g.form_name]?.form === form);
+                console.log("Отфильтрованные теплицы по форме:", filtered);
 
                 const formNames = filtered.map(g => g.form_name);
 
@@ -486,6 +494,7 @@
                 });
 
                 const uniqueFrames = [...new Set(frames)];
+                console.log("Доступные каркасы:", uniqueFrames);
 
                 uniqueFrames.forEach((frame) => {
                     const option = document.createElement("option");
@@ -524,6 +533,8 @@
                 const matchingKeys = Object.keys(greenhouseData).filter(fn => {
                     return greenhouseData[fn].form === form && fn.includes(`${width}М`);
                 });
+                console.log("Подходящие ключи (matchingKeys) для формы и ширины:", matchingKeys);
+
 
                 if (matchingKeys.length === 0) {
                     alert("Не найдена теплица с такой шириной и формой.");
@@ -542,6 +553,9 @@
                     .eq('frame_description', fullFrameName)
                     .eq('polycarbonate_type', polycarbonate)
                     .single();
+                
+                console.log("Данные для расчета цены:", data);
+                console.log("Ошибка для расчета цены:", error);
 
                 if (error || !data) {
                     console.error('Ошибка при получении данных для расчета:', error);
