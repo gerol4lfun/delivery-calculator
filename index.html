@@ -544,30 +544,36 @@ console.log("Выпадающий список городов обновлён."
         polycarbonateDropdown.appendChild(option);
     });
 }
-            function updateFrameOptions() {
-                const city = document.getElementById("city").value;
-                const form = document.getElementById("form").value;
-                const frameSelect = document.getElementById("frame");
+            
+            function updateWidthOptions() {
+    const city = document.getElementById("city").value;
+    const form = document.getElementById("form").value;
+    const widthSelect = document.getElementById("width");
 
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+    if (!city || !form) {
+        console.warn("Не выбран город или форма!");
+        widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
+        return;
+    }
 
-                if (!city || !form) {
-                    console.warn("Не выбран город или форма!");
-                    return;
-                }
+    // Фильтруем данные по выбранной форме
+    const filteredByForm = currentCityData.filter(g => {
+        const gForm = greenhouseData[g.form_name]?.form;
+        return gForm === form;
+    });
 
-                const filtered = currentCityData.filter(g => greenhouseData[g.form_name]?.form === form);
-                console.log("Отфильтрованные теплицы по форме:", filtered);
+    // Получаем все ширины из отфильтрованных данных
+    const availableWidths = [...new Set(filteredByForm.map(g => g.width).filter(Boolean))];
+    availableWidths.sort((a,b) => a - b); // Сортируем по возрастанию
 
-                const formNames = filtered.map(g => g.form_name);
-
-                let frames = [];
-                formNames.forEach(fn => {
-                    const gh = greenhouseData[fn];
-                    if (gh && gh.frames) {
-                        frames = frames.concat(gh.frames);
-                    }
-                });
+    widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
+    availableWidths.forEach(w => {
+        const option = document.createElement('option');
+        option.value = w;
+        option.textContent = w + " м";
+        widthSelect.appendChild(option);
+    });
+}
 
                 const uniqueFrames = [...new Set(frames)];
                 console.log("Доступные каркасы:", uniqueFrames);
