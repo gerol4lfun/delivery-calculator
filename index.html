@@ -544,36 +544,30 @@ console.log("Выпадающий список городов обновлён."
         polycarbonateDropdown.appendChild(option);
     });
 }
-            
-            function updateWidthOptions() {
-    const city = document.getElementById("city").value;
-    const form = document.getElementById("form").value;
-    const widthSelect = document.getElementById("width");
+            function updateFrameOptions() {
+                const city = document.getElementById("city").value;
+                const form = document.getElementById("form").value;
+                const frameSelect = document.getElementById("frame");
 
-    if (!city || !form) {
-        console.warn("Не выбран город или форма!");
-        widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
-        return;
-    }
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-    // Фильтруем данные по выбранной форме
-    const filteredByForm = currentCityData.filter(g => {
-        const gForm = greenhouseData[g.form_name]?.form;
-        return gForm === form;
-    });
+                if (!city || !form) {
+                    console.warn("Не выбран город или форма!");
+                    return;
+                }
 
-    // Получаем все ширины из отфильтрованных данных
-    const availableWidths = [...new Set(filteredByForm.map(g => g.width).filter(Boolean))];
-    availableWidths.sort((a,b) => a - b); // Сортируем по возрастанию
+                const filtered = currentCityData.filter(g => greenhouseData[g.form_name]?.form === form);
+                console.log("Отфильтрованные теплицы по форме:", filtered);
 
-    widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
-    availableWidths.forEach(w => {
-        const option = document.createElement('option');
-        option.value = w;
-        option.textContent = w + " м";
-        widthSelect.appendChild(option);
-    });
-}
+                const formNames = filtered.map(g => g.form_name);
+
+                let frames = [];
+                formNames.forEach(fn => {
+                    const gh = greenhouseData[fn];
+                    if (gh && gh.frames) {
+                        frames = frames.concat(gh.frames);
+                    }
+                });
 
                 const uniqueFrames = [...new Set(frames)];
                 console.log("Доступные каркасы:", uniqueFrames);
