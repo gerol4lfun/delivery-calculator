@@ -386,32 +386,39 @@
             };
 
          async function loadCities() {
-    // Запрос к таблице prices в Supabase
-    let { data: cityData, error } = await supabaseClient
-        .from('prices')
-        .select('city_name'); // Без limit и фильтров
+    let cityData = [];
+    let page = 0;
+    const pageSize = 1000; // Количество строк за один запрос
 
-    // Логи для отладки
-    console.log("Результат запроса без фильтров:", cityData);
-    console.log("Ошибка при получении городов:", error);
+    while (true) {
+        // Запрос с пагинацией
+        let { data, error } = await supabaseClient
+            .from('prices')
+            .select('city_name', { distinct: true }) // Получаем уникальные города
+            .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
 
-    if (error) {
-        console.error("Ошибка при выполнении запроса к Supabase:", error);
-        return;
+        if (error) {
+            console.error("Ошибка при получении городов:", error);
+            break;
+        }
+
+        // Если данных меньше, чем страница — значит, это последняя страница
+        if (data.length === 0) break;
+
+        cityData = cityData.concat(data);
+        page++;
     }
 
-    // Проверка на количество полученных городов
-    console.log("Количество полученных городов:", cityData.length);
+    console.log("Все города из Supabase (с пагинацией):", cityData);
 
-    // Извлечение уникальных названий городов
-    const cityNames = [...new Set(cityData.map(item => item.city_name))];
-    console.log("Уникальные города:", cityNames);
+    // Обработка данных и создание выпадающего списка
+    const uniqueCities = [...new Set(cityData.map(item => item.city_name))];
+    console.log("Уникальные города:", uniqueCities);
 
-    // Обновление выпадающего списка городов в интерфейсе
     const cityDropdown = document.getElementById('city');
     cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
-    cityNames.forEach(city => {
+    uniqueCities.forEach(city => {
         cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
     });
 
