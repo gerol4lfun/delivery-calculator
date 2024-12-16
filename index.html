@@ -396,21 +396,20 @@
 
             // Функция для получения данных о теплицах
             async function fetchGreenhouses() {
-                let { data, error } = await supabaseClient
-                    .from('prices')
-                    .select('*');
+    let { data, error } = await supabaseClient
+        .from('prices')
+        .select('*')
+        .range(0, 49999); // Попытка загрузить до 50000 строк
 
-                if (error) {
-                    console.error('Ошибка при получении данных:', error);
-                    return [];
-                }
+    if (error) {
+        console.error('Ошибка при получении данных:', error);
+        return [];
+    }
 
-                // Лог доступных форм теплиц
-                console.log("Доступные формы теплиц:", [...new Set(data.map(g => g.form_name))]);
-                console.log('Данные из Supabase:', JSON.stringify(data, null, 2));
-
-                return data;
-            }
+    console.log("Доступные формы теплиц:", [...new Set(data.map(g => g.form_name))]);
+    console.log('Данные из Supabase:', data);
+    return data;
+}
 
             // Функция для загрузки данных и заполнения выпадающих списков
             async function loadGreenhouses() {
@@ -502,15 +501,16 @@
         return;
     }
 
-    // Фильтруем данные Supabase по городу и форме
-    const filtered = greenhouses.filter(g => 
+    // Фильтруем данные из Supabase по городу и форме
+    // Сопоставляем form_name из Supabase с ключами в greenhouseData
+    const filtered = greenhouses.filter(g =>
         g.city_name === city && greenhouseData[g.form_name]?.form === form
     );
 
     // Извлекаем все form_name подходящих теплиц
     const formNames = filtered.map(g => g.form_name);
 
-    // Сопоставляем их с greenhouseData и собираем все каркасы
+    // Для каждой теплицы из formNames берём соответствующий объект в greenhouseData и собираем каркасы
     let frames = [];
     formNames.forEach(fn => {
         const gh = greenhouseData[fn];
