@@ -385,21 +385,27 @@
                 "НАВЕС ПРЕМИУМ 6М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] }
             };
 
-            async function loadCities() {
-                let { data: cityData, error } = await supabaseClient
-                    .from('prices')
-                    .select('city_name')
-                    .limit(30000);
-                
-                console.log("Данные по городам (cityData):", cityData);
-                console.log("Ошибка при получении городов:", error);
+         async function loadCities() {
+    let { data: cityData, error } = await supabaseClient
+        .from('prices')
+        .select('city_name'); // Запрос без limit и фильтров
 
+    // Логи для отладки
+    console.log("Результат запроса без фильтров:", cityData);
+    console.log("Ошибка при получении городов:", error);
 
-                if (error) {
-                    console.error('Ошибка при получении городов:', error);
-                    return;
-                }
+    if (error) {
+        console.error("Ошибка при выполнении запроса к Supabase:", error);
+        return;
+    }
 
+    // Проверка на количество городов
+    console.log("Количество полученных городов:", cityData.length);
+
+    // Обновление UI или проверка обработки данных
+    const uniqueCities = [...new Set(cityData.map(item => item.city_name))];
+    console.log("Уникальные города:", uniqueCities);
+}
                 // Извлекаем уникальные названия городов
                 const cityNames = [...new Set(cityData.map(item => item.city_name))];
                 console.log("Все города без filter:", cityData.map(item => item.city_name));
