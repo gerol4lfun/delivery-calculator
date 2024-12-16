@@ -390,6 +390,8 @@
                     .from('prices')
                     .select('city_name')
                     .limit(30000);
+                
+                console.log("Города получены:", cityData, "Ошибка:", error);
 
                 if (error) {
                     console.error('Ошибка при получении городов:', error);
@@ -399,6 +401,8 @@
                 // Извлекаем уникальные названия городов
                 const cityNames = [...new Set(cityData.map(item => item.city_name).filter(Boolean))];
 
+                console.log("Уникальные города:", cityNames); // Добавить лог городов
+                
                 const cityDropdown = document.getElementById('city');
                 cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
