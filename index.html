@@ -339,7 +339,39 @@
                 { login: "Manager8", password: "Mng8#Access" },
                 { login: "Manager9", password: "Mng9!Control" },
                 { login: "Manager10", password: "Mng10#Secure" }
-            ];
+            ];// Функция аутентификации
+            
+function authenticate() {
+    const loginInput = document.getElementById("login");
+    const passwordInput = document.getElementById("password");
+    const authError = document.getElementById("auth-error");
+
+    const login = loginInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    // Проверяем логин и пароль
+    const user = users.find(u => u.login === login && u.password === password);
+
+    if (user) {
+        // Если пользователь найден, скрываем окно авторизации и показываем калькулятор
+        authError.style.display = "none";
+        localStorage.setItem('savedLogin', login); // Сохраняем логин
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("calculator-container").classList.remove("hidden");
+        // Дополнительно вы можете вызвать initializeCalculator(), если это требуется
+        // initializeCalculator();
+    } else {
+        // Если пользователь не найден — показываем ошибку
+        authError.style.display = "block";
+    }
+}
+
+// Функция выхода
+function logout() {
+    localStorage.removeItem('savedLogin');
+    document.getElementById("auth-container").classList.remove("hidden");
+    document.getElementById("calculator-container").classList.add("hidden");
+}
             
             const greenhouseData = {
                 "ТЕПЛИЦА БОЯРСКАЯ 2.5М": { form: "Арочная", frames: ["20х20"] },
