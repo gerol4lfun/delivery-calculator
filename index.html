@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор доставки и стоимости теплиц</title>
     <!-- Яндекс.Карты -->
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=YOUR_YANDEX_API_KEY&lang=ru_RU" type="text/javascript"></script>
     <!-- Supabase JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
@@ -311,25 +311,42 @@
         <script>
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Замените на ваш Anon Public Key
+            const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Замените на ваш Anon Public Key
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             let currentCityData = []; // сюда сохраняем данные по выбранному городу
 
+            // Определение каркасов по формам
+            const greenhouseForms = {
+                "Арочная (Боярская)": ["20х20", "40х20", "20х20+20х20", "40х20+20х20"],
+                "Каплевидная (Стрелецкая)": ["40х20"],
+                "Прямостенная (Царская)": ["Царская люкс 40х20", "Царская премиум 40х20+20х20"],
+                "Домиком (Домик люкс)": ["40х20", "40х20+20х20"],
+                "Домиком (Домик премиум)": ["40х20", "40х20+20х20"],
+                "Митлайдер арочная (Митлайдер люкс)": ["40х20"],
+                "Митлайдер арочная (Митлайдер премиум)": ["40х20+20х20"],
+                "Митлайдер прямостенная (Митлайдер элит)": ["40х20+20х20"],
+                "Пристенная (Пристенная люкс)": ["40х20", "40х20+20х20"],
+                "Пристенная (Пристенная премиум)": ["40х20", "40х20+20х20"],
+                "Промышленная прямостенная (Промышленная премьер премиум)": ["40х20+40х20"],
+                "Промышленная домиком (Промышленная монарх премиум)": ["40х20+20х20"]
+            };
+
             // Приоритеты форм (чем меньше число, тем выше в списке):
             const formPriority = {
-                "Арочная": 1,
-                "Каплевидная": 2,
-                "Прямостенная": 3,
-                "Домиком": 4,
-                "Пристенная": 5,
-                "Митлайдер арочная": 6,
-                "Митлайдер прямостенная": 7,
-                "Промышленная прямостенная": 8,
-                "Промышленная домиком": 9,
-                "Навес": 10
-                // "Грядки": 11 (добавим позже)
+                "Арочная (Боярская)": 1,
+                "Каплевидная (Стрелецкая)": 2,
+                "Прямостенная (Царская)": 3,
+                "Домиком (Домик люкс)": 4,
+                "Домиком (Домик премиум)": 5,
+                "Митлайдер арочная (Митлайдер люкс)": 6,
+                "Митлайдер арочная (Митлайдер премиум)": 7,
+                "Митлайдер прямостенная (Митлайдер элит)": 8,
+                "Пристенная (Пристенная люкс)": 9,
+                "Пристенная (Пристенная премиум)": 10,
+                "Промышленная прямостенная (Промышленная премьер премиум)": 11,
+                "Промышленная домиком (Промышленная монарх премиум)": 12
             };
 
             // Пользователи
@@ -430,22 +447,17 @@
             async function onCityChange() {
                 const city = document.getElementById('city').value;
                 if (!city) {
-                    document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
-                    document.getElementById('polycarbonate').innerHTML = '<option value="">Сначала выберите город</option>';
-                    document.getElementById('width').innerHTML = '<option value="">Выберите ширину</option>';
-                    document.getElementById('length').innerHTML = '<option value="">Выберите длину</option>';
-                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                    // Сброс всех зависимых полей
+                    resetFormFields();
                     return;
                 }
 
+                // Загрузка данных по выбранному городу из Supabase
                 let { data, error } = await supabaseClient
                     .from('prices')
-                    .select('form_name, polycarbonate_type, width, length')
+                    .select('form_name, polycarbonate_type, width, length, frame_description')
                     .eq('city_name', city)
                     .limit(30000);
-
-                console.log("Данные для выбранного города:", data);
-                console.log("Ошибка при получении данных по городу:", error);
 
                 if (error) {
                     console.error('Ошибка при получении данных по городу:', error);
@@ -454,22 +466,20 @@
 
                 currentCityData = data;
 
-                const availableForms = [...new Set(currentCityData
-                    .map(g => g.form_name)
-                    .filter(Boolean))];
+                // Получение доступных форм из greenhouseForms, присутствующих в currentCityData
+                const availableFormsSet = new Set(currentCityData.map(g => g.form_name));
+                const availableForms = Object.keys(greenhouseForms).filter(form => availableFormsSet.has(form));
 
-                console.log("Доступные формы для города:", city, availableForms);
-
-                // Сортируем формы по приоритету
+                // Сортировка форм по приоритету
                 availableForms.sort((a, b) => {
                     const prioA = formPriority[a] || 9999;
                     const prioB = formPriority[b] || 9999;
                     return prioA - prioB;
                 });
 
+                // Обновление выпадающего списка форм
                 const formDropdown = document.getElementById('form');
                 formDropdown.innerHTML = '<option value="">Выберите форму</option>';
-
                 availableForms.forEach(form => {
                     const option = document.createElement('option');
                     option.value = form;
@@ -477,10 +487,10 @@
                     formDropdown.appendChild(option);
                 });
 
+                // Обновление выпадающего списка поликарбоната
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
-                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
-
                 const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
+                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
                 uniquePoly.forEach(poly => {
                     const option = document.createElement('option');
                     option.value = poly;
@@ -488,7 +498,20 @@
                     polycarbonateDropdown.appendChild(option);
                 });
 
-                // Сбросить остальные поля
+                // Сброс остальных полей
+                resetWidthLengthFrame();
+            }
+
+            // Функция сброса полей
+            function resetFormFields() {
+                document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
+                document.getElementById('polycarbonate').innerHTML = '<option value="">Сначала выберите город</option>';
+                document.getElementById('width').innerHTML = '<option value="">Выберите ширину</option>';
+                document.getElementById('length').innerHTML = '<option value="">Выберите длину</option>';
+                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+            }
+
+            function resetWidthLengthFrame() {
                 document.getElementById('width').innerHTML = '<option value="">Выберите ширину</option>';
                 document.getElementById('length').innerHTML = '<option value="">Выберите длину</option>';
                 document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
@@ -506,15 +529,18 @@
                     return;
                 }
 
-                // Фильтруем данные по выбранной форме
-                const filteredByForm = currentCityData.filter(g => {
-                    return g.form_name === form;
-                });
+                // Получение доступных каркасов из greenhouseForms для выбранной формы
+                const availableFrames = greenhouseForms[form] || [];
 
-                // Получаем все ширины из отфильтрованных данных
-                const availableWidths = [...new Set(filteredByForm.map(g => g.width).filter(Boolean))];
-                availableWidths.sort((a, b) => a - b); // Сортируем по возрастанию
+                // Получение доступных ширин из currentCityData, соответствующих выбранной форме и каркасам
+                const availableWidths = [...new Set(currentCityData
+                    .filter(g => g.form_name === form && availableFrames.includes(g.frame_description.replace(/оцинкованная труба |Царская |Митлайдер |Пристенная |Промышленная |Домиком |монарх премиум |премьер премиум |люкс |премиум/gi, '')))
+                    .map(g => g.width)
+                    .filter(Boolean))];
 
+                availableWidths.sort((a, b) => a - b); // Сортировка по возрастанию
+
+                // Обновление выпадающего списка ширин
                 widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
                 availableWidths.forEach(w => {
                     const option = document.createElement('option');
@@ -524,8 +550,7 @@
                 });
 
                 // Сбросить поля длины и каркаса
-                document.getElementById('length').innerHTML = '<option value="">Выберите длину</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                resetWidthLengthFrame();
             }
 
             // Функция обновления опций длины
@@ -541,14 +566,18 @@
                     return;
                 }
 
-                // Фильтруем по городу, форме и ширине
-                const filtered = currentCityData.filter(g => {
-                    return g.form_name === form && g.width === width;
-                });
+                // Получение доступных каркасов из greenhouseForms для выбранной формы
+                const availableFrames = greenhouseForms[form] || [];
 
-                const availableLengths = [...new Set(filtered.map(g => g.length).filter(Boolean))];
+                // Получение доступных длин из currentCityData, соответствующих выбранной форме, ширине и каркасам
+                const availableLengths = [...new Set(currentCityData
+                    .filter(g => g.form_name === form && g.width === width && availableFrames.includes(g.frame_description.replace(/оцинкованная труба |Царская |Митлайдер |Пристенная |Промышленная |Домиком |монарх премиум |премьер премиум |люкс |премиум/gi, '')))
+                    .map(g => g.length)
+                    .filter(Boolean))];
+
                 availableLengths.sort((a, b) => a - b);
 
+                // Обновление выпадающего списка длин
                 lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
                 availableLengths.forEach(l => {
                     const option = document.createElement('option');
@@ -575,20 +604,30 @@
                     return;
                 }
 
-                // Фильтруем данные по всем выбранным параметрам
+                // Получение доступных каркасов из greenhouseForms для выбранной формы
+                const availableFrames = greenhouseForms[form] || [];
+
+                // Фильтрация данных по выбранным параметрам и доступным каркасам
                 const filtered = currentCityData.filter(g => {
-                    return g.form_name === form && g.width === width && g.length === length;
+                    const frameDescription = g.frame_description.replace(/оцинкованная труба |Царская |Митлайдер |Пристенная |Промышленная |Домиком |монарх премиум |премьер премиум |люкс |премиум/gi, '');
+                    return g.form_name === form && g.width === width && g.length === length && availableFrames.includes(frameDescription);
                 });
 
-                // Из filtered вытащим все frame_description
-                const availableFrames = [...new Set(filtered.map(g => g.frame_description).filter(Boolean))];
+                // Из filtered получаем все frame_description
+                const availableFrameDescriptions = [...new Set(filtered.map(g => g.frame_description).filter(Boolean))];
 
-                frameSelect.innerHTML = ''; // Очищаем список без добавления примера
-                availableFrames.forEach(fd => {
-                    // Предположим формат "оцинкованная труба 40х20 мм"
+                // Обновление выпадающего списка каркасов
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+                availableFrameDescriptions.forEach(fd => {
+                    // Предполагаем формат "оцинкованная труба 40х20 мм" или "Царская люкс 40х20"
                     const parts = fd.split(" ");
+                    let frameType = "";
                     if (parts.length >= 3) {
-                        const frameType = parts[2].replace("мм", "").trim(); // "40х20"
+                        frameType = parts[2].replace("мм", "").trim(); // "40х20"
+                    } else if (parts.length === 2) {
+                        frameType = parts[1].trim(); // "40х20"
+                    }
+                    if (frameType) {
                         const option = document.createElement('option');
                         option.value = frameType;
                         option.textContent = frameType;
@@ -597,10 +636,15 @@
                 });
 
                 // Если только один каркас, автозаполняем
-                if (availableFrames.length === 1) {
-                    const parts = availableFrames[0].split(" ");
+                if (availableFrameDescriptions.length === 1) {
+                    const parts = availableFrameDescriptions[0].split(" ");
+                    let frameType = "";
                     if (parts.length >= 3) {
-                        const frameType = parts[2].replace("мм", "").trim();
+                        frameType = parts[2].replace("мм", "").trim();
+                    } else if (parts.length === 2) {
+                        frameType = parts[1].trim();
+                    }
+                    if (frameType) {
                         frameSelect.value = frameType;
                         console.log("Автоматически выбран каркас:", frameType);
                     }
@@ -646,10 +690,6 @@
                 }
 
                 let basePrice = data.price;
-
-                // Получение цены поликарбоната из Supabase (если необходимо)
-                // Если цена поликарбоната уже включена в общую цену, можно убрать этот шаг
-                // const polycarbonatePrice = data.polycarbonate_price || 0; // Замените на актуальное поле
 
                 // Дополнительные услуги
                 const assembly = document.getElementById('assembly').checked ? 5000 : 0;
@@ -730,7 +770,7 @@
             ];
 
             // Города для карты
-            const cities = [
+            const citiesForMap = [
                 { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
                 { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
                 { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
@@ -813,7 +853,7 @@
                     let nearestCity = null;
                     let minDistance = Infinity;
 
-                    cities.forEach(city => {
+                    citiesForMap.forEach(city => {
                         const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
                         if (cityDistance < minDistance) {
                             minDistance = cityDistance;
