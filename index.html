@@ -386,9 +386,10 @@
             };
 
          async function loadCities() {
+    // Запрос к таблице prices в Supabase
     let { data: cityData, error } = await supabaseClient
         .from('prices')
-        .select('city_name'); // Запрос без limit и фильтров
+        .select('city_name'); // Без limit и фильтров
 
     // Логи для отладки
     console.log("Результат запроса без фильтров:", cityData);
@@ -399,31 +400,23 @@
         return;
     }
 
-    // Проверка на количество городов
+    // Проверка на количество полученных городов
     console.log("Количество полученных городов:", cityData.length);
 
-    // Обновление UI или проверка обработки данных
-    const uniqueCities = [...new Set(cityData.map(item => item.city_name))];
-    console.log("Уникальные города:", uniqueCities);
+    // Извлечение уникальных названий городов
+    const cityNames = [...new Set(cityData.map(item => item.city_name))];
+    console.log("Уникальные города:", cityNames);
+
+    // Обновление выпадающего списка городов в интерфейсе
+    const cityDropdown = document.getElementById('city');
+    cityDropdown.innerHTML = '<option value="">Выберите город</option>';
+
+    cityNames.forEach(city => {
+        cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
+    });
+
+    console.log("Выпадающий список городов обновлён.");
 }
-                // Извлекаем уникальные названия городов
-                const cityNames = [...new Set(cityData.map(item => item.city_name))];
-                console.log("Все города без filter:", cityData.map(item => item.city_name));
-
-
-                console.log("Уникальные города:", cityNames);
-                
-                const cityDropdown = document.getElementById('city');
-                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
-
-                cityNames.forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.textContent = city;
-                    cityDropdown.appendChild(option);
-                });
-            }
-
             async function onCityChange() {
                 const city = document.getElementById('city').value;
                 if (!city) {
