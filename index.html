@@ -341,7 +341,6 @@
                 { login: "Manager10", password: "Mng10#Secure" }
             ];
             
-            // Таблица соответствий: название теплицы, форма, каркас
             const greenhouseData = {
                 "ТЕПЛИЦА БОЯРСКАЯ 2.5М": { form: "Арочная", frames: ["20х20"] },
                 "ТЕПЛИЦА БОЯРСКАЯ 3М": { form: "Арочная", frames: ["20х20"] },
@@ -386,77 +385,44 @@
                 "НАВЕС ПРЕМИУМ 6М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] }
             };
 
-            // Функция Авторизации
-            function authenticate() {
-                const loginInput = document.getElementById("login");
-                const passwordInput = document.getElementById("password");
-                const login = loginInput.value.trim();
-                const password = passwordInput.value.trim();
-                const authError = document.getElementById("auth-error");
-
-                // Скрыть сообщение об ошибке при каждом новом вводе
-                authError.style.display = "none";
-
-                const user = users.find(u => u.login === login && u.password === password);
-
-                if (user) {
-                    localStorage.setItem('savedLogin', login);
-                    document.getElementById("auth-container").classList.add("hidden");
-                    document.getElementById("calculator-container").classList.remove("hidden");
-                    initializeCalculator();
-                } else {
-                    authError.style.display = "block";
-                }
-            }
-
-            // Функция Logout
-            function logout() {
-                localStorage.removeItem('savedLogin');
-                document.getElementById("auth-container").classList.remove("hidden");
-                document.getElementById("calculator-container").classList.add("hidden");
-            }
-
-            // Функция для загрузки списка городов
             async function loadCities() {
-                // distinct по city_name
-                let { data: citiesData, error } = await supabaseClient
+                let { data: cityData, error } = await supabaseClient
                     .from('prices')
-                    .select('city_name', { count: 'exact' })
-                    .neq('city_name', '')
-                    .distinct();
+                    .select('city_name')
+                    .limit(30000);
 
                 if (error) {
                     console.error('Ошибка при получении городов:', error);
                     return;
                 }
 
+                // Извлекаем уникальные названия городов
+                const cityNames = [...new Set(cityData.map(item => item.city_name).filter(Boolean))];
+
                 const cityDropdown = document.getElementById('city');
                 cityDropdown.innerHTML = '<option value="">Выберите город</option>';
 
-                citiesData.forEach(item => {
+                cityNames.forEach(city => {
                     const option = document.createElement('option');
-                    option.value = item.city_name;
-                    option.textContent = item.city_name;
+                    option.value = city;
+                    option.textContent = city;
                     cityDropdown.appendChild(option);
                 });
             }
 
-            // При выборе города загружаем данные только для этого города
             async function onCityChange() {
                 const city = document.getElementById('city').value;
                 if (!city) {
-                    // Сброс формы, если город не выбран
                     document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
                     document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
                     return;
                 }
 
-                // Загружаем данные для выбранного города
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('form_name, polycarbonate_type')
                     .eq('city_name', city)
-                    .limit(30000); // Запрашиваем до 30000 строк, чтобы наверняка загрузить все данные для города
+                    .limit(30000);
 
                 if (error) {
                     console.error('Ошибка при получении данных по городу:', error);
@@ -465,7 +431,6 @@
 
                 currentCityData = data;
 
-                // Формируем список форм
                 const availableForms = [...new Set(currentCityData
                     .map(g => greenhouseData[g.form_name]?.form)
                     .filter(Boolean))];
@@ -480,7 +445,6 @@
                     formDropdown.appendChild(option);
                 });
 
-                // Обновляем список поликарбоната для выбранного города
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
                 polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
 
@@ -493,7 +457,6 @@
                 });
             }
 
-            // Обновление списка каркасов на основе выбранного города и формы
             function updateFrameOptions() {
                 const city = document.getElementById("city").value;
                 const form = document.getElementById("form").value;
@@ -506,7 +469,6 @@
                     return;
                 }
 
-                // Фильтруем currentCityData по выбранной форме
                 const filtered = currentCityData.filter(g => greenhouseData[g.form_name]?.form === form);
 
                 const formNames = filtered.map(g => g.form_name);
@@ -534,7 +496,6 @@
                 }
             }
 
-            // Функция Расчета Стоимости Теплицы
             async function calculateGreenhouseCost() {
                 const city = document.getElementById("city").value;
                 const form = document.getElementById("form").value;
@@ -551,11 +512,27 @@
 
                 const fullFrameName = `оцинкованная труба ${frame} мм`;
 
+                // Найдём соответствующий form_name из greenhouseData
+                // Нам нужен тот, что соответствует выбранной форме и ширине
+                // Многие теплицы отличаются длиной: мы выберем те, что содержат нужную ширину в названии.
+                // В greenhouseData ключи включают ширину, например "ТЕПЛИЦА БОЯРСКАЯ 2.5М"
+                // Значит нам нужно найти ключ, у которого form совпадает и в названии ключа есть нужная ширина.
+                const matchingKeys = Object.keys(greenhouseData).filter(fn => {
+                    return greenhouseData[fn].form === form && fn.includes(`${width}М`);
+                });
+
+                if (matchingKeys.length === 0) {
+                    alert("Не найдена теплица с такой шириной и формой.");
+                    return;
+                }
+
+                // Нам может подойти первая из matchingKeys, так как длину мы будем отфильтровывать запросом.
+                // Но в БД длина и ширина отдельно, так что проверим запросом.
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('*')
                     .eq('city_name', city)
-                    .eq('form_name', Object.keys(greenhouseData).find(fn => greenhouseData[fn].form === form && fn.includes(`${width}М`)))
+                    .in('form_name', matchingKeys)
                     .eq('width', width)
                     .eq('length', length)
                     .eq('frame_description', fullFrameName)
@@ -590,7 +567,6 @@
                 document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
             }
 
-            // Загрузка данных о теплицах при загрузке страницы
             window.onload = async function() {
                 const savedLogin = localStorage.getItem('savedLogin');
                 if (savedLogin) {
@@ -599,6 +575,8 @@
                     document.getElementById("auth-container").classList.add("hidden");
                     document.getElementById("calculator-container").classList.remove("hidden");
                     await initializeCalculator();
+                } else {
+                    // Если не залогинен, просто ничего не делаем здесь
                 }
             }
 
@@ -686,7 +664,6 @@
                 });
             });
 
-            // Функция Расчета Доставки
             async function calculateDelivery() {
                 const addressInput = document.getElementById("address");
                 const address = addressInput.value.trim().toLowerCase();
