@@ -491,55 +491,49 @@
             }
 
             function updateFrameOptions() {
-                const form = document.getElementById("form").value;
-                const frameSelect = document.getElementById("frame");
+    const city = document.getElementById("city").value;
+    const form = document.getElementById("form").value;
+    const frameSelect = document.getElementById("frame");
 
-                console.log("Выбранная форма теплицы:", form);
+    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-                // Сброс текущих опций
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+    if (!city || !form) {
+        console.warn("Не выбран город или форма!");
+        return;
+    }
 
-                // Если форма не выбрана, выходим
-                if (!form) {
-                    console.warn("Форма теплицы не выбрана!");
-                    return;
-                }
+    // Фильтруем данные Supabase по городу и форме
+    const filtered = greenhouses.filter(g => 
+        g.city_name === city && greenhouseData[g.form_name]?.form === form
+    );
 
-                // Извлекаем доступные каркасы из greenhouseData на основе выбранной формы
-                const matchingGreenhouses = Object.entries(greenhouseData).filter(
-                    ([name, data]) => data.form === form
-                );
+    // Извлекаем все form_name подходящих теплиц
+    const formNames = filtered.map(g => g.form_name);
 
-                console.log("Найденные теплицы для формы:", form, matchingGreenhouses);
+    // Сопоставляем их с greenhouseData и собираем все каркасы
+    let frames = [];
+    formNames.forEach(fn => {
+        const gh = greenhouseData[fn];
+        if (gh && gh.frames) {
+            frames = frames.concat(gh.frames);
+        }
+    });
 
-                if (matchingGreenhouses.length === 0) {
-                    console.warn("Нет доступных данных для выбранной формы:", form);
-                    return;
-                }
+    // Удаляем дубликаты
+    const uniqueFrames = [...new Set(frames)];
 
-                // Извлекаем все доступные каркасы для формы
-                const uniqueFrames = [
-                    ...new Set(
-                        matchingGreenhouses.flatMap(([name, data]) => data.frames)
-                    ),
-                ];
+    uniqueFrames.forEach((frame) => {
+        const option = document.createElement("option");
+        option.value = frame;
+        option.textContent = frame;
+        frameSelect.add(option);
+    });
 
-                console.log("Доступные каркасы для формы", form, ":", uniqueFrames);
-
-                // Заполняем выпадающий список каркасов
-                uniqueFrames.forEach((frame) => {
-                    const option = document.createElement("option");
-                    option.value = frame;
-                    option.textContent = frame;
-                    frameSelect.add(option);
-                });
-
-                // Если доступен только один вариант, выбираем его автоматически
-                if (uniqueFrames.length === 1) {
-                    frameSelect.value = uniqueFrames[0];
-                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
-                }
-            }
+    if (uniqueFrames.length === 1) {
+        frameSelect.value = uniqueFrames[0];
+        console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+    }
+}
 
             // Функция Авторизации
             function authenticate() {
