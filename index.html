@@ -634,12 +634,8 @@ async function onCityChange() {
     currentCityData = data;
 
     // 1. Обновляем выпадающий список поликарбоната
-    const polycarbonateDropdown = document.getElementById('polycarbonate');
     polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
-
     const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
-    console.log("Уникальные типы поликарбоната:", uniquePoly);
-
     uniquePoly.forEach(poly => {
         const option = document.createElement('option');
         option.value = poly;
