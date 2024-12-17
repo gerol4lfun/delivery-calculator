@@ -221,7 +221,7 @@
 
                 <div class="parameters">
                     <label for="form">Форма теплицы:</label>
-                    <select id="form" onchange="onFormChange()">
+                    <select id="form" onchange="()">
                         <option value="">Сначала выберите город</option>
                     </select>
                 </div>
@@ -744,7 +744,7 @@ const formNames = Object.keys(availableForms).filter(formType =>
 
                // Фильтруем данные по выбранной форме на основе availableForms
 const filteredData = currentCityData.filter(item => 
-    availableForms[form]?.some(name => item.form_name.includes(name))
+    availableForms[form] && availableForms[form].some(name => item.form_name.includes(name))
 );
 
 console.log("Отфильтрованные теплицы по форме:", filteredData);
