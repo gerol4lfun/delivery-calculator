@@ -306,6 +306,9 @@
         </div>
 
         <script>
+            
+            const DEBUG = true; // Включение режима отладки
+
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
@@ -665,6 +668,15 @@ const availableForms = {
                     .eq('city_name', city)
                     .limit(30000);
 
+                if (!data || data.length === 0) {
+    console.warn("Данные для города отсутствуют или пусты:", city);
+    if (DEBUG) console.log("Ответ от сервера:", data);
+    alert("Данные для выбранного города не найдены. Попробуйте другой город.");
+    return; // Остановить выполнение функции
+} else {
+    console.log("Данные для города успешно загружены:", data);
+}
+
                 // Логи для отладки
                 console.log("Данные для выбранного города:", data);
                 console.log("Ошибка при получении данных по городу:", error);
@@ -691,6 +703,11 @@ const availableForms = {
                 });
 
                 console.log("Выпадающий список поликарбоната обновлён.");
+                
+                if (!availableForms) {
+    console.warn("Список доступных форм не загружен!");
+    return; // Остановить выполнение функции
+}
 
                 // Фильтруем формы на основе availableForms
 const formNames = Object.keys(availableForms).filter(formType =>
