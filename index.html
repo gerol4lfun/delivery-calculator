@@ -225,13 +225,16 @@
                         <option value="">Сначала выберите город</option>
                     </select>
                 </div>
+                
+<div class="parameters">
+    <label for="width">Ширина теплицы (м):</label>
+    <input type="number" id="width" placeholder="Введите ширину">
+</div>
 
-                <div class="parameters">
-                    <label for="model">Модель теплицы:</label>
-                    <select id="model" onchange="onModelChange()">
-                        <option value="">Сначала выберите форму</option>
-                    </select>
-                </div>
+<div class="parameters">
+    <label for="length">Длина теплицы (м):</label>
+    <input type="number" id="length" placeholder="Введите длину">
+</div>
 
                 <div class="parameters">
                     <label for="frame">Каркас:</label>
@@ -647,6 +650,7 @@ async function onCityChange() {
     document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
     console.log("Модели и каркасы сброшены.");
 }
+            
             // Функция обработки изменения формы
 function onFormChange() {
     const form = document.getElementById("form").value;
@@ -660,10 +664,11 @@ function onFormChange() {
         return;
     }
 
-    // Фильтрация данных из currentCityData по выбранной форме
+    // Фильтрация данных по выбранной форме
     const framesForForm = [...new Set(currentCityData
         .filter(item => getFormCategory(item.form_name) === form)
         .map(item => item.frame_description))];
+
     console.log(`Доступные каркасы для формы "${form}":`, framesForForm);
 
     // Заполняем выпадающий список каркасов
@@ -673,6 +678,12 @@ function onFormChange() {
         option.textContent = frame;
         frameSelect.appendChild(option);
     });
+
+    // Если доступен только один каркас – выбираем его автоматически
+    if (framesForForm.length === 1) {
+        frameSelect.value = framesForForm[0];
+        console.log("Автоматически выбран каркас:", framesForForm[0]);
+    }
 
     console.log("Выпадающий список каркасов обновлён.");
 }
