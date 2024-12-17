@@ -311,8 +311,13 @@
 function getFormCategory(formName) {
     console.log("Анализ form_name:", formName); // Лог для отладки
 
-    // Приводим название к удобному формату: удаляем "ТЕПЛИЦА" и цифры
-    const cleanName = formName.replace(/ТЕПЛИЦА/g, "").replace(/\d+(\.\d+)?М/g, "").trim();
+    // Приводим название к удобному формату: убираем "ТЕПЛИЦА", цифры и очищаем пробелы
+    const cleanName = formName
+        .replace(/ТЕПЛИЦА/g, "")        // Убираем слово "ТЕПЛИЦА"
+        .replace(/\d+(\.\d+)?М/g, "")   // Убираем размеры, например "2.5М" или "3М"
+        .replace(/[^\w\s]/g, "")        // Удаляем знаки препинания
+        .trim();                        // Убираем пробелы по краям
+
     console.log("Очищенное имя для анализа:", cleanName);
 
     if (cleanName.includes("БОЯРСКАЯ")) {
