@@ -309,6 +309,11 @@
             
             const DEBUG = true; // Включение режима отладки
 
+            // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
+function normalizeString(str) {
+    return str.trim().toLowerCase();
+}
+
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
@@ -668,6 +673,10 @@ const availableForms = {
                     .eq('city_name', city)
                     .limit(30000);
 
+                if (DEBUG) {
+    console.log("Результат запроса Supabase:", { data, error });
+}
+
                 if (!data || data.length === 0) {
     console.warn("Данные для города отсутствуют или пусты:", city);
     if (DEBUG) console.log("Ответ от сервера:", data);
@@ -739,220 +748,284 @@ const formNames = Object.keys(availableForms).filter(formType =>
             }
 
             // Функция обработки изменения формы
-            async function onFormChange() {
-                const form = document.getElementById("form").value;
-                console.log(`Выбрана форма: ${form}`);
+async function onFormChange() {
+    const form = document.getElementById("form").value;
+    console.log(`Выбрана форма: ${form}`);
 
-                const widthSelect = document.getElementById("width");
-                widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
+    const widthSelect = document.getElementById("width");
+    widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
 
-                if (!form) {
-                    console.warn("Форма не выбрана!");
-                    return;
-                }
+    if (!form) {
+        console.warn("Форма не выбрана!");
+        return;
+    }
 
-                if (!availableForms[form]) {
-    console.warn(`Не найдены доступные формы для: ${form}`);
-    return;
+    if (!availableForms[form]) {
+        console.warn(`Не найдены доступные формы для: ${form}`);
+        return;
+    }
+
+    console.log("Фильтруемая форма:", form);
+    console.log("Все доступные form_name:", currentCityData.map(g => g.form_name));
+
+    // Фильтруем данные по выбранной форме на основе availableForms
+    const filteredData = currentCityData.filter(item =>
+        availableForms[form] && availableForms[form].some(name => 
+            normalizeString(item.form_name).includes(normalizeString(name))
+        )
+    );
+
+    // Проверка на пустые данные
+    if (filteredData.length === 0) {
+        console.warn("Данные после фильтрации пусты. Проверьте параметры.");
+        alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+        return; // Останавливаем выполнение функции, если данных нет
+    }
+
+    console.log("Отфильтрованные данные:", filteredData);
+
+    // Получаем уникальные значения ширины
+    const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
+    console.log("Уникальные ширины для формы:", uniqueWidths);
+
+    // Заполняем выпадающий список ширины
+    uniqueWidths.forEach(width => {
+        widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
+    });
+
+    console.log("Выпадающий список ширины обновлён.");
+
+    // Сбрасываем длину и каркас
+    document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
+    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+    console.log("Длина и каркас сброшены.");
 }
 
-               console.log("Фильтруемая форма:", form);
-console.log("Все доступные form_name:", currentCityData.map(g => g.form_name));
+          // Функция обработки изменения ширины
+async function onWidthChange() {
+    const form = document.getElementById("form").value;
+    const width = parseFloat(document.getElementById("width").value);
+    console.log(`Выбрана ширина: ${width} м для формы: ${form}`);
 
-// Фильтруем данные по выбранной форме на основе availableForms
-const filteredData = currentCityData.filter(item => {
-    return availableForms[form] && availableForms[form].some(name => item.form_name.includes(name));
-});
-console.log("Отфильтрованные данные:", filteredData);
+    const lengthSelect = document.getElementById("length");
+    lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
 
-// Получаем уникальные значения ширины
-const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
-console.log("Уникальные ширины для формы:", uniqueWidths);
+    if (isNaN(width)) {
+        console.warn("Ширина не выбрана!");
+        return;
+    }
 
-// Заполняем выпадающий список ширины
-uniqueWidths.forEach(width => {
-    widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
-});
+    console.log("Форма для фильтрации:", form);
+    console.log("Очищенные названия form_name:", currentCityData.map(item => getFormCategory(item.form_name)));
 
-                console.log("Выпадающий список ширины обновлён.");
+    // Фильтруем данные по выбранной форме и ширине
+    const filteredData = currentCityData.filter(item =>
+        availableForms[form].some(name => item.form_name.includes(name)) &&
+        item.width === width
+    );
 
-                // Сбрасываем длину и каркас
-                document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
-                console.log("Длина и каркас сброшены.");
-            }
+    // Проверка на пустые данные после фильтрации
+    if (filteredData.length === 0) {
+        console.warn("Данные после фильтрации пусты. Проверьте параметры.");
+        alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+        return; // Останавливаем выполнение функции
+    }
 
-            // Функция обработки изменения ширины
-            async function onWidthChange() {
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                console.log(`Выбрана ширина: ${width} м для формы: ${form}`);
+    console.log("Отфильтрованные данные по ширине:", filteredData);
 
-                const lengthSelect = document.getElementById("length");
-                lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
+    // Получаем уникальные значения длины
+    const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
+    console.log("Уникальные длины для выбранной формы и ширины:", uniqueLengths);
 
-                if (isNaN(width)) {
-                    console.warn("Ширина не выбрана!");
-                    return;
-                }
+    // Заполняем выпадающий список длины
+    uniqueLengths.forEach(length => {
+        lengthSelect.innerHTML += `<option value="${length}">${length} м</option>`;
+    });
 
-                console.log("Форма для фильтрации:", form);
-console.log("Очищенные названия form_name:", currentCityData.map(item => getFormCategory(item.form_name)));
+    console.log("Выпадающий список длины обновлён.");
 
-                // Фильтруем данные по выбранной форме и ширине
-                const filteredData = currentCityData.filter(item =>
-    availableForms[form].some(name => item.form_name.includes(name)) &&
-    item.width === width
-);
-
-                // Получаем уникальные значения длины
-                const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
-                console.log("Уникальные длины для выбранной формы и ширины:", uniqueLengths);
-
-                // Заполняем выпадающий список длины
-                uniqueLengths.forEach(length => {
-                    lengthSelect.innerHTML += `<option value="${length}">${length} м</option>`;
-                });
-
-                console.log("Выпадающий список длины обновлён.");
-
-                // Сбрасываем каркас
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
-                console.log("Каркас сброшен.");
-            }
+    // Сбрасываем каркас
+    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+    console.log("Каркас сброшен.");
+}
 
             // Функция обработки изменения длины
-            async function onLengthChange() {
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
-                console.log(`Выбрана длина: ${length} м для формы: ${form} и ширины: ${width} м`);
+async function onLengthChange() {
+    const form = document.getElementById("form").value;
+    const width = parseFloat(document.getElementById("width").value);
+    const length = parseFloat(document.getElementById("length").value);
+    console.log(`Выбрана длина: ${length} м для формы: ${form} и ширины: ${width} м`);
 
-                const frameSelect = document.getElementById("frame");
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+    const frameSelect = document.getElementById("frame");
+    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-                if (isNaN(length)) {
-                    console.warn("Длина не выбрана!");
-                    return;
-                }
+    if (isNaN(length)) {
+        console.warn("Длина не выбрана!");
+        return;
+    }
 
-                // Фильтруем данные по выбранной форме, ширине и длине
-                const filteredData = currentCityData.filter(item =>
-    availableForms[form].some(name => item.form_name.includes(name)) &&
-    item.width === width &&
-    item.length === length
-);
-                console.log("Отфильтрованные теплицы по форме, ширине и длине:", filteredData);
+    // Фильтруем данные по выбранной форме, ширине и длине
+    const filteredData = currentCityData.filter(item =>
+        availableForms[form].some(name => item.form_name.includes(name)) &&
+        item.width === width &&
+        item.length === length
+    );
 
-                // Получаем уникальные описания каркасов
-                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
-                console.log("Уникальные каркасы для выбранных параметров:", uniqueFrames);
+    // Проверка на пустые данные после фильтрации
+    if (filteredData.length === 0) {
+        console.warn("Данные после фильтрации пусты. Проверьте параметры.");
+        alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+        return;
+    }
 
-                // Заполняем выпадающий список каркаса с упрощённым отображением
-                uniqueFrames.forEach(frame => {
-                    // Извлечение числовой части каркаса, включая возможный знак +
-                    const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})(?:\s?\+\s?\d{1,2}х\d{1,2})?/);
-                    const numericFrame = numericFrameMatch ? numericFrameMatch[0] : frame; // Если совпадение найдено, используем его
+    console.log("Отфильтрованные данные по длине:", filteredData);
 
-                    const option = document.createElement('option');
-                    option.value = frame; // Сохраняем оригинальное описание для запроса
-                    option.textContent = numericFrame; // Отображаем только числовую часть
-                    frameSelect.appendChild(option);
-                });
+    // Получаем уникальные описания каркасов
+    const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
+    console.log("Уникальные каркасы для выбранных параметров:", uniqueFrames);
 
-                console.log("Выпадающий список каркаса обновлён.");
+    // Заполняем выпадающий список каркаса
+    uniqueFrames.forEach(frame => {
+        // Извлечение числовой части каркаса, включая возможный знак "+"
+        const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})(?:\s?\+\s?\d{1,2}х\d{1,2})?/);
+        const numericFrame = numericFrameMatch ? numericFrameMatch[0] : frame; // Если совпадение найдено, используем его
 
-                // Автоматический выбор каркаса, если доступен только один
-                if (uniqueFrames.length === 1) {
-                    frameSelect.value = uniqueFrames[0];
-                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
-                }
-            }
+        const option = document.createElement('option');
+        option.value = frame; // Сохраняем оригинальное описание для запроса
+        option.textContent = numericFrame; // Отображаем только числовую часть
+        frameSelect.appendChild(option);
+    });
 
-            // Функция обработки изменения каркаса (если необходимо)
-            function onFrameChange() {
-                const frame = document.getElementById("frame").value;
-                console.log(`Выбран каркас: ${frame}`);
-                // Здесь можно добавить дополнительную логику при выборе каркаса
-            }
+    console.log("Выпадающий список каркаса обновлён.");
 
-            // Функция расчёта стоимости теплицы
-            async function calculateGreenhouseCost() {
-                const city = document.getElementById("city").value;
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
-                const frame = document.getElementById("frame").value;
-                const polycarbonate = document.getElementById("polycarbonate").value;
-                const arcStep = parseFloat(document.getElementById("arcStep").value);
-
-                console.log("Начинается расчёт стоимости теплицы с параметрами:", {
-                    city, form, width, length, frame, polycarbonate, arcStep
-                });
-
-                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
-                    console.warn("Пользователь не заполнил все обязательные поля.");
-                    alert("Пожалуйста, заполните все обязательные поля.");
-                    return;
-                }
-
-                // Логирование параметров запроса
-                console.log("Параметры запроса:", {
-                    city,
-                    form,
-                    width,
-                    length,
-                    frame,
-                    polycarbonate
-                });
-
-                // Запрос к Supabase с фильтрацией по городу
-console.log("Отправка запроса к Supabase для получения данных по городу...");
-let { data, error } = await supabaseClient
-    .from('prices')
-    .select('*')
-    .eq('city_name', city) // Запрашиваем только по городу
-    .limit(100); // Ограничиваем результат 100 строками для проверки
-
-console.log("Данные из Supabase по городу:", data);
-console.log("Ошибка при запросе данных:", error);
-
-if (error || !data) { // Проверяем ошибку сразу
-    console.error("Ошибка при получении данных:", error);
-    alert("Теплица с заданными параметрами не найдена.");
-    return;
+    // Автоматический выбор каркаса, если доступен только один
+    if (uniqueFrames.length === 1) {
+        frameSelect.value = uniqueFrames[0];
+        console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+    }
 }
 
-// Логируем все строки из Supabase для проверки
-console.log("Все строки из Supabase по городу:");
-data.forEach((item, index) => {
-    console.log(`Строка ${index + 1}:`, {
-        form_name: item.form_name,
-        width: item.width,
-        length: item.length,
-        frame_description: item.frame_description,
-        polycarbonate_type: item.polycarbonate_type
+            // Функция расчёта стоимости теплицы
+async function calculateGreenhouseCost() {
+    const city = document.getElementById("city").value;
+    const form = document.getElementById("form").value;
+    const width = parseFloat(document.getElementById("width").value);
+    const length = parseFloat(document.getElementById("length").value);
+    const frame = document.getElementById("frame").value;
+    const polycarbonate = document.getElementById("polycarbonate").value;
+    const arcStep = parseFloat(document.getElementById("arcStep").value);
+
+    console.log("Начинается расчёт стоимости теплицы с параметрами:", {
+        city, form, width, length, frame, polycarbonate, arcStep
     });
-});
 
-// Проверка твоих введённых параметров
-console.log("Введённые параметры для сравнения:", {
-    form_name: form,
-    width: width,
-    length: length,
-    frame_description: frame,
-    polycarbonate_type: polycarbonate
-});
+    // Проверка на заполнение всех обязательных полей
+    if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+        console.warn("Пользователь не заполнил все обязательные поля.");
+        alert("Пожалуйста, заполните все обязательные поля.");
+        return;
+    }
 
-// Фильтрация вручную
-const filteredResult = data.filter(item => 
-    item.city_name.trim().toLowerCase() === city.trim().toLowerCase() &&
-    getFormCategory(item.form_name) === form && // Исправлено здесь
-    parseFloat(item.width) === width &&
-    parseFloat(item.length) === length &&
-    item.frame_description.trim().toLowerCase() === frame.trim().toLowerCase() &&
-    item.polycarbonate_type.trim().toLowerCase() === polycarbonate.trim().toLowerCase()
-);
+    // Логирование параметров запроса
+    console.log("Параметры запроса:", {
+        city,
+        form,
+        width,
+        length,
+        frame,
+        polycarbonate
+    });
+
+    // Запрос к Supabase с фильтрацией по городу
+    console.log("Отправка запроса к Supabase для получения данных по городу...");
+    let { data, error } = await supabaseClient
+        .from('prices')
+        .select('*')
+        .eq('city_name', city) // Запрашиваем только по городу
+        .limit(100); // Ограничиваем результат 100 строками для проверки
+
+    console.log("Данные из Supabase по городу:", data);
+    console.log("Ошибка при запросе данных:", error);
+
+    if (error || !data) { // Проверяем ошибку сразу
+        console.error("Ошибка при получении данных:", error);
+        alert("Теплица с заданными параметрами не найдена.");
+        return;
+    }
+
+    // Логируем все строки из Supabase для проверки
+    console.log("Все строки из Supabase по городу:");
+    data.forEach((item, index) => {
+        console.log(`Строка ${index + 1}:`, {
+            form_name: item.form_name,
+            width: item.width,
+            length: item.length,
+            frame_description: item.frame_description,
+            polycarbonate_type: item.polycarbonate_type
+        });
+    });
+
+    // Проверка введённых параметров для фильтрации
+    console.log("Введённые параметры для сравнения:", {
+        form_name: form,
+        width: width,
+        length: length,
+        frame_description: frame,
+        polycarbonate_type: polycarbonate
+    });
+
+    // Фильтрация вручную
+    const filteredResult = data.filter(item => {
+        // Логируем категорию формы для отладки
+        const category = getFormCategory(item.form_name);
+        console.log("Анализ категории формы:", item.form_name, "Результат:", category);
+
+        return (
+            item.city_name.trim().toLowerCase() === city.trim().toLowerCase() &&
+            category === form &&
+            parseFloat(item.width) === width &&
+            parseFloat(item.length) === length &&
+            item.frame_description.trim().toLowerCase() === frame.trim().toLowerCase() &&
+            item.polycarbonate_type.trim().toLowerCase() === polycarbonate.trim().toLowerCase()
+        );
+    });
+
+    // Проверка, что после фильтрации остались данные
+    if (filteredResult.length === 0) {
+        console.warn("Теплица с такими параметрами не найдена.");
+        alert("Теплица с заданными параметрами не найдена.");
+        return;
+    }
+
+    // Логируем отфильтрованные данные
+    console.log("Результаты фильтрации:", filteredResult);
+
+    // Выбираем первую подходящую цену
+    let basePrice = filteredResult[0].price;
+    console.log("Базовая цена теплицы:", basePrice);
+
+    // Дополнительные услуги
+    const assembly = document.getElementById('assembly').checked ? 5000 : 0;
+    const bracing = document.getElementById('bracing').checked ? 2000 : 0;
+    const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
+
+    // Дополнительные товары
+    const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
+    const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
+    const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
+
+    // Стоимость дуг
+    const arcCost = arcStep * 1000;
+
+    // Итоговая стоимость
+    const totalPrice = basePrice + assembly + bracing + groundHooks + dripIrrigation + windowAutomation + galvanizedTape + arcCost;
+    const roundedPrice = Math.ceil(totalPrice / 50) * 50;
+
+    console.log("Итоговая стоимость теплицы:", roundedPrice);
+
+    // Выводим итоговую стоимость
+    document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
+}
 
 console.log("Результаты фильтрации вручную:", filteredResult);
 
