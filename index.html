@@ -577,60 +577,76 @@ async function loadCities() {
 }
 
             // Функция обработки изменения города
-            async function onCityChange() {
-                const city = document.getElementById('city').value;
-                console.log("Выбран город:", city);
+async function onCityChange() {
+    const city = document.getElementById('city').value;
+    console.log("Выбран город:", city);
 
-                if (!city) {
-                    console.log("Город не выбран, сбрасываем формы, модели и каркасы");
-                    document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
-                    document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
-                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
-                    return;
-                }
+    // Если город не выбран – сбрасываем все поля
+    if (!city) {
+        console.log("Город не выбран, сбрасываем формы, модели и каркасы");
+        document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
+        document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
+        document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
+        return;
+    }
 
-                console.log(`Получение данных для города: ${city}`);
-                let { data, error } = await supabaseClient
-                    .from('prices')
-                    .select('form_name, polycarbonate_type')
-                    .eq('city_name', city)
-                    .limit(30000);
-                
-                console.log("Данные для выбранного города:", data);
-                console.log("Ошибка при получении данных по городу:", error);
-                console.log("Все form_name из данных:", data.map(item => item.form_name));
+    console.log(`Получение данных для города: ${city}`);
+    let { data, error } = await supabaseClient
+        .from('prices')
+        .select('form_name, polycarbonate_type')
+        .eq('city_name', city)
+        .limit(30000);
 
+    // Логи для отладки
+    console.log("Данные для выбранного города:", data);
+    console.log("Ошибка при получении данных по городу:", error);
 
-                if (error) {
-                    console.error('Ошибка при получении данных по городу:', error);
-                    return;
-                }
+    if (error) {
+        console.error('Ошибка при получении данных по городу:', error);
+        return;
+    }
 
-                currentCityData = data;
+    currentCityData = data;
 
-                // Обновление выпадающего списка поликарбоната
-                const polycarbonateDropdown = document.getElementById('polycarbonate');
-                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
+    // 1. Обновляем выпадающий список поликарбоната
+    const polycarbonateDropdown = document.getElementById('polycarbonate');
+    polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
 
-                const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
-                console.log("Уникальные типы поликарбоната:", uniquePoly);
+    const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
+    console.log("Уникальные типы поликарбоната:", uniquePoly);
 
-                uniquePoly.forEach(poly => {
-                    const option = document.createElement('option');
-                    option.value = poly;
-                    option.textContent = poly;
-                    polycarbonateDropdown.appendChild(option);
-                });
+    uniquePoly.forEach(poly => {
+        const option = document.createElement('option');
+        option.value = poly;
+        option.textContent = poly;
+        polycarbonateDropdown.appendChild(option);
+    });
 
-                console.log("Выпадающий список поликарбоната обновлён.");
+    console.log("Выпадающий список поликарбоната обновлён.");
 
-                // Сброс остальных полей
-                document.getElementById('form').innerHTML = '<option value="">Выберите форму</option>';
-                document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
-                console.log("Формы, модели и каркасы сброшены.");
-            }
+    // 2. Определяем уникальные формы теплиц
+    const formNames = [...new Set(data.map(item => getFormCategory(item.form_name)))];
+    console.log("Уникальные формы теплиц:", formNames);
 
+    // Обновляем выпадающий список форм теплиц
+    const formDropdown = document.getElementById('form');
+    formDropdown.innerHTML = '<option value="">Выберите форму</option>';
+    formNames.forEach(form => {
+        if (form && form !== "Прочие") { // Исключаем пустые и ненужные категории
+            const option = document.createElement('option');
+            option.value = form;
+            option.textContent = form;
+            formDropdown.appendChild(option);
+        }
+    });
+
+    console.log("Выпадающий список форм теплиц обновлён.");
+
+    // 3. Сбрасываем модели и каркасы
+    document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
+    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
+    console.log("Модели и каркасы сброшены.");
+}
             // Функция обработки изменения формы
             function onFormChange() {
                 const form = document.getElementById("form").value;
