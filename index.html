@@ -313,6 +313,77 @@
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             let currentCityData = []; // Данные по выбранному городу
+            let currentCityData = []; // Данные по выбранному городу
+
+// Определение доступных форм теплиц и их названий
+const availableForms = {
+    "Арочная": [
+        "ТЕПЛИЦА БОЯРСКАЯ 2.5М", 
+        "ТЕПЛИЦА БОЯРСКАЯ 3М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", 
+        "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М"
+    ],
+    "Каплевидная": [
+        "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", 
+        "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", 
+        "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М"
+    ],
+    "Прямостенная": [
+        "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", 
+        "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", 
+        "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", 
+        "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", 
+        "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", 
+        "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", 
+        "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М"
+    ],
+    "Домиком": [
+        "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", 
+        "ТЕПЛИЦА ДОМИК ЛЮКС 3М", 
+        "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", 
+        "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", 
+        "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", 
+        "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", 
+        "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М"
+    ],
+    "Пристенная": [
+        "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", 
+        "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", 
+        "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", 
+        "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М"
+    ],
+    "Митлайдер арочная": [
+        "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", 
+        "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", 
+        "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", 
+        "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М"
+    ],
+    "Митлайдер прямостенная": [
+        "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", 
+        "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М"
+    ],
+    "Промышленная прямостенная": [
+        "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", 
+        "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М"
+    ],
+    "Промышленная домиком": [
+        "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", 
+        "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М"
+    ],
+    "Навес": [
+        "НАВЕС ЛЮКС 3.5М", 
+        "НАВЕС ЛЮКС 4М", 
+        "НАВЕС ПРЕМИУМ 5М", 
+        "НАВЕС ПРЕМИУМ 6М"
+    ]
+};
 
             // Вспомогательная функция для определения формы теплицы по названию
             function getFormCategory(formName) {
@@ -630,9 +701,10 @@
 
                 console.log("Выпадающий список поликарбоната обновлён.");
 
-                // 2. Определяем уникальные формы теплиц
-                const formNames = [...new Set(data.map(item => getFormCategory(item.form_name)))];
-                console.log("Уникальные формы теплиц:", formNames);
+                // Фильтруем формы на основе availableForms
+const formNames = Object.keys(availableForms).filter(formType =>
+    data.some(item => availableForms[formType].some(name => item.form_name.includes(name)))
+);
 
                 // Сортируем формы по приоритету
                 formNames.sort((a, b) => (formPriority[a] || 100) - (formPriority[b] || 100)); // Прочие формы получат низкий приоритет
@@ -671,18 +743,21 @@
                     return;
                 }
 
-                // Фильтруем данные по выбранной форме
-                const filteredData = currentCityData.filter(g => getFormCategory(g.form_name) === form);
-                console.log("Отфильтрованные теплицы по форме:", filteredData);
+               // Фильтруем данные по выбранной форме на основе availableForms
+const filteredData = currentCityData.filter(item => 
+    availableForms[form]?.some(name => item.form_name.includes(name))
+);
 
-                // Получаем уникальные значения ширины
-                const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
-                console.log("Уникальные ширины для формы:", uniqueWidths);
+console.log("Отфильтрованные теплицы по форме:", filteredData);
 
-                // Заполняем выпадающий список ширины
-                uniqueWidths.forEach(width => {
-                    widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
-                });
+// Получаем уникальные значения ширины
+const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
+console.log("Уникальные ширины для формы:", uniqueWidths);
+
+// Заполняем выпадающий список ширины
+uniqueWidths.forEach(width => {
+    widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
+});
 
                 console.log("Выпадающий список ширины обновлён.");
 
@@ -707,8 +782,10 @@
                 }
 
                 // Фильтруем данные по выбранной форме и ширине
-                const filteredData = currentCityData.filter(g => getFormCategory(g.form_name) === form && g.width === width);
-                console.log("Отфильтрованные теплицы по форме и ширине:", filteredData);
+                const filteredData = currentCityData.filter(item =>
+    availableForms[form].some(name => item.form_name.includes(name)) &&
+    item.width === width
+);
 
                 // Получаем уникальные значения длины
                 const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
@@ -742,11 +819,11 @@
                 }
 
                 // Фильтруем данные по выбранной форме, ширине и длине
-                const filteredData = currentCityData.filter(g => 
-                    getFormCategory(g.form_name) === form &&
-                    g.width === width &&
-                    g.length === length
-                );
+                const filteredData = currentCityData.filter(item =>
+    availableForms[form].some(name => item.form_name.includes(name)) &&
+    item.width === width &&
+    item.length === length
+);
                 console.log("Отфильтрованные теплицы по форме, ширине и длине:", filteredData);
 
                 // Получаем уникальные описания каркасов
