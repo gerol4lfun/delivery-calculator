@@ -822,11 +822,32 @@ let { data, error } = await supabaseClient
 console.log("Данные из Supabase по городу:", data);
 console.log("Ошибка при запросе данных:", error);
 
-if (error || !data) {
+if (error || !data) { // Проверяем ошибку сразу
     console.error("Ошибка при получении данных:", error);
     alert("Теплица с заданными параметрами не найдена.");
     return;
 }
+
+// Логируем все строки из Supabase для проверки
+console.log("Все строки из Supabase по городу:");
+data.forEach((item, index) => {
+    console.log(`Строка ${index + 1}:`, {
+        form_name: item.form_name,
+        width: item.width,
+        length: item.length,
+        frame_description: item.frame_description,
+        polycarbonate_type: item.polycarbonate_type
+    });
+});
+
+// Проверка твоих введённых параметров
+console.log("Введённые параметры для сравнения:", {
+    form_name: form,
+    width: width,
+    length: length,
+    frame_description: frame,
+    polycarbonate_type: polycarbonate
+});
 
 // Фильтрация вручную
 const filteredResult = data.filter(item => 
