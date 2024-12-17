@@ -1289,8 +1289,9 @@ async function calculateGreenhouseCost() {
         return;
     }
 
+    // Используем currentCityData, а не greenhouseData
     const filteredFrames = currentCityData
-        .filter(g => greenhouseData[g.form_name]?.form === form)
+        .filter(g => g.form_name === form)
         .map(g => g.frame_description);
 
     const uniqueFrames = [...new Set(filteredFrames)];
@@ -1298,16 +1299,15 @@ async function calculateGreenhouseCost() {
         frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
     });
 
-    // Автоматически выбираем каркас, если он один
+    // Автоматический выбор каркаса, если доступен только один
     if (uniqueFrames.length === 1) {
         frameSelect.value = uniqueFrames[0];
         console.log("Автоматически выбран каркас:", uniqueFrames[0]);
     }
 
-    // Обновляем ширину и длину после выбора формы
-     updateWidthAndLengthOptions();
+    // Обновляем ширину и длину
+    await updateWidthAndLengthOptions();
 }
-
         </script>
     </div>
 </body>
