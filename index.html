@@ -735,104 +735,83 @@ function onFormChange() {
             // Функция обновления опций каркаса
             // Убрана, т.к. теперь каркас обновляется в onModelChange
 
-            // Функция расчёта стоимости теплицы
-            async function calculateGreenhouseCost() {
-                const city = document.getElementById("city").value;
-                const form = document.getElementById("form").value;
-                const model = document.getElementById("model").value;
-                const widthSelect = document.getElementById("width");
-                const width = widthSelect.value ? parseFloat(widthSelect.value) : NaN;
-                const lengthSelect = document.getElementById("length");
-                const length = lengthSelect.value ? parseFloat(lengthSelect.value) : NaN;
-                const frame = document.getElementById("frame").value;
-                const polycarbonate = document.getElementById("polycarbonate").value;
-                const arcStepSelect = document.getElementById("arcStep");
-                const arcStep = arcStepSelect.value ? parseFloat(arcStepSelect.value) : NaN;
+           // Функция расчёта стоимости теплицы
+async function calculateGreenhouseCost() {
+    const city = document.getElementById("city").value;
+    const form = document.getElementById("form").value;
+    const width = parseFloat(document.getElementById("width").value);
+    const length = parseFloat(document.getElementById("length").value);
+    const frame = document.getElementById("frame").value;
+    const polycarbonate = document.getElementById("polycarbonate").value;
 
-                console.log("Начинается расчёт стоимости теплицы с параметрами:", {
-                    city, form, model, width, length, frame, polycarbonate, arcStep
-                });
+    console.log("Начинается расчёт стоимости теплицы с параметрами:", {
+        city, form, width, length, frame, polycarbonate
+    });
 
-                if (!city || !form || !model || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
-                    console.warn("Пользователь не заполнил все обязательные поля.");
-                    alert("Пожалуйста, заполните все обязательные поля.");
-                    return;
-                }
+    if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate) {
+        console.warn("Пользователь не заполнил все обязательные поля.");
+        alert("Пожалуйста, заполните все обязательные поля.");
+        return;
+    }
 
-                // Получим модель и каркас
-                const selectedForm = availableForms.find(f => f.name === form);
-                if (!selectedForm) {
-                    console.error(`Форма "${form}" не найдена в availableForms`);
-                    alert("Ошибка при выборе формы.");
-                    return;
-                }
+    // Запрос к Supabase с фильтрацией по всем параметрам
+    console.log("Отправка запроса к Supabase для получения цены теплицы...");
+    let { data, error } = await supabaseClient
+        .from('prices')
+        .select('*')
+        .eq('form_name', form)
+        .eq('width', width)
+        .eq('length', length)
+        .eq('frame_description', frame)
+        .eq('polycarbonate_type', polycarbonate)
+        .single();
+    
+    console.log("Данные для расчета цены:", data);
+    console.log("Ошибка для расчета цены:", error);
 
-                const selectedModel = selectedForm.models.find(m => m.name === model);
-                if (!selectedModel) {
-                    console.error(`Модель "${model}" не найдена в форме "${form}"`);
-                    alert("Ошибка при выборе модели.");
-                    return;
-                }
+    if (error || !data) {
+        console.error('Ошибка при получении данных для расчета:', error);
+        alert("Теплица с заданными параметрами не найдена.");
+        return;
+    }
 
-                if (!selectedModel.frames.includes(frame)) {
-                    console.error(`Каркас "${frame}" не доступен для модели "${model}"`);
-                    alert("Ошибка при выборе каркаса.");
-                    return;
-                }
+    let basePrice = data.price;
+    console.log("Базовая цена теплицы:", basePrice);
 
-                // Запрос к Supabase с фильтрацией по всем параметрам
-                console.log("Отправка запроса к Supabase для получения цены теплицы...");
-                let { data, error } = await supabaseClient
-                    .from('prices')
-                    .select('*')
-                    .eq('form_name', model)
-                    .eq('width', width)
-                    .eq('length', length)
-                    .eq('frame_description', frame)
-                    .eq('polycarbonate_type', polycarbonate)
-                    .single();
-                
-                console.log("Данные для расчета цены:", data);
-                console.log("Ошибка для расчета цены:", error);
+    // Дополнительные услуги
+    const assembly = document.getElementById('assembly').checked ? 5000 : 0;
+    const bracing = document.getElementById('bracing').checked ? 2000 : 0;
+    const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
 
-                if (error || !data) {
-                    console.error('Ошибка при получении данных для расчета:', error);
-                    alert("Теплица с заданными параметрами не найдена.");
-                    return;
-                }
+    console.log("Дополнительные услуги:", { assembly, bracing, groundHooks });
 
-                let basePrice = data.price;
-                console.log("Базовая цена теплицы:", basePrice);
+    // Дополнительные товары
+    const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
+    const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
+    const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
 
-                const assembly = document.getElementById('assembly').checked ? 5000 : 0;
-                const bracing = document.getElementById('bracing').checked ? 2000 : 0;
-                const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
+    console.log("Дополнительные товары:", { dripIrrigation, windowAutomation, galvanizedTape });
 
-                console.log("Дополнительные услуги:", { assembly, bracing, groundHooks });
+    const additionalServices = assembly + bracing + groundHooks;
+    const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
 
-                const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
-                const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
-                const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
+    console.log("Итого дополнительные услуги:", additionalServices);
+    console.log("Итого дополнительные товары:", additionalProducts);
 
-                console.log("Дополнительные товары:", { dripIrrigation, windowAutomation, galvanizedTape });
+    // Стоимость дуг
+    const arcStep = parseFloat(document.getElementById("arcStep").value);
+    const arcCost = arcStep * 1000; 
+    console.log("Стоимость дуг (arcCost):", arcCost);
 
-                const additionalServices = assembly + bracing + groundHooks;
-                const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
+    // Итоговая стоимость
+    const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
+    console.log("Общая стоимость до округления:", totalPrice);
 
-                console.log("Итого дополнительные услуги:", additionalServices);
-                console.log("Итого дополнительные товары:", additionalProducts);
+    const roundedPrice = Math.ceil(totalPrice / 50) * 50;
+    console.log("Итоговая стоимость после округления:", roundedPrice);
 
-                const arcCost = arcStep * 1000; 
-                console.log("Стоимость дуг (arcCost):", arcCost);
-
-                const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
-                console.log("Общая стоимость до округления:", totalPrice);
-
-                const roundedPrice = Math.ceil(totalPrice / 50) * 50;
-                console.log("Итоговая стоимость после округления:", roundedPrice);
-
-                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
-            }
+    document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
+}
 
             // Инициализация при загрузке страницы
             window.onload = async function() {
