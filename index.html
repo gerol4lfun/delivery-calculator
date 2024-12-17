@@ -309,57 +309,52 @@
 
             // Вспомогательная функция для определения формы теплицы по названию
 function getFormCategory(formName) {
-    // Проверка на "Арочная"
-    if (formName.includes("БОЯРСКАЯ")) {
+    console.log("Анализ form_name:", formName); // Лог для отладки
+
+    // Приводим название к удобному формату: удаляем "ТЕПЛИЦА" и цифры
+    const cleanName = formName.replace(/ТЕПЛИЦА/g, "").replace(/\d+(\.\d+)?М/g, "").trim();
+    console.log("Очищенное имя для анализа:", cleanName);
+
+    if (cleanName.includes("БОЯРСКАЯ")) {
         return "Арочная";
     }
 
-    // Проверка на "Каплевидная"
-    if (formName.includes("СТРЕЛЕЦКАЯ")) {
+    if (cleanName.includes("СТРЕЛЕЦКАЯ")) {
         return "Каплевидная";
     }
 
-    // Проверка на "Прямостенная"
-    if (formName.includes("ЦАРСКАЯ")) {
+    if (cleanName.includes("ЦАРСКАЯ")) {
         return "Прямостенная";
     }
 
-    // Проверка на "Домиком"
-    if (formName.includes("ДОМИК")) {
+    if (cleanName.includes("ДОМИК")) {
         return "Домиком";
     }
 
-    // Проверка на "Пристенная"
-    if (formName.includes("ПРИСТЕННАЯ")) {
+    if (cleanName.includes("ПРИСТЕННАЯ")) {
         return "Пристенная";
     }
 
-    // Проверка на "Митлайдер арочная"
-    if (formName.includes("МИТЛАЙДЕР") && formName.includes("ЛЮКС")) {
+    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЛЮКС")) {
         return "Митлайдер арочная";
     }
 
-    // Проверка на "Митлайдер прямостенная"
-    if (formName.includes("МИТЛАЙДЕР") && formName.includes("ЭЛИТ")) {
+    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЭЛИТ")) {
         return "Митлайдер прямостенная";
     }
 
-    // Проверка на "Промышленная прямостенная"
-    if (formName.includes("ПРЕМЬЕР")) {
+    if (cleanName.includes("ПРЕМЬЕР")) {
         return "Промышленная прямостенная";
     }
 
-    // Проверка на "Промышленная домиком"
-    if (formName.includes("МОНАРХ")) {
+    if (cleanName.includes("МОНАРХ")) {
         return "Промышленная домиком";
     }
 
-    // Проверка на "Навес"
-    if (formName.includes("НАВЕС")) {
+    if (cleanName.includes("НАВЕС")) {
         return "Навес";
     }
 
-    // Значение по умолчанию, если ни один вариант не подошёл
     return "Прочие";
 }
 
