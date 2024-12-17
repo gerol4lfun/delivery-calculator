@@ -221,41 +221,22 @@
 
                 <div class="parameters">
                     <label for="form">Форма теплицы:</label>
-                    <select id="form" onchange="updateFrameOptions()">
+                    <select id="form" onchange="onFormChange()">
                         <option value="">Сначала выберите город</option>
                     </select>
                 </div>
 
                 <div class="parameters">
-                    <label for="width">Ширина (м):</label>
-                    <select id="width">
-                        <option value="">Выберите ширину</option>
-                        <option value="2.5">2.5 м</option>
-                        <option value="3">3 м</option>
-                        <option value="3.5">3.5 м</option>
-                        <option value="4">4 м</option>
-                        <option value="5">5 м</option>
-                        <option value="6">6 м</option>
-                        <option value="7">7 м</option>
-                    </select>
-                </div>
-
-                <div class="parameters">
-                    <label for="length">Длина (м):</label>
-                    <select id="length">
-                        <option value="">Выберите длину</option>
-                        <option value="4">4 м</option>
-                        <option value="6">6 м</option>
-                        <option value="8">8 м</option>
-                        <option value="10">10 м</option>
-                        <option value="12">12 м</option>
+                    <label for="model">Модель теплицы:</label>
+                    <select id="model" onchange="onModelChange()">
+                        <option value="">Сначала выберите форму</option>
                     </select>
                 </div>
 
                 <div class="parameters">
                     <label for="frame">Каркас:</label>
                     <select id="frame">
-                        <option value="">Сначала выберите форму</option>
+                        <option value="">Сначала выберите модель</option>
                     </select>
                 </div>
 
@@ -341,62 +322,88 @@
                 { login: "Manager10", password: "Mng10#Secure" }
             ];
 
-            // Объект greenhouseData
-            const greenhouseData = {
-                "ТЕПЛИЦА БОЯРСКАЯ 2.5М": { form: "Арочная", frames: ["20х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ 3М": { form: "Арочная", frames: ["20х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М": { form: "Арочная", frames: ["40х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М": { form: "Арочная", frames: ["40х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М": { form: "Арочная", frames: ["40х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М": { form: "Арочная", frames: ["20х20+20х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М": { form: "Арочная", frames: ["20х20+20х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М": { form: "Арочная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М": { form: "Арочная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М": { form: "Арочная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М": { form: "Арочная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М": { form: "Каплевидная", frames: ["40х20"] },
-                "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М": { form: "Каплевидная", frames: ["40х20"] },
-                "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М": { form: "Каплевидная", frames: ["40х20"] },
-                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М": { form: "Каплевидная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М": { form: "Каплевидная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М": { form: "Каплевидная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М": { form: "Каплевидная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М": { form: "Каплевидная", frames: ["40х20"] },
-                "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М": { form: "Каплевидная", frames: ["40х20"] },
-                "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М": { form: "Каплевидная", frames: ["40х20"] },
-                "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М": { form: "Домиком", frames: ["40х20"] },
-                "ТЕПЛИЦА ДОМИК ЛЮКС 3М": { form: "Домиком", frames: ["40х20"] },
-                "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М": { form: "Домиком", frames: ["40х20"] },
-                "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М": { form: "Домиком", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М": { form: "Домиком", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М": { form: "Домиком", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М": { form: "Домиком", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М": { form: "Митлайдер арочная", frames: ["40х20"] },
-                "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М": { form: "Митлайдер арочная", frames: ["40х20"] },
-                "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М": { form: "Митлайдер арочная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М": { form: "Митлайдер арочная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М": { form: "Митлайдер прямостенная", frames: ["40х20+40х20"] },
-                "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М": { form: "Митлайдер прямостенная", frames: ["40х20+40х20"] },
-                "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М": { form: "Пристенная", frames: ["40х20"] },
-                "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М": { form: "Пристенная", frames: ["40х20"] },
-                "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М": { form: "Пристенная", frames: ["40х20+20х20"] },
-                "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М": { form: "Пристенная", frames: ["40х20+20х20"] },
-                "НАВЕС ЛЮКС 3.5М": { form: "Навес", frames: ["40х20+20х20"] },
-                "НАВЕС ЛЮКС 4М": { form: "Навес", frames: ["40х20+20х20"] },
-                "НАВЕС ПРЕМИУМ 5М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
-                "НАВЕС ПРЕМИУМ 6М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
-                "ПРОМЫШЛЕННАЯ ПРЕМЬЕР 5М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
-                "ПРОМЫШЛЕННАЯ ПРЕМЬЕР 6М": { form: "Промышленная прямостенная", frames: ["40х20+40х20"] },
-                "ПРОМЫШЛЕННАЯ МОНАРХ 7М": { form: "Промышленная домиком", frames: ["40х20+40х20"] },
-                "ПРОМЫШЛЕННАЯ МОНАРХ 8М": { form: "Промышленная домиком", frames: ["40х20+40х20"] }
-            };
-
-            // Нормализованный объект greenhouseData с нижним регистром ключей
-            const greenhouseDataNormalized = {};
-            Object.keys(greenhouseData).forEach(key => {
-                greenhouseDataNormalized[key.trim().toLowerCase()] = greenhouseData[key];
-            });
-            console.log("Нормализованный greenhouseData создан.");
+            // Определение доступных форм, моделей и каркасов
+            const availableForms = [
+                {
+                    name: "Арочная",
+                    models: [
+                        { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М", frames: ["20х20"] },
+                        { name: "ТЕПЛИЦА БОЯРСКАЯ 3М", frames: ["20х20"] }
+                    ]
+                },
+                {
+                    name: "Каплевидная",
+                    models: [
+                        { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", frames: ["40х20"] }
+                    ]
+                },
+                {
+                    name: "Прямостенная",
+                    models: [
+                        { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", frames: ["40х20"] }
+                    ]
+                },
+                {
+                    name: "Домиком",
+                    models: [
+                        { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frames: ["40х20"] }
+                    ]
+                },
+                {
+                    name: "Пристенная",
+                    models: [
+                        { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", frames: ["40х20+20х20"] },
+                        { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М", frames: ["40х20+20х20"] }
+                    ]
+                },
+                {
+                    name: "Митлайдер арочная",
+                    models: [
+                        { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", frames: ["40х20"] },
+                        { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", frames: ["40х20+20х20"] },
+                        { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М", frames: ["40х20+20х20"] }
+                    ]
+                },
+                {
+                    name: "Митлайдер прямостенная",
+                    models: [
+                        { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", frames: ["40х20+40х20"] },
+                        { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М", frames: ["40х20+40х20"] }
+                    ]
+                },
+                {
+                    name: "Промышленная прямостенная",
+                    models: [
+                        { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", frames: ["40х20+40х20"] },
+                        { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М", frames: ["40х20+40х20"] }
+                    ]
+                },
+                {
+                    name: "Промышленная домиком",
+                    models: [
+                        { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", frames: ["40х20+40х20"] },
+                        { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М", frames: ["40х20+40х20"] }
+                    ]
+                },
+                {
+                    name: "Навес",
+                    models: [
+                        { name: "НАВЕС ЛЮКС 3.5М", frames: ["40х20+20х20"] },
+                        { name: "НАВЕС ЛЮКС 4М", frames: ["40х20+20х20"] },
+                        { name: "НАВЕС ПРЕМИУМ 5М", frames: ["40х20+40х20"] },
+                        { name: "НАВЕС ПРЕМИУМ 6М", frames: ["40х20+40х20"] }
+                    ]
+                }
+            ];
 
             // Приоритеты форм (чем меньше число, тем выше в списке):
             const formPriority = {
@@ -523,9 +530,10 @@
                 console.log("Выбран город:", city);
 
                 if (!city) {
-                    console.log("Город не выбран, сбрасываем формы и каркасы");
+                    console.log("Город не выбран, сбрасываем формы, модели и каркасы");
                     document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
-                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
+                    document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
+                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
                     return;
                 }
 
@@ -546,41 +554,6 @@
 
                 currentCityData = data;
 
-                // Модифицированная логика для определения доступных форм
-                const availableFormsSet = new Set(currentCityData.map(g => {
-                    const formNameNormalized = g.form_name.trim().toLowerCase();
-                    const mappedForm = greenhouseDataNormalized[formNameNormalized]?.form;
-                    if (mappedForm) {
-                        console.log(`Mapped form for "${g.form_name}": "${mappedForm}"`);
-                        return mappedForm;
-                    } else {
-                        console.warn(`Form name "${g.form_name}" не найден в greenhouseDataNormalized`);
-                        return null;
-                    }
-                }).filter(Boolean));
-
-                console.log("Уникальные доступные формы (используя greenhouseDataNormalized):", availableFormsSet);
-
-                // Преобразуем Set в массив и сортируем по приоритету
-                const availableForms = Array.from(availableFormsSet).sort((a, b) => {
-                    const prioA = formPriority[a] || 9999;
-                    const prioB = formPriority[b] || 9999;
-                    return prioA - prioB;
-                });
-                console.log("Доступные формы после сортировки по приоритету:", availableForms);
-
-                const formDropdown = document.getElementById('form');
-                formDropdown.innerHTML = '<option value="">Выберите форму</option>';
-
-                availableForms.forEach(form => {
-                    const option = document.createElement('option');
-                    option.value = form;
-                    option.textContent = form;
-                    formDropdown.appendChild(option);
-                });
-
-                console.log("Выпадающий список форм обновлён.");
-
                 // Обновление выпадающего списка поликарбоната
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
                 polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
@@ -598,92 +571,135 @@
                 console.log("Выпадающий список поликарбоната обновлён.");
 
                 // Сброс остальных полей
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
-                console.log("Поле каркаса сброшено.");
+                document.getElementById('form').innerHTML = '<option value="">Выберите форму</option>';
+                document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
+                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
+                console.log("Формы, модели и каркасы сброшены.");
             }
 
-            // Функция обновления опций каркаса
-            function updateFrameOptions() {
-                const city = document.getElementById("city").value;
+            // Функция обработки изменения формы
+            function onFormChange() {
                 const form = document.getElementById("form").value;
-                const frameSelect = document.getElementById("frame");
+                console.log(`Выбрана форма: ${form}`);
 
-                console.log(`Выбрана форма: ${form} для города: ${city}`);
+                const modelSelect = document.getElementById("model");
+                modelSelect.innerHTML = '<option value="">Выберите модель</option>';
 
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
-
-                if (!city || !form) {
-                    console.warn("Не выбран город или форма!");
+                if (!form) {
+                    console.warn("Форма не выбрана!");
                     return;
                 }
 
-                // Получение всех greenhouseData ключей, соответствующих выбранной форме
-                const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => greenhouseData[fn].form === form);
-                console.log("Matching Greenhouses для формы:", matchingGreenhouses);
+                // Находим выбранную форму в availableForms
+                const selectedForm = availableForms.find(f => f.name === form);
+                if (!selectedForm) {
+                    console.error(`Форма "${form}" не найдена в availableForms`);
+                    return;
+                }
 
-                // Получение всех возможных каркасов для выбранной формы
-                let frames = [];
-                matchingGreenhouses.forEach(fn => {
-                    const gh = greenhouseData[fn];
-                    if (gh && gh.frames) {
-                        frames = frames.concat(gh.frames);
-                    }
+                // Добавляем модели в выпадающий список
+                selectedForm.models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.name;
+                    option.textContent = model.name;
+                    modelSelect.appendChild(option);
                 });
-                console.log("Каркасы, собранные из matchingGreenhouses:", frames);
 
-                const uniqueFrames = [...new Set(frames)];
-                console.log("Уникальные каркасы:", uniqueFrames);
+                console.log("Выпадающий список моделей обновлён.");
+                
+                // Сброс каркасов
+                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
+            }
 
-                uniqueFrames.forEach((frame) => {
-                    const option = document.createElement("option");
+            // Функция обработки изменения модели
+            function onModelChange() {
+                const form = document.getElementById("form").value;
+                const model = document.getElementById("model").value;
+                console.log(`Выбрана модель: ${model} для формы: ${form}`);
+
+                const frameSelect = document.getElementById("frame");
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+
+                if (!model) {
+                    console.warn("Модель не выбрана!");
+                    return;
+                }
+
+                // Находим выбранную модель в availableForms
+                const selectedForm = availableForms.find(f => f.name === form);
+                if (!selectedForm) {
+                    console.error(`Форма "${form}" не найдена в availableForms`);
+                    return;
+                }
+
+                const selectedModel = selectedForm.models.find(m => m.name === model);
+                if (!selectedModel) {
+                    console.error(`Модель "${model}" не найдена в форме "${form}"`);
+                    return;
+                }
+
+                // Добавляем каркасы в выпадающий список
+                selectedModel.frames.forEach(frame => {
+                    const option = document.createElement('option');
                     option.value = frame;
                     option.textContent = frame;
-                    frameSelect.add(option);
+                    frameSelect.appendChild(option);
                 });
 
                 console.log("Выпадающий список каркасов обновлён.");
 
-                if (uniqueFrames.length === 1) {
-                    frameSelect.value = uniqueFrames[0];
-                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+                // Автоматический выбор каркаса, если доступен только один
+                if (selectedModel.frames.length === 1) {
+                    frameSelect.value = selectedModel.frames[0];
+                    console.log("Автоматически выбран каркас:", selectedModel.frames[0]);
                 }
             }
+
+            // Функция обновления опций каркаса
+            // Убрана, т.к. теперь каркас обновляется в onModelChange
 
             // Функция расчёта стоимости теплицы
             async function calculateGreenhouseCost() {
                 const city = document.getElementById("city").value;
                 const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
+                const model = document.getElementById("model").value;
+                const widthSelect = document.getElementById("width");
+                const width = widthSelect.value ? parseFloat(widthSelect.value) : NaN;
+                const lengthSelect = document.getElementById("length");
+                const length = lengthSelect.value ? parseFloat(lengthSelect.value) : NaN;
                 const frame = document.getElementById("frame").value;
                 const polycarbonate = document.getElementById("polycarbonate").value;
-                const arcStep = parseFloat(document.getElementById("arcStep").value);
+                const arcStepSelect = document.getElementById("arcStep");
+                const arcStep = arcStepSelect.value ? parseFloat(arcStepSelect.value) : NaN;
 
                 console.log("Начинается расчёт стоимости теплицы с параметрами:", {
-                    city, form, width, length, frame, polycarbonate, arcStep
+                    city, form, model, width, length, frame, polycarbonate, arcStep
                 });
 
-                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+                if (!city || !form || !model || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
                     console.warn("Пользователь не заполнил все обязательные поля.");
                     alert("Пожалуйста, заполните все обязательные поля.");
                     return;
                 }
 
-                // Формируем frame_description, соответствующий базе данных
-                // Предполагаем, что в базе данных хранится только размер, например "40х20+20х20"
-                const fullFrameName = frame;
-                console.log("Полное описание каркаса (frame_description):", fullFrameName);
+                // Получим модель и каркас
+                const selectedForm = availableForms.find(f => f.name === form);
+                if (!selectedForm) {
+                    console.error(`Форма "${form}" не найдена в availableForms`);
+                    alert("Ошибка при выборе формы.");
+                    return;
+                }
 
-                // Получим все greenhouseData ключи, соответствующие выбранной форме и ширине
-                const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => {
-                    return greenhouseData[fn].form === form && fn.includes(`${width}М`);
-                });
+                const selectedModel = selectedForm.models.find(m => m.name === model);
+                if (!selectedModel) {
+                    console.error(`Модель "${model}" не найдена в форме "${form}"`);
+                    alert("Ошибка при выборе модели.");
+                    return;
+                }
 
-                console.log("Подходящие ключи (matchingGreenhouses) для формы и ширины:", matchingGreenhouses);
-
-                if (matchingGreenhouses.length === 0) {
-                    console.warn("Не найдена теплица с такой шириной и формой.");
-                    alert("Не найдена теплица с такой шириной и формой.");
+                if (!selectedModel.frames.includes(frame)) {
+                    console.error(`Каркас "${frame}" не доступен для модели "${model}"`);
+                    alert("Ошибка при выборе каркаса.");
                     return;
                 }
 
@@ -692,10 +708,10 @@
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('*')
-                    .in('form_name', matchingGreenhouses)
+                    .eq('form_name', model)
                     .eq('width', width)
                     .eq('length', length)
-                    .eq('frame_description', fullFrameName)
+                    .eq('frame_description', frame)
                     .eq('polycarbonate_type', polycarbonate)
                     .single();
                 
@@ -972,201 +988,81 @@
                 console.log("Загрузка городов завершена.");
             }
 
-            // Функция загрузки городов
-            async function loadCities() {
-                console.log("Начинается загрузка городов из Supabase...");
-                let cityData = [];
-                let page = 0;
-                const pageSize = 1000; // Количество строк за один запрос
-
-                while (true) {
-                    // Запрос с пагинацией
-                    let { data, error } = await supabaseClient
-                        .from('prices')
-                        .select('city_name', { distinct: true }) // Получаем уникальные города
-                        .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
-
-                    if (error) {
-                        console.error("Ошибка при получении городов из Supabase:", error);
-                        break;
-                    }
-
-                    console.log(`Получено ${data.length} городов на странице ${page + 1}`);
-
-                    // Если данных меньше, чем страница — значит, это последняя страница
-                    if (data.length === 0) break;
-
-                    cityData = cityData.concat(data);
-                    page++;
-                }
-
-                console.log("Все города из Supabase (с пагинацией):", cityData);
-
-                // Обработка данных и создание выпадающего списка
-                let uniqueCities = [...new Set(cityData.map(item => item.city_name))];
-                console.log("Уникальные города:", uniqueCities);
-
-                // Удаляем Москву и СПб из списка, если они есть
-                let mIndex = uniqueCities.indexOf("Москва");
-                if (mIndex > -1) {
-                    uniqueCities.splice(mIndex, 1);
-                    console.log("Москва удалена из списка городов");
-                }
-
-                let spbIndex = uniqueCities.indexOf("Санкт-Петербург");
-                if (spbIndex > -1) {
-                    uniqueCities.splice(spbIndex, 1);
-                    console.log("Санкт-Петербург удалён из списка городов");
-                }
-
-                // Сортируем оставшиеся по алфавиту
-                uniqueCities.sort((a, b) => a.localeCompare(b, 'ru'));
-                console.log("Сортировка городов по алфавиту завершена");
-
-                // Добавляем в начало Москва и Санкт-Петербург
-                uniqueCities.unshift("Санкт-Петербург");
-                uniqueCities.unshift("Москва");
-                console.log("Москва и Санкт-Петербург добавлены в начало списка городов");
-
-                const cityDropdown = document.getElementById('city');
-                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
-
-                uniqueCities.forEach(city => {
-                    cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
-                });
-
-                console.log("Выпадающий список городов обновлён.");
-            }
-
-            // Функция обработки изменения города
-            async function onCityChange() {
-                const city = document.getElementById('city').value;
-                console.log("Выбран город:", city);
-
-                if (!city) {
-                    console.log("Город не выбран, сбрасываем формы и каркасы");
-                    document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
-                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
-                    return;
-                }
-
-                console.log(`Получение данных для города: ${city}`);
-                let { data, error } = await supabaseClient
-                    .from('prices')
-                    .select('form_name, polycarbonate_type')
-                    .eq('city_name', city)
-                    .limit(30000);
-                
-                console.log("Данные для выбранного города:", data);
-                console.log("Ошибка при получении данных по городу:", error);
-
-                if (error) {
-                    console.error('Ошибка при получении данных по городу:', error);
-                    return;
-                }
-
-                currentCityData = data;
-
-                // Модифицированная логика для определения доступных форм
-                const availableFormsSet = new Set(currentCityData.map(g => {
-                    const formNameNormalized = g.form_name.trim().toLowerCase();
-                    const mappedForm = greenhouseDataNormalized[formNameNormalized]?.form;
-                    if (mappedForm) {
-                        console.log(`Mapped form for "${g.form_name}": "${mappedForm}"`);
-                        return mappedForm;
-                    } else {
-                        console.warn(`Form name "${g.form_name}" не найден в greenhouseDataNormalized`);
-                        return null;
-                    }
-                }).filter(Boolean));
-
-                console.log("Уникальные доступные формы (используя greenhouseDataNormalized):", availableFormsSet);
-
-                // Преобразуем Set в массив и сортируем по приоритету
-                const availableForms = Array.from(availableFormsSet).sort((a, b) => {
-                    const prioA = formPriority[a] || 9999;
-                    const prioB = formPriority[b] || 9999;
-                    return prioA - prioB;
-                });
-                console.log("Доступные формы после сортировки по приоритету:", availableForms);
-
-                const formDropdown = document.getElementById('form');
-                formDropdown.innerHTML = '<option value="">Выберите форму</option>';
-
-                availableForms.forEach(form => {
-                    const option = document.createElement('option');
-                    option.value = form;
-                    option.textContent = form;
-                    formDropdown.appendChild(option);
-                });
-
-                console.log("Выпадающий список форм обновлён.");
-
-                // Обновление выпадающего списка поликарбоната
-                const polycarbonateDropdown = document.getElementById('polycarbonate');
-                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
-
-                const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
-                console.log("Уникальные типы поликарбоната:", uniquePoly);
-
-                uniquePoly.forEach(poly => {
-                    const option = document.createElement('option');
-                    option.value = poly;
-                    option.textContent = poly;
-                    polycarbonateDropdown.appendChild(option);
-                });
-
-                console.log("Выпадающий список поликарбоната обновлён.");
-
-                // Сброс остальных полей
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
-                console.log("Поле каркаса сброшено.");
-            }
-
-            // Функция обновления опций каркаса
-            function updateFrameOptions() {
-                const city = document.getElementById("city").value;
+            // Функция обработки изменения формы
+            function onFormChange() {
                 const form = document.getElementById("form").value;
+                console.log(`Выбрана форма: ${form}`);
+
+                const modelSelect = document.getElementById("model");
+                modelSelect.innerHTML = '<option value="">Выберите модель</option>';
+
+                if (!form) {
+                    console.warn("Форма не выбрана!");
+                    return;
+                }
+
+                // Находим выбранную форму в availableForms
+                const selectedForm = availableForms.find(f => f.name === form);
+                if (!selectedForm) {
+                    console.error(`Форма "${form}" не найдена в availableForms`);
+                    return;
+                }
+
+                // Добавляем модели в выпадающий список
+                selectedForm.models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.name;
+                    option.textContent = model.name;
+                    modelSelect.appendChild(option);
+                });
+
+                console.log("Выпадающий список моделей обновлён.");
+                
+                // Сброс каркасов
+                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
+            }
+
+            // Функция обработки изменения модели
+            function onModelChange() {
+                const form = document.getElementById("form").value;
+                const model = document.getElementById("model").value;
+                console.log(`Выбрана модель: ${model} для формы: ${form}`);
+
                 const frameSelect = document.getElementById("frame");
-
-                console.log(`Выбрана форма: ${form} для города: ${city}`);
-
                 frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-                if (!city || !form) {
-                    console.warn("Не выбран город или форма!");
+                if (!model) {
+                    console.warn("Модель не выбрана!");
                     return;
                 }
 
-                // Получение всех greenhouseData ключей, соответствующих выбранной форме
-                const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => greenhouseData[fn].form === form);
-                console.log("Matching Greenhouses для формы:", matchingGreenhouses);
+                // Находим выбранную модель в availableForms
+                const selectedForm = availableForms.find(f => f.name === form);
+                if (!selectedForm) {
+                    console.error(`Форма "${form}" не найдена в availableForms`);
+                    return;
+                }
 
-                // Получение всех возможных каркасов для выбранной формы
-                let frames = [];
-                matchingGreenhouses.forEach(fn => {
-                    const gh = greenhouseData[fn];
-                    if (gh && gh.frames) {
-                        frames = frames.concat(gh.frames);
-                    }
-                });
-                console.log("Каркасы, собранные из matchingGreenhouses:", frames);
+                const selectedModel = selectedForm.models.find(m => m.name === model);
+                if (!selectedModel) {
+                    console.error(`Модель "${model}" не найдена в форме "${form}"`);
+                    return;
+                }
 
-                const uniqueFrames = [...new Set(frames)];
-                console.log("Уникальные каркасы:", uniqueFrames);
-
-                uniqueFrames.forEach((frame) => {
-                    const option = document.createElement("option");
+                // Добавляем каркасы в выпадающий список
+                selectedModel.frames.forEach(frame => {
+                    const option = document.createElement('option');
                     option.value = frame;
                     option.textContent = frame;
-                    frameSelect.add(option);
+                    frameSelect.appendChild(option);
                 });
 
                 console.log("Выпадающий список каркасов обновлён.");
 
-                if (uniqueFrames.length === 1) {
-                    frameSelect.value = uniqueFrames[0];
-                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+                // Автоматический выбор каркаса, если доступен только один
+                if (selectedModel.frames.length === 1) {
+                    frameSelect.value = selectedModel.frames[0];
+                    console.log("Автоматически выбран каркас:", selectedModel.frames[0]);
                 }
             }
 
@@ -1174,37 +1070,44 @@
             async function calculateGreenhouseCost() {
                 const city = document.getElementById("city").value;
                 const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
+                const model = document.getElementById("model").value;
+                const widthSelect = document.getElementById("width");
+                const width = widthSelect.value ? parseFloat(widthSelect.value) : NaN;
+                const lengthSelect = document.getElementById("length");
+                const length = lengthSelect.value ? parseFloat(lengthSelect.value) : NaN;
                 const frame = document.getElementById("frame").value;
                 const polycarbonate = document.getElementById("polycarbonate").value;
-                const arcStep = parseFloat(document.getElementById("arcStep").value);
+                const arcStepSelect = document.getElementById("arcStep");
+                const arcStep = arcStepSelect.value ? parseFloat(arcStepSelect.value) : NaN;
 
                 console.log("Начинается расчёт стоимости теплицы с параметрами:", {
-                    city, form, width, length, frame, polycarbonate, arcStep
+                    city, form, model, width, length, frame, polycarbonate, arcStep
                 });
 
-                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+                if (!city || !form || !model || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
                     console.warn("Пользователь не заполнил все обязательные поля.");
                     alert("Пожалуйста, заполните все обязательные поля.");
                     return;
                 }
 
-                // Формируем frame_description, соответствующий базе данных
-                // Предполагаем, что в базе данных хранится только размер, например "40х20+20х20"
-                const fullFrameName = frame;
-                console.log("Полное описание каркаса (frame_description):", fullFrameName);
+                // Получим модель и каркас
+                const selectedForm = availableForms.find(f => f.name === form);
+                if (!selectedForm) {
+                    console.error(`Форма "${form}" не найдена в availableForms`);
+                    alert("Ошибка при выборе формы.");
+                    return;
+                }
 
-                // Получим все greenhouseData ключи, соответствующие выбранной форме и ширине
-                const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => {
-                    return greenhouseData[fn].form === form && fn.includes(`${width}М`);
-                });
+                const selectedModel = selectedForm.models.find(m => m.name === model);
+                if (!selectedModel) {
+                    console.error(`Модель "${model}" не найдена в форме "${form}"`);
+                    alert("Ошибка при выборе модели.");
+                    return;
+                }
 
-                console.log("Подходящие ключи (matchingGreenhouses) для формы и ширины:", matchingGreenhouses);
-
-                if (matchingGreenhouses.length === 0) {
-                    console.warn("Не найдена теплица с такой шириной и формой.");
-                    alert("Не найдена теплица с такой шириной и формой.");
+                if (!selectedModel.frames.includes(frame)) {
+                    console.error(`Каркас "${frame}" не доступен для модели "${model}"`);
+                    alert("Ошибка при выборе каркаса.");
                     return;
                 }
 
@@ -1213,10 +1116,10 @@
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('*')
-                    .in('form_name', matchingGreenhouses)
+                    .eq('form_name', model)
                     .eq('width', width)
                     .eq('length', length)
-                    .eq('frame_description', fullFrameName)
+                    .eq('frame_description', frame)
                     .eq('polycarbonate_type', polycarbonate)
                     .single();
                 
