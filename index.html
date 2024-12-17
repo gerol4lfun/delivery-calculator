@@ -928,7 +928,7 @@ console.log("Введённые параметры для сравнения:", 
 // Фильтрация вручную
 const filteredResult = data.filter(item => 
     item.city_name.trim().toLowerCase() === city.trim().toLowerCase() &&
-    item.form_name.trim().toLowerCase() === form.trim().toLowerCase() &&
+    getFormCategory(item.form_name) === form && // Исправлено здесь
     parseFloat(item.width) === width &&
     parseFloat(item.length) === length &&
     item.frame_description.trim().toLowerCase() === frame.trim().toLowerCase() &&
