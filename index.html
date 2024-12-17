@@ -391,6 +391,13 @@
                 "ПРОМЫШЛЕННАЯ МОНАРХ 8М": { form: "Промышленная домиком", frames: ["40х20+40х20"] }
             };
 
+            // Нормализованный объект greenhouseData с нижним регистром ключей
+            const greenhouseDataNormalized = {};
+            Object.keys(greenhouseData).forEach(key => {
+                greenhouseDataNormalized[key.trim().toLowerCase()] = greenhouseData[key];
+            });
+            console.log("Нормализованный greenhouseData создан.");
+
             // Приоритеты форм (чем меньше число, тем выше в списке):
             const formPriority = {
                 "Арочная": 1,
@@ -540,12 +547,22 @@
                 currentCityData = data;
 
                 // Модифицированная логика для определения доступных форм
-                const availableFormsSet = new Set(currentCityData.map(g => greenhouseData[g.form_name]?.form || g.form_name));
-                const availableForms = Array.from(availableFormsSet).filter(Boolean);
-                console.log("Уникальные доступные формы (используя greenhouseData):", availableForms);
+                const availableFormsSet = new Set(currentCityData.map(g => {
+                    const formNameNormalized = g.form_name.trim().toLowerCase();
+                    const mappedForm = greenhouseDataNormalized[formNameNormalized]?.form;
+                    if (mappedForm) {
+                        console.log(`Mapped form for "${g.form_name}": "${mappedForm}"`);
+                        return mappedForm;
+                    } else {
+                        console.warn(`Form name "${g.form_name}" не найден в greenhouseDataNormalized`);
+                        return null;
+                    }
+                }).filter(Boolean));
 
-                // Сортируем формы по приоритету
-                availableForms.sort((a, b) => {
+                console.log("Уникальные доступные формы (используя greenhouseDataNormalized):", availableFormsSet);
+
+                // Преобразуем Set в массив и сортируем по приоритету
+                const availableForms = Array.from(availableFormsSet).sort((a, b) => {
                     const prioA = formPriority[a] || 9999;
                     const prioB = formPriority[b] || 9999;
                     return prioA - prioB;
@@ -740,11 +757,11 @@
                 }
             }
 
-            // Инициализация калькулятора
+            // Функция загрузки городов при инициализации калькулятора
             async function initializeCalculator() {
                 console.log("Инициализация калькулятора: загрузка городов.");
                 await loadCities();
-                console.log("Инициализация калькулятора завершена.");
+                console.log("Загрузка городов завершена.");
             }
 
             // Регионы доставки
@@ -1051,12 +1068,22 @@
                 currentCityData = data;
 
                 // Модифицированная логика для определения доступных форм
-                const availableFormsSet = new Set(currentCityData.map(g => greenhouseData[g.form_name]?.form || g.form_name));
-                const availableForms = Array.from(availableFormsSet).filter(Boolean);
-                console.log("Уникальные доступные формы (используя greenhouseData):", availableForms);
+                const availableFormsSet = new Set(currentCityData.map(g => {
+                    const formNameNormalized = g.form_name.trim().toLowerCase();
+                    const mappedForm = greenhouseDataNormalized[formNameNormalized]?.form;
+                    if (mappedForm) {
+                        console.log(`Mapped form for "${g.form_name}": "${mappedForm}"`);
+                        return mappedForm;
+                    } else {
+                        console.warn(`Form name "${g.form_name}" не найден в greenhouseDataNormalized`);
+                        return null;
+                    }
+                }).filter(Boolean));
 
-                // Сортируем формы по приоритету
-                availableForms.sort((a, b) => {
+                console.log("Уникальные доступные формы (используя greenhouseDataNormalized):", availableFormsSet);
+
+                // Преобразуем Set в массив и сортируем по приоритету
+                const availableForms = Array.from(availableFormsSet).sort((a, b) => {
                     const prioA = formPriority[a] || 9999;
                     const prioB = formPriority[b] || 9999;
                     return prioA - prioB;
