@@ -384,60 +384,54 @@ const availableForms = {
     ]
 };
 
-            // Вспомогательная функция для определения формы теплицы по названию
             function getFormCategory(formName) {
     console.log("Анализ form_name:", formName); // Лог для отладки
 
-    // Убираем только "ТЕПЛИЦА" и лишние пробелы, но сохраняем размеры
+    // Приводим название к удобному формату:
     const cleanName = formName
-        .replace(/ТЕПЛИЦА\s*/g, "")       // Убираем слово "ТЕПЛИЦА" и пробелы
-        .replace(/\s{2,}/g, " ")          // Убираем лишние пробелы
-        .trim();                          // Чистим пробелы по краям
+        .replace(/ТЕПЛИЦА\s*/gi, "")       // Убираем слово "ТЕПЛИЦА" и пробелы
+        .replace(/\d+(\.\d+)?М/gi, "")     // Удаляем размеры, например "2.5М", "3М"
+        .replace(/\s{2,}/g, " ")           // Убираем лишние пробелы
+        .trim();                           // Очищаем пробелы по краям
 
     console.log("Очищенное имя для анализа:", cleanName);
 
-    // Определяем форму теплицы по ключевым словам
-    if (cleanName.includes("БОЯРСКАЯ") && cleanName.includes("ЛЮКС")) {
+    // Категории форм теплиц с ключевыми словами
+    if (/БОЯРСКАЯ/gi.test(cleanName)) {
         return "Арочная";
     }
-
-    if (cleanName.includes("ЦАРСКАЯ")) {
-        return "Прямостенная";
-    }
-
-    if (cleanName.includes("СТРЕЛЕЦКАЯ")) {
+    if (/СТРЕЛЕЦКАЯ/gi.test(cleanName)) {
         return "Каплевидная";
     }
-
-    if (cleanName.includes("ДОМИК")) {
+    if (/ЦАРСКАЯ|ПРЯМОСТЕННАЯ/gi.test(cleanName)) {
+        return "Прямостенная";
+    }
+    if (/ДОМИК/gi.test(cleanName)) {
         return "Домиком";
     }
-
-    if (cleanName.includes("ПРИСТЕННАЯ")) {
+    if (/ПРИСТЕННАЯ/gi.test(cleanName)) {
         return "Пристенная";
     }
-
-    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЛЮКС")) {
-        return "Митлайдер арочная";
+    if (/МИТЛАЙДЕР/gi.test(cleanName)) {
+        return "Митлайдер";
     }
-
-    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЭЛИТ")) {
-        return "Митлайдер прямостенная";
-    }
-
-    if (cleanName.includes("ПРЕМЬЕР")) {
-        return "Промышленная прямостенная";
-    }
-
-    if (cleanName.includes("МОНАРХ")) {
-        return "Промышленная домиком";
-    }
-
-    if (cleanName.includes("НАВЕС")) {
+    if (/НАВЕС/gi.test(cleanName)) {
         return "Навес";
     }
+    if (/ПРОМЫШЛЕННАЯ|ПРОМЫШЛЕННЫЕ/gi.test(cleanName)) {
+        return "Промышленная";
+    }
+    if (/ЭКОНОМ/gi.test(cleanName)) {
+        return "Эконом";
+    }
+    if (/ЛЮКС/gi.test(cleanName)) {
+        return "Люкс";
+    }
+    if (/ПОЛИКАРБОНАТ/gi.test(cleanName)) {
+        return "Поликарбонат";
+    }
 
-    return "Прочие";
+    return "Прочие"; // Если ничего не совпадает
 }
 
             // Пользователи
