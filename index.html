@@ -308,7 +308,7 @@
         <script>
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Замените на ваш Anon Public Key
+            const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Замените на ваш Anon Public Key
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -669,9 +669,16 @@
                 const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
                 console.log("Уникальные каркасы для выбранных параметров:", uniqueFrames);
 
-                // Заполняем выпадающий список каркаса
+                // Заполняем выпадающий список каркаса с упрощённым отображением
                 uniqueFrames.forEach(frame => {
-                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
+                    // Извлечение числовой части каркаса
+                    const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})/);
+                    const numericFrame = numericFrameMatch ? numericFrameMatch[0] : frame; // Если совпадение найдено, используем его
+
+                    const option = document.createElement('option');
+                    option.value = frame; // Сохраняем оригинальное описание для запроса
+                    option.textContent = numericFrame; // Отображаем только числовую часть
+                    frameSelect.appendChild(option);
                 });
 
                 console.log("Выпадающий список каркаса обновлён.");
@@ -710,19 +717,29 @@
                     return;
                 }
 
+                // Логирование параметров запроса
+                console.log("Параметры запроса:", {
+                    city,
+                    form,
+                    width,
+                    length,
+                    frame,
+                    polycarbonate
+                });
+
                 // Запрос к Supabase с фильтрацией по всем параметрам
                 console.log("Отправка запроса к Supabase для получения цены теплицы...");
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('*')
                     .eq('city_name', city)
-                    .eq('form_name', form) // Предполагается, что 'form_name' соответствует выбранной форме
+                    .eq('form_name', form)
                     .eq('width', width)
                     .eq('length', length)
-                    .eq('frame_description', frame)
+                    .eq('frame_description', frame) // Убедитесь, что frame соответствует точному значению
                     .eq('polycarbonate_type', polycarbonate)
-                    .single();
-                
+                    .maybeSingle(); // Используем maybeSingle вместо single()
+
                 console.log("Данные для расчета цены:", data);
                 console.log("Ошибка для расчета цены:", error);
 
@@ -1163,17 +1180,24 @@
                     g.width === width &&
                     g.length === length
                 );
-                console.log("Отфильтрованные теплицы для каркаса:", filteredData);
+                console.log("Отфильтрованные теплицы по форме, ширине и длине:", filteredData);
 
                 // Получаем уникальные описания каркасов
                 const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
                 console.log("Уникальные каркасы:", uniqueFrames);
 
-                // Обновляем выпадающий список каркаса
+                // Заполняем выпадающий список каркаса с упрощённым отображением
                 const frameSelect = document.getElementById("frame");
                 frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
                 uniqueFrames.forEach(frame => {
-                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
+                    // Извлечение числовой части каркаса
+                    const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})/);
+                    const numericFrame = numericFrameMatch ? numericFrameMatch[0] : frame; // Если совпадение найдено, используем его
+
+                    const option = document.createElement('option');
+                    option.value = frame; // Сохраняем оригинальное описание для запроса
+                    option.textContent = numericFrame; // Отображаем только числовую часть
+                    frameSelect.appendChild(option);
                 });
 
                 console.log("Выпадающий список каркаса обновлён.");
@@ -1205,19 +1229,29 @@
                     return;
                 }
 
+                // Логирование параметров запроса
+                console.log("Параметры запроса:", {
+                    city,
+                    form,
+                    width,
+                    length,
+                    frame,
+                    polycarbonate
+                });
+
                 // Запрос к Supabase с фильтрацией по всем параметрам
                 console.log("Отправка запроса к Supabase для получения цены теплицы...");
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('*')
                     .eq('city_name', city)
-                    .eq('form_name', form) // Предполагается, что 'form_name' соответствует выбранной форме
+                    .eq('form_name', form)
                     .eq('width', width)
                     .eq('length', length)
-                    .eq('frame_description', frame)
+                    .eq('frame_description', frame) // Убедитесь, что frame соответствует точному значению
                     .eq('polycarbonate_type', polycarbonate)
-                    .single();
-                
+                    .maybeSingle(); // Используем maybeSingle вместо single()
+
                 console.log("Данные для расчета цены:", data);
                 console.log("Ошибка для расчета цены:", error);
 
@@ -1262,6 +1296,29 @@
                 console.log("Итоговая стоимость после округления:", roundedPrice);
 
                 document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
+            }
+
+            // Инициализация при загрузке страницы
+            window.onload = async function() {
+                const savedLogin = localStorage.getItem('savedLogin');
+                console.log("Загружается страница. Сохранённый логин:", savedLogin);
+                if (savedLogin) {
+                    document.getElementById("login").value = savedLogin;
+                    document.getElementById("password").focus();
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    console.log("Выполняется инициализация калькулятора после автологина.");
+                    await initializeCalculator();
+                } else {
+                    console.log("Пользователь не аутентифицирован. Показывается форма входа.");
+                }
+            }
+
+            // Функция загрузки городов при инициализации калькулятора
+            async function initializeCalculator() {
+                console.log("Инициализация калькулятора: загрузка городов.");
+                await loadCities();
+                console.log("Загрузка городов завершена.");
             }
         </script>
     </div>
