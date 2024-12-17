@@ -484,6 +484,9 @@
                 const formNames = [...new Set(currentCityData.map(item => getFormCategory(item.form_name)))];
                 console.log("Уникальные формы теплиц:", formNames);
 
+                // Сортируем формы по приоритету
+                formNames.sort((a, b) => formPriority[a] - formPriority[b]);
+
                 // Обновляем выпадающий список форм теплиц
                 formDropdown.innerHTML = '<option value="">Выберите форму</option>';
                 formNames.forEach(form => {
@@ -501,7 +504,7 @@
                 frameDropdown.innerHTML = '<option value="">Сначала выберите форму</option>';
                 console.log("Каркасы сброшены.");
 
-                // 4. Обновляем опции ширины, длины и каркаса
+                // 4. Обновляем опции ширины и длины
                 await updateWidthAndLengthOptions();
                 updateFrameOptions();
             }
@@ -642,6 +645,22 @@
                 console.log("Итоговая стоимость после округления:", roundedPrice);
 
                 document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
+            }
+
+            // Инициализация при загрузке страницы
+            window.onload = async function() {
+                const savedLogin = localStorage.getItem('savedLogin');
+                console.log("Загружается страница. Сохранённый логин:", savedLogin);
+                if (savedLogin) {
+                    document.getElementById("login").value = savedLogin;
+                    document.getElementById("password").focus();
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    console.log("Выполняется инициализация калькулятора после автологина.");
+                    await initializeCalculator();
+                } else {
+                    console.log("Пользователь не аутентифицирован. Показывается форма входа.");
+                }
             }
 
             // Функция загрузки городов при инициализации калькулятора
