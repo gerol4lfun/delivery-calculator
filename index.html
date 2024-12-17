@@ -648,38 +648,34 @@ async function onCityChange() {
     console.log("Модели и каркасы сброшены.");
 }
             // Функция обработки изменения формы
-            function onFormChange() {
-                const form = document.getElementById("form").value;
-                console.log(`Выбрана форма: ${form}`);
+function onFormChange() {
+    const form = document.getElementById("form").value;
+    console.log(`Выбрана форма: ${form}`);
 
-                const modelSelect = document.getElementById("model");
-                modelSelect.innerHTML = '<option value="">Выберите модель</option>';
+    const frameSelect = document.getElementById("frame");
+    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-                if (!form) {
-                    console.warn("Форма не выбрана!");
-                    return;
-                }
+    if (!form) {
+        console.warn("Форма не выбрана!");
+        return;
+    }
 
-                // Находим выбранную форму в availableForms
-                const selectedForm = availableForms.find(f => f.name === form);
-                if (!selectedForm) {
-                    console.error(`Форма "${form}" не найдена в availableForms`);
-                    return;
-                }
+    // Фильтрация данных из currentCityData по выбранной форме
+    const framesForForm = [...new Set(currentCityData
+        .filter(item => getFormCategory(item.form_name) === form)
+        .map(item => item.frame_description))];
+    console.log(`Доступные каркасы для формы "${form}":`, framesForForm);
 
-                // Добавляем модели в выпадающий список
-                selectedForm.models.forEach(model => {
-                    const option = document.createElement('option');
-                    option.value = model.name;
-                    option.textContent = model.name;
-                    modelSelect.appendChild(option);
-                });
+    // Заполняем выпадающий список каркасов
+    framesForForm.forEach(frame => {
+        const option = document.createElement("option");
+        option.value = frame;
+        option.textContent = frame;
+        frameSelect.appendChild(option);
+    });
 
-                console.log("Выпадающий список моделей обновлён.");
-                
-                // Сброс каркасов
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
-            }
+    console.log("Выпадающий список каркасов обновлён.");
+}
 
             // Функция обработки изменения модели
             function onModelChange() {
