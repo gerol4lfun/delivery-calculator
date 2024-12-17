@@ -593,6 +593,8 @@ async function loadCities() {
                 
                 console.log("Данные для выбранного города:", data);
                 console.log("Ошибка при получении данных по городу:", error);
+                console.log("Все form_name из данных:", data.map(item => item.form_name));
+
 
                 if (error) {
                     console.error('Ошибка при получении данных по городу:', error);
