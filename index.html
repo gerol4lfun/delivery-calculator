@@ -665,6 +665,10 @@ async function onCityChange() {
     document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
     document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
     console.log("Модели и каркасы сброшены.");
+
+     // 4. Обновляем опции ширины, длины и каркаса
+    await updateWidthAndLengthOptions();
+    updateFrameOptions();
 }
             
             // Функция обработки изменения формы
@@ -1236,6 +1240,70 @@ async function calculateGreenhouseCost() {
 
                 document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
             }
+            
+            async function updateWidthAndLengthOptions() {
+    const form = document.getElementById('form').value;
+
+    if (!form) {
+        document.getElementById('width').innerHTML = '<option value="">Выберите ширину</option>';
+        document.getElementById('length').innerHTML = '<option value="">Выберите длину</option>';
+        return;
+    }
+
+    // Фильтрация данных по выбранной форме
+    const filteredData = currentCityData.filter(g => greenhouseData[g.form_name]?.form === form);
+    console.log("Отфильтрованные теплицы по форме:", filteredData);
+
+    // Получение уникальных значений ширины и длины
+    const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
+    const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
+
+    // Обновляем выпадающий список ширины
+    const widthDropdown = document.getElementById('width');
+    widthDropdown.innerHTML = '<option value="">Выберите ширину</option>';
+    uniqueWidths.forEach(width => {
+        widthDropdown.innerHTML += `<option value="${width}">${width} м</option>`;
+    });
+
+    // Обновляем выпадающий список длины
+    const lengthDropdown = document.getElementById('length');
+    lengthDropdown.innerHTML = '<option value="">Выберите длину</option>';
+    uniqueLengths.forEach(length => {
+        lengthDropdown.innerHTML += `<option value="${length}">${length} м</option>`;
+    });
+
+    console.log("Опции ширины и длины обновлены.");
+}
+            
+            async function updateFrameOptions() {
+    const form = document.getElementById('form').value;
+
+    const frameSelect = document.getElementById("frame");
+    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+
+    if (!form) {
+        console.warn("Не выбрана форма!");
+        return;
+    }
+
+    const filteredFrames = currentCityData
+        .filter(g => greenhouseData[g.form_name]?.form === form)
+        .map(g => g.frame_description);
+
+    const uniqueFrames = [...new Set(filteredFrames)];
+    uniqueFrames.forEach(frame => {
+        frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
+    });
+
+    // Автоматически выбираем каркас, если он один
+    if (uniqueFrames.length === 1) {
+        frameSelect.value = uniqueFrames[0];
+        console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+    }
+
+    // Обновляем ширину и длину после выбора формы
+    await updateWidthAndLengthOptions();
+}
 
         </script>
     </div>
