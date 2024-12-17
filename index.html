@@ -743,9 +743,9 @@ const formNames = Object.keys(availableForms).filter(formType =>
                 }
 
                // Фильтруем данные по выбранной форме на основе availableForms
-const filteredData = currentCityData.filter(item => 
-    availableForms[form] && availableForms[form].some(name => item.form_name.includes(name))
-);
+const filteredData = currentCityData.filter(item => {
+    return availableForms[form] && availableForms[form].some(name => item.form_name.includes(name));
+});
 
 console.log("Отфильтрованные теплицы по форме:", filteredData);
 
