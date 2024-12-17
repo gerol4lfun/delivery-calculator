@@ -415,10 +415,13 @@
                 const login = loginInput.value.trim();
                 const password = passwordInput.value.trim();
 
+                console.log("Попытка авторизации пользователя:", login);
+
                 // Проверяем логин и пароль
                 const user = users.find(u => u.login === login && u.password === password);
 
                 if (user) {
+                    console.log("Пользователь успешно аутентифицирован:", login);
                     // Если пользователь найден, скрываем окно авторизации и показываем калькулятор
                     authError.style.display = "none";
                     localStorage.setItem('savedLogin', login); // Сохраняем логин
@@ -426,6 +429,7 @@
                     document.getElementById("calculator-container").classList.remove("hidden");
                     initializeCalculator();
                 } else {
+                    console.warn("Неудачная попытка авторизации пользователя:", login);
                     // Если пользователь не найден — показываем ошибку
                     authError.style.display = "block";
                 }
@@ -433,6 +437,8 @@
 
             // Функция выхода
             function logout() {
+                const savedLogin = localStorage.getItem('savedLogin');
+                console.log("Пользователь вышел из системы:", savedLogin);
                 localStorage.removeItem('savedLogin');
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("calculator-container").classList.add("hidden");
@@ -440,6 +446,7 @@
 
             // Функция загрузки городов
             async function loadCities() {
+                console.log("Начинается загрузка городов из Supabase...");
                 let cityData = [];
                 let page = 0;
                 const pageSize = 1000; // Количество строк за один запрос
@@ -452,9 +459,11 @@
                         .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
 
                     if (error) {
-                        console.error("Ошибка при получении городов:", error);
+                        console.error("Ошибка при получении городов из Supabase:", error);
                         break;
                     }
+
+                    console.log(`Получено ${data.length} городов на странице ${page + 1}`);
 
                     // Если данных меньше, чем страница — значит, это последняя страница
                     if (data.length === 0) break;
@@ -471,17 +480,25 @@
 
                 // Удаляем Москву и СПб из списка, если они есть
                 let mIndex = uniqueCities.indexOf("Москва");
-                if (mIndex > -1) uniqueCities.splice(mIndex, 1);
+                if (mIndex > -1) {
+                    uniqueCities.splice(mIndex, 1);
+                    console.log("Москва удалена из списка городов");
+                }
 
                 let spbIndex = uniqueCities.indexOf("Санкт-Петербург");
-                if (spbIndex > -1) uniqueCities.splice(spbIndex, 1);
+                if (spbIndex > -1) {
+                    uniqueCities.splice(spbIndex, 1);
+                    console.log("Санкт-Петербург удалён из списка городов");
+                }
 
                 // Сортируем оставшиеся по алфавиту
                 uniqueCities.sort((a, b) => a.localeCompare(b, 'ru'));
+                console.log("Сортировка городов по алфавиту завершена");
 
                 // Добавляем в начало Москва и Санкт-Петербург
                 uniqueCities.unshift("Санкт-Петербург");
                 uniqueCities.unshift("Москва");
+                console.log("Москва и Санкт-Петербург добавлены в начало списка городов");
 
                 const cityDropdown = document.getElementById('city');
                 cityDropdown.innerHTML = '<option value="">Выберите город</option>';
@@ -496,12 +513,16 @@
             // Функция обработки изменения города
             async function onCityChange() {
                 const city = document.getElementById('city').value;
+                console.log("Выбран город:", city);
+
                 if (!city) {
+                    console.log("Город не выбран, сбрасываем формы и каркасы");
                     document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
                     document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
                     return;
                 }
 
+                console.log(`Получение данных для города: ${city}`);
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('form_name, polycarbonate_type')
@@ -521,8 +542,7 @@
                 // Модифицированная логика для определения доступных форм
                 const availableFormsSet = new Set(currentCityData.map(g => greenhouseData[g.form_name]?.form || g.form_name));
                 const availableForms = Array.from(availableFormsSet).filter(Boolean);
-
-                console.log("Доступные формы для города:", city, availableForms);
+                console.log("Уникальные доступные формы (используя greenhouseData):", availableForms);
 
                 // Сортируем формы по приоритету
                 availableForms.sort((a, b) => {
@@ -530,6 +550,7 @@
                     const prioB = formPriority[b] || 9999;
                     return prioA - prioB;
                 });
+                console.log("Доступные формы после сортировки по приоритету:", availableForms);
 
                 const formDropdown = document.getElementById('form');
                 formDropdown.innerHTML = '<option value="">Выберите форму</option>';
@@ -541,11 +562,15 @@
                     formDropdown.appendChild(option);
                 });
 
+                console.log("Выпадающий список форм обновлён.");
+
                 // Обновление выпадающего списка поликарбоната
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
                 polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
 
                 const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
+                console.log("Уникальные типы поликарбоната:", uniquePoly);
+
                 uniquePoly.forEach(poly => {
                     const option = document.createElement('option');
                     option.value = poly;
@@ -553,8 +578,11 @@
                     polycarbonateDropdown.appendChild(option);
                 });
 
+                console.log("Выпадающий список поликарбоната обновлён.");
+
                 // Сброс остальных полей
                 document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
+                console.log("Поле каркаса сброшено.");
             }
 
             // Функция обновления опций каркаса
@@ -562,6 +590,8 @@
                 const city = document.getElementById("city").value;
                 const form = document.getElementById("form").value;
                 const frameSelect = document.getElementById("frame");
+
+                console.log(`Выбрана форма: ${form} для города: ${city}`);
 
                 frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
@@ -572,6 +602,7 @@
 
                 // Получение всех greenhouseData ключей, соответствующих выбранной форме
                 const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => greenhouseData[fn].form === form);
+                console.log("Matching Greenhouses для формы:", matchingGreenhouses);
 
                 // Получение всех возможных каркасов для выбранной формы
                 let frames = [];
@@ -581,9 +612,10 @@
                         frames = frames.concat(gh.frames);
                     }
                 });
+                console.log("Каркасы, собранные из matchingGreenhouses:", frames);
 
                 const uniqueFrames = [...new Set(frames)];
-                console.log("Доступные каркасы:", uniqueFrames);
+                console.log("Уникальные каркасы:", uniqueFrames);
 
                 uniqueFrames.forEach((frame) => {
                     const option = document.createElement("option");
@@ -591,6 +623,8 @@
                     option.textContent = frame;
                     frameSelect.add(option);
                 });
+
+                console.log("Выпадающий список каркасов обновлён.");
 
                 if (uniqueFrames.length === 1) {
                     frameSelect.value = uniqueFrames[0];
@@ -608,7 +642,12 @@
                 const polycarbonate = document.getElementById("polycarbonate").value;
                 const arcStep = parseFloat(document.getElementById("arcStep").value);
 
+                console.log("Начинается расчёт стоимости теплицы с параметрами:", {
+                    city, form, width, length, frame, polycarbonate, arcStep
+                });
+
                 if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+                    console.warn("Пользователь не заполнил все обязательные поля.");
                     alert("Пожалуйста, заполните все обязательные поля.");
                     return;
                 }
@@ -616,6 +655,7 @@
                 // Формируем frame_description, соответствующий базе данных
                 // Предполагаем, что в базе данных хранится только размер, например "40х20+20х20"
                 const fullFrameName = frame;
+                console.log("Полное описание каркаса (frame_description):", fullFrameName);
 
                 // Получим все greenhouseData ключи, соответствующие выбранной форме и ширине
                 const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => {
@@ -625,11 +665,13 @@
                 console.log("Подходящие ключи (matchingGreenhouses) для формы и ширины:", matchingGreenhouses);
 
                 if (matchingGreenhouses.length === 0) {
+                    console.warn("Не найдена теплица с такой шириной и формой.");
                     alert("Не найдена теплица с такой шириной и формой.");
                     return;
                 }
 
                 // Запрос к Supabase с фильтрацией по всем параметрам
+                console.log("Отправка запроса к Supabase для получения цены теплицы...");
                 let { data, error } = await supabaseClient
                     .from('prices')
                     .select('*')
@@ -650,23 +692,34 @@
                 }
 
                 let basePrice = data.price;
+                console.log("Базовая цена теплицы:", basePrice);
 
                 const assembly = document.getElementById('assembly').checked ? 5000 : 0;
                 const bracing = document.getElementById('bracing').checked ? 2000 : 0;
                 const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
 
+                console.log("Дополнительные услуги:", { assembly, bracing, groundHooks });
+
                 const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
                 const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
                 const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
 
+                console.log("Дополнительные товары:", { dripIrrigation, windowAutomation, galvanizedTape });
+
                 const additionalServices = assembly + bracing + groundHooks;
                 const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
 
+                console.log("Итого дополнительные услуги:", additionalServices);
+                console.log("Итого дополнительные товары:", additionalProducts);
+
                 const arcCost = arcStep * 1000; 
+                console.log("Стоимость дуг (arcCost):", arcCost);
 
                 const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
+                console.log("Общая стоимость до округления:", totalPrice);
 
                 const roundedPrice = Math.ceil(totalPrice / 50) * 50;
+                console.log("Итоговая стоимость после округления:", roundedPrice);
 
                 document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
             }
@@ -674,20 +727,24 @@
             // Инициализация при загрузке страницы
             window.onload = async function() {
                 const savedLogin = localStorage.getItem('savedLogin');
+                console.log("Загружается страница. Сохранённый логин:", savedLogin);
                 if (savedLogin) {
                     document.getElementById("login").value = savedLogin;
                     document.getElementById("password").focus();
                     document.getElementById("auth-container").classList.add("hidden");
                     document.getElementById("calculator-container").classList.remove("hidden");
+                    console.log("Выполняется инициализация калькулятора после автологина.");
                     await initializeCalculator();
                 } else {
-                    // Если не залогинен, просто ничего не делаем здесь
+                    console.log("Пользователь не аутентифицирован. Показывается форма входа.");
                 }
             }
 
             // Инициализация калькулятора
             async function initializeCalculator() {
+                console.log("Инициализация калькулятора: загрузка городов.");
                 await loadCities();
+                console.log("Инициализация калькулятора завершена.");
             }
 
             // Регионы доставки
@@ -766,27 +823,38 @@
             let currentRoute;
 
             ymaps.ready(() => {
+                console.log("Инициализация Яндекс.Карт...");
                 mapInstance = new ymaps.Map("map", {
                     center: [55.751244, 37.618423],
                     zoom: 7
                 });
+                console.log("Яндекс.Карты инициализированы.");
             });
 
             // Функция расчёта доставки
             async function calculateDelivery() {
+                console.log("Начинается расчёт доставки...");
                 const addressInput = document.getElementById("address");
                 const address = addressInput.value.trim().toLowerCase();
                 const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
+                console.log("Введённый адрес:", address);
+                console.log("Тип доставки:", deliveryType);
+
                 if (!address) {
+                    console.warn("Адрес не введён.");
                     document.getElementById('result').innerText = "Введите адрес!";
                     return;
                 }
 
                 try {
+                    console.log("Выполняется геокодирование адреса...");
                     const res = await ymaps.geocode(address);
                     const geoObject = res.geoObjects.get(0);
+                    console.log("Результат геокодирования:", geoObject);
+
                     if (!geoObject) {
+                        console.warn("Адрес не найден.");
                         document.getElementById('result').innerText = "Адрес не найден!";
                         return;
                     }
@@ -794,11 +862,17 @@
                     const localities = geoObject.getLocalities().map(locality => locality.toLowerCase());
                     const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
 
+                    console.log("Найденные населённые пункты:", localities);
+                    console.log("Найденные административные области:", administrativeAreas);
+
                     const isInDeliveryRegion = deliveryRegions.some(region => 
                         localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
                     );
 
+                    console.log("Находится ли адрес в зоне доставки:", isInDeliveryRegion);
+
                     if (!isInDeliveryRegion) {
+                        console.warn("Адрес вне зоны доставки.");
                         document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
                         return;
                     }
@@ -807,56 +881,360 @@
                     const destinationLat = coords[0];
                     const destinationLon = coords[1];
 
+                    console.log("Координаты адреса:", [destinationLat, destinationLon]);
+
                     let nearestCity = null;
                     let minDistance = Infinity;
 
                     citiesForMap.forEach(city => {
                         const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                        console.log(`Расстояние до города ${city.name}: ${cityDistance} км`);
                         if (cityDistance < minDistance) {
                             minDistance = cityDistance;
                             nearestCity = city;
                         }
                     });
 
+                    console.log("Ближайший город:", nearestCity, "Расстояние:", minDistance, "км");
+
                     if (!nearestCity) {
+                        console.warn("Не удалось определить ближайший город.");
                         document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
                         return;
                     }
 
                     mapInstance.setCenter(nearestCity.coords, 7);
+                    console.log(`Центр карты установлен на ${nearestCity.name}`);
 
                     if (currentRoute) {
                         mapInstance.geoObjects.remove(currentRoute);
+                        console.log("Предыдущий маршрут удалён.");
                     }
 
                     try {
+                        console.log("Выполняется расчёт маршрута...");
                         const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
                         currentRoute = route;
                         mapInstance.geoObjects.add(route);
+                        console.log("Маршрут добавлен на карту:", route);
 
                         const distanceInKm = route.getLength() / 1000;
+                        console.log("Длина маршрута:", distanceInKm, "км");
+
                         const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+                        console.log("Расстояние от границы города:", distanceFromBoundary, "км");
 
                         let cost;
                         if (deliveryType === "withoutAssembly") {
                             cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                            console.log("Стоимость доставки без сборки:", cost, "руб.");
                         } else {
                             cost = Math.max(1000, 40 * distanceFromBoundary);
+                            console.log("Стоимость доставки со сборкой:", cost, "руб.");
                         }
 
                         const roundedCost = Math.ceil(cost / 50) * 50;
+                        console.log("Округленная стоимость доставки:", roundedCost, "руб.");
 
                         document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
                     } catch (routeError) {
-                        console.error(routeError);
+                        console.error("Ошибка при расчёте маршрута:", routeError);
                         document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
                     }
 
                 } catch (geocodeError) {
-                    console.error(geocodeError);
+                    console.error("Ошибка при геокодировании адреса:", geocodeError);
                     document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
                 }
             }
+
+            // Функция загрузки городов при инициализации калькулятора
+            async function initializeCalculator() {
+                console.log("Инициализация калькулятора: загрузка городов.");
+                await loadCities();
+                console.log("Загрузка городов завершена.");
+            }
+
+            // Функция загрузки городов
+            async function loadCities() {
+                console.log("Начинается загрузка городов из Supabase...");
+                let cityData = [];
+                let page = 0;
+                const pageSize = 1000; // Количество строк за один запрос
+
+                while (true) {
+                    // Запрос с пагинацией
+                    let { data, error } = await supabaseClient
+                        .from('prices')
+                        .select('city_name', { distinct: true }) // Получаем уникальные города
+                        .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
+
+                    if (error) {
+                        console.error("Ошибка при получении городов из Supabase:", error);
+                        break;
+                    }
+
+                    console.log(`Получено ${data.length} городов на странице ${page + 1}`);
+
+                    // Если данных меньше, чем страница — значит, это последняя страница
+                    if (data.length === 0) break;
+
+                    cityData = cityData.concat(data);
+                    page++;
+                }
+
+                console.log("Все города из Supabase (с пагинацией):", cityData);
+
+                // Обработка данных и создание выпадающего списка
+                let uniqueCities = [...new Set(cityData.map(item => item.city_name))];
+                console.log("Уникальные города:", uniqueCities);
+
+                // Удаляем Москву и СПб из списка, если они есть
+                let mIndex = uniqueCities.indexOf("Москва");
+                if (mIndex > -1) {
+                    uniqueCities.splice(mIndex, 1);
+                    console.log("Москва удалена из списка городов");
+                }
+
+                let spbIndex = uniqueCities.indexOf("Санкт-Петербург");
+                if (spbIndex > -1) {
+                    uniqueCities.splice(spbIndex, 1);
+                    console.log("Санкт-Петербург удалён из списка городов");
+                }
+
+                // Сортируем оставшиеся по алфавиту
+                uniqueCities.sort((a, b) => a.localeCompare(b, 'ru'));
+                console.log("Сортировка городов по алфавиту завершена");
+
+                // Добавляем в начало Москва и Санкт-Петербург
+                uniqueCities.unshift("Санкт-Петербург");
+                uniqueCities.unshift("Москва");
+                console.log("Москва и Санкт-Петербург добавлены в начало списка городов");
+
+                const cityDropdown = document.getElementById('city');
+                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
+
+                uniqueCities.forEach(city => {
+                    cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
+                });
+
+                console.log("Выпадающий список городов обновлён.");
+            }
+
+            // Функция обработки изменения города
+            async function onCityChange() {
+                const city = document.getElementById('city').value;
+                console.log("Выбран город:", city);
+
+                if (!city) {
+                    console.log("Город не выбран, сбрасываем формы и каркасы");
+                    document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
+                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
+                    return;
+                }
+
+                console.log(`Получение данных для города: ${city}`);
+                let { data, error } = await supabaseClient
+                    .from('prices')
+                    .select('form_name, polycarbonate_type')
+                    .eq('city_name', city)
+                    .limit(30000);
+                
+                console.log("Данные для выбранного города:", data);
+                console.log("Ошибка при получении данных по городу:", error);
+
+                if (error) {
+                    console.error('Ошибка при получении данных по городу:', error);
+                    return;
+                }
+
+                currentCityData = data;
+
+                // Модифицированная логика для определения доступных форм
+                const availableFormsSet = new Set(currentCityData.map(g => greenhouseData[g.form_name]?.form || g.form_name));
+                const availableForms = Array.from(availableFormsSet).filter(Boolean);
+                console.log("Уникальные доступные формы (используя greenhouseData):", availableForms);
+
+                // Сортируем формы по приоритету
+                availableForms.sort((a, b) => {
+                    const prioA = formPriority[a] || 9999;
+                    const prioB = formPriority[b] || 9999;
+                    return prioA - prioB;
+                });
+                console.log("Доступные формы после сортировки по приоритету:", availableForms);
+
+                const formDropdown = document.getElementById('form');
+                formDropdown.innerHTML = '<option value="">Выберите форму</option>';
+
+                availableForms.forEach(form => {
+                    const option = document.createElement('option');
+                    option.value = form;
+                    option.textContent = form;
+                    formDropdown.appendChild(option);
+                });
+
+                console.log("Выпадающий список форм обновлён.");
+
+                // Обновление выпадающего списка поликарбоната
+                const polycarbonateDropdown = document.getElementById('polycarbonate');
+                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
+
+                const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
+                console.log("Уникальные типы поликарбоната:", uniquePoly);
+
+                uniquePoly.forEach(poly => {
+                    const option = document.createElement('option');
+                    option.value = poly;
+                    option.textContent = poly;
+                    polycarbonateDropdown.appendChild(option);
+                });
+
+                console.log("Выпадающий список поликарбоната обновлён.");
+
+                // Сброс остальных полей
+                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите форму</option>';
+                console.log("Поле каркаса сброшено.");
+            }
+
+            // Функция обновления опций каркаса
+            function updateFrameOptions() {
+                const city = document.getElementById("city").value;
+                const form = document.getElementById("form").value;
+                const frameSelect = document.getElementById("frame");
+
+                console.log(`Выбрана форма: ${form} для города: ${city}`);
+
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+
+                if (!city || !form) {
+                    console.warn("Не выбран город или форма!");
+                    return;
+                }
+
+                // Получение всех greenhouseData ключей, соответствующих выбранной форме
+                const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => greenhouseData[fn].form === form);
+                console.log("Matching Greenhouses для формы:", matchingGreenhouses);
+
+                // Получение всех возможных каркасов для выбранной формы
+                let frames = [];
+                matchingGreenhouses.forEach(fn => {
+                    const gh = greenhouseData[fn];
+                    if (gh && gh.frames) {
+                        frames = frames.concat(gh.frames);
+                    }
+                });
+                console.log("Каркасы, собранные из matchingGreenhouses:", frames);
+
+                const uniqueFrames = [...new Set(frames)];
+                console.log("Уникальные каркасы:", uniqueFrames);
+
+                uniqueFrames.forEach((frame) => {
+                    const option = document.createElement("option");
+                    option.value = frame;
+                    option.textContent = frame;
+                    frameSelect.add(option);
+                });
+
+                console.log("Выпадающий список каркасов обновлён.");
+
+                if (uniqueFrames.length === 1) {
+                    frameSelect.value = uniqueFrames[0];
+                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+                }
+            }
+
+            // Функция расчёта стоимости теплицы
+            async function calculateGreenhouseCost() {
+                const city = document.getElementById("city").value;
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+                const frame = document.getElementById("frame").value;
+                const polycarbonate = document.getElementById("polycarbonate").value;
+                const arcStep = parseFloat(document.getElementById("arcStep").value);
+
+                console.log("Начинается расчёт стоимости теплицы с параметрами:", {
+                    city, form, width, length, frame, polycarbonate, arcStep
+                });
+
+                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+                    console.warn("Пользователь не заполнил все обязательные поля.");
+                    alert("Пожалуйста, заполните все обязательные поля.");
+                    return;
+                }
+
+                // Формируем frame_description, соответствующий базе данных
+                // Предполагаем, что в базе данных хранится только размер, например "40х20+20х20"
+                const fullFrameName = frame;
+                console.log("Полное описание каркаса (frame_description):", fullFrameName);
+
+                // Получим все greenhouseData ключи, соответствующие выбранной форме и ширине
+                const matchingGreenhouses = Object.keys(greenhouseData).filter(fn => {
+                    return greenhouseData[fn].form === form && fn.includes(`${width}М`);
+                });
+
+                console.log("Подходящие ключи (matchingGreenhouses) для формы и ширины:", matchingGreenhouses);
+
+                if (matchingGreenhouses.length === 0) {
+                    console.warn("Не найдена теплица с такой шириной и формой.");
+                    alert("Не найдена теплица с такой шириной и формой.");
+                    return;
+                }
+
+                // Запрос к Supabase с фильтрацией по всем параметрам
+                console.log("Отправка запроса к Supabase для получения цены теплицы...");
+                let { data, error } = await supabaseClient
+                    .from('prices')
+                    .select('*')
+                    .in('form_name', matchingGreenhouses)
+                    .eq('width', width)
+                    .eq('length', length)
+                    .eq('frame_description', fullFrameName)
+                    .eq('polycarbonate_type', polycarbonate)
+                    .single();
+                
+                console.log("Данные для расчета цены:", data);
+                console.log("Ошибка для расчета цены:", error);
+
+                if (error || !data) {
+                    console.error('Ошибка при получении данных для расчета:', error);
+                    alert("Теплица с заданными параметрами не найдена.");
+                    return;
+                }
+
+                let basePrice = data.price;
+                console.log("Базовая цена теплицы:", basePrice);
+
+                const assembly = document.getElementById('assembly').checked ? 5000 : 0;
+                const bracing = document.getElementById('bracing').checked ? 2000 : 0;
+                const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
+
+                console.log("Дополнительные услуги:", { assembly, bracing, groundHooks });
+
+                const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
+                const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
+                const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
+
+                console.log("Дополнительные товары:", { dripIrrigation, windowAutomation, galvanizedTape });
+
+                const additionalServices = assembly + bracing + groundHooks;
+                const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
+
+                console.log("Итого дополнительные услуги:", additionalServices);
+                console.log("Итого дополнительные товары:", additionalProducts);
+
+                const arcCost = arcStep * 1000; 
+                console.log("Стоимость дуг (arcCost):", arcCost);
+
+                const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
+                console.log("Общая стоимость до округления:", totalPrice);
+
+                const roundedPrice = Math.ceil(totalPrice / 50) * 50;
+                console.log("Итоговая стоимость после округления:", roundedPrice);
+
+                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
+            }
+
         </script>
     </div>
 </body>
