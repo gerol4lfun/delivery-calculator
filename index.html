@@ -458,71 +458,62 @@
                 document.getElementById("calculator-container").classList.add("hidden");
             }
 
-            // Функция загрузки городов
-            async function loadCities() {
-                console.log("Начинается загрузка городов из Supabase...");
-                let cityData = [];
-                let page = 0;
-                const pageSize = 1000; // Количество строк за один запрос
+            // Функция для загрузки городов из Supabase с учётом пагинации
+async function loadCities() {
+    console.log("Загрузка городов из Supabase с учётом пагинации...");
 
-                while (true) {
-                    // Запрос с пагинацией
-                    let { data, error } = await supabaseClient
-                        .from('prices')
-                        .select('city_name', { distinct: true }) // Получаем уникальные города
-                        .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
+    const pageSize = 1000; // Максимальное количество строк за один запрос
+    let allCities = [];
+    let page = 0;
 
-                    if (error) {
-                        console.error("Ошибка при получении городов из Supabase:", error);
-                        break;
-                    }
+    while (true) {
+        // Запрос данных с пагинацией
+        let { data, error } = await supabaseClient
+            .from('prices')
+            .select('city_name') // Запрашиваем города
+            .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
 
-                    console.log(`Получено ${data.length} городов на странице ${page + 1}`);
+        if (error) {
+            console.error("Ошибка при загрузке городов из Supabase:", error);
+            return;
+        }
 
-                    // Если данных меньше, чем страница — значит, это последняя страница
-                    if (data.length === 0) break;
+        console.log(`Получено ${data.length} городов на странице ${page + 1}`);
 
-                    cityData = cityData.concat(data);
-                    page++;
-                }
+        // Если данных на странице меньше, чем pageSize, значит, это последняя страница
+        if (data.length === 0) break;
 
-                console.log("Все города из Supabase (с пагинацией):", cityData);
+        // Добавляем города в общий массив
+        allCities = allCities.concat(data.map(item => item.city_name));
+        page++;
+    }
 
-                // Обработка данных и создание выпадающего списка
-                let uniqueCities = [...new Set(cityData.map(item => item.city_name))];
-                console.log("Уникальные города:", uniqueCities);
+    console.log("Все города загружены:", allCities);
 
-                // Удаляем Москву и СПб из списка, если они есть
-                let mIndex = uniqueCities.indexOf("Москва");
-                if (mIndex > -1) {
-                    uniqueCities.splice(mIndex, 1);
-                    console.log("Москва удалена из списка городов");
-                }
+    // Убираем дубликаты городов
+    let uniqueCities = [...new Set(allCities)];
 
-                let spbIndex = uniqueCities.indexOf("Санкт-Петербург");
-                if (spbIndex > -1) {
-                    uniqueCities.splice(spbIndex, 1);
-                    console.log("Санкт-Петербург удалён из списка городов");
-                }
+    // Приоритетные города
+    const priorityCities = ["Москва", "Санкт-Петербург"];
 
-                // Сортируем оставшиеся по алфавиту
-                uniqueCities.sort((a, b) => a.localeCompare(b, 'ru'));
-                console.log("Сортировка городов по алфавиту завершена");
+    // Удаляем приоритетные города из основного списка
+    uniqueCities = uniqueCities.filter(city => !priorityCities.includes(city));
 
-                // Добавляем в начало Москва и Санкт-Петербург
-                uniqueCities.unshift("Санкт-Петербург");
-                uniqueCities.unshift("Москва");
-                console.log("Москва и Санкт-Петербург добавлены в начало списка городов");
+    // Сортируем оставшиеся города по алфавиту
+    uniqueCities.sort((a, b) => a.localeCompare(b, 'ru'));
 
-                const cityDropdown = document.getElementById('city');
-                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
+    // Объединяем приоритетные города и отсортированные города
+    const finalCities = [...priorityCities, ...uniqueCities];
 
-                uniqueCities.forEach(city => {
-                    cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
-                });
+    // Обновляем выпадающий список
+    const cityDropdown = document.getElementById('city');
+    cityDropdown.innerHTML = '<option value="">Выберите город</option>';
+    finalCities.forEach(city => {
+        cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
+    });
 
-                console.log("Выпадающий список городов обновлён.");
-            }
+    console.log("Выпадающий список городов обновлён с учётом приоритетов и пагинации.");
+}
 
             // Функция обработки изменения города
             async function onCityChange() {
