@@ -386,29 +386,31 @@ const availableForms = {
 
             // Вспомогательная функция для определения формы теплицы по названию
             function getFormCategory(formName) {
-    console.log("Анализ form_name:", formName);
+    console.log("Анализ form_name:", formName); // Лог для отладки
 
-    // Убираем лишние слова и размеры
+    // Приводим название к удобному формату:
+    // Убираем "ТЕПЛИЦА" и размеры, оставляя только название формы
     const cleanName = formName
-        .replace(/ТЕПЛИЦА\s*/g, "")  // Убираем "ТЕПЛИЦА"
-        .replace(/\d+(\.\d+)?М/g, "") // Убираем размеры
-        .replace(/\s{2,}/g, " ") // Убираем лишние пробелы
-        .trim();
+        .replace(/ТЕПЛИЦА\s*/gi, "")     // Убираем слово "ТЕПЛИЦА" и пробелы
+        .replace(/\d+(\.\d+)?М/gi, "")   // Удаляем размеры, например "2.5М", "3М"
+        .replace(/\s{2,}/g, " ")         // Убираем лишние пробелы
+        .trim();                         // Очищаем пробелы по краям
 
-    console.log("Очищенное имя для анализа:", cleanName);
+    console.log("Очищенное имя для анализа:", cleanName); // Показывает, что получилось
 
-    if (cleanName.includes("БОЯРСКАЯ")) return "Арочная";
-    if (cleanName.includes("СТРЕЛЕЦКАЯ")) return "Каплевидная";
-    if (cleanName.includes("ЦАРСКАЯ")) return "Прямостенная"; // Исправлено
-    if (cleanName.includes("ДОМИК")) return "Домиком";
-    if (cleanName.includes("ПРИСТЕННАЯ")) return "Пристенная";
-    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЛЮКС")) return "Митлайдер арочная";
-    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЭЛИТ")) return "Митлайдер прямостенная";
-    if (cleanName.includes("ПРЕМЬЕР")) return "Промышленная прямостенная";
-    if (cleanName.includes("МОНАРХ")) return "Промышленная домиком";
-    if (cleanName.includes("НАВЕС")) return "Навес";
+    // Добавляем гибкие условия для сопоставления
+    if (/БОЯРСКАЯ/gi.test(cleanName)) return "Арочная";
+    if (/СТРЕЛЕЦКАЯ/gi.test(cleanName)) return "Каплевидная";
+    if (/ЦАРСКАЯ/gi.test(cleanName)) return "Прямостенная";
+    if (/ДОМИК/gi.test(cleanName)) return "Домиком";
+    if (/ПРИСТЕННАЯ/gi.test(cleanName)) return "Пристенная";
+    if (/МИТЛАЙДЕР.*ЛЮКС/gi.test(cleanName)) return "Митлайдер арочная";
+    if (/МИТЛАЙДЕР.*ЭЛИТ/gi.test(cleanName)) return "Митлайдер прямостенная";
+    if (/ПРЕМЬЕР/gi.test(cleanName)) return "Промышленная прямостенная";
+    if (/МОНАРХ/gi.test(cleanName)) return "Промышленная домиком";
+    if (/НАВЕС/gi.test(cleanName)) return "Навес";
 
-    return "Прочие";
+    return "Прочие"; // Если ни одно условие не сработало
 }
 
             // Пользователи
@@ -711,12 +713,14 @@ const formNames = Object.keys(availableForms).filter(formType =>
                     return;
                 }
 
-               // Фильтруем данные по выбранной форме на основе availableForms
+               console.log("Фильтруемая форма:", form);
+console.log("Все доступные form_name:", currentCityData.map(g => g.form_name));
+
+// Фильтруем данные по выбранной форме на основе availableForms
 const filteredData = currentCityData.filter(item => {
     return availableForms[form] && availableForms[form].some(name => item.form_name.includes(name));
 });
-
-console.log("Отфильтрованные теплицы по форме:", filteredData);
+console.log("Отфильтрованные данные:", filteredData);
 
 // Получаем уникальные значения ширины
 const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
