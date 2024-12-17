@@ -814,15 +814,13 @@
                 // Запрос к Supabase с фильтрацией по всем параметрам
                 console.log("Отправка запроса к Supabase для получения цены теплицы...");
                 let { data, error } = await supabaseClient
-                    .from('prices')
-                    .select('*')
-                    .eq('city_name', city)
-                    .eq('form_name', form)
-                    .eq('width', width)
-                    .eq('length', length)
-                    .eq('frame_description', frame) // Убедитесь, что frame соответствует точному значению
-                    .eq('polycarbonate_type', polycarbonate)
-                    .maybeSingle(); // Используем maybeSingle вместо single()
+    .from('prices')
+    .select('*')
+    .eq('city_name', city) // Запрашиваем только по городу
+    .limit(10); // Ограничиваем результат 10 строками
+
+console.log("Данные из Supabase по городу:", data);
+console.log("Ошибка при запросе данных:", error);
 
                 console.log("Данные для расчета цены:", data);
                 console.log("Ошибка для расчета цены:", error);
