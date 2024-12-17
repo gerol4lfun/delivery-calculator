@@ -386,61 +386,30 @@ const availableForms = {
 
             // Вспомогательная функция для определения формы теплицы по названию
             function getFormCategory(formName) {
-                console.log("Анализ form_name:", formName); // Лог для отладки
+    console.log("Анализ form_name:", formName);
 
-                // Приводим название к удобному формату:
-                // Убираем "ТЕПЛИЦА" и размеры, оставляя только название формы
-                const cleanName = formName
-                    .replace(/ТЕПЛИЦА\s*/g, "")       // Убираем слово "ТЕПЛИЦА" и пробелы
-                    .replace(/\d+(\.\d+)?М/g, "")     // Удаляем размеры, например "2.5М", "3М"
-                    .replace(/\s{2,}/g, " ")          // Убираем лишние пробелы
-                    .trim();                          // Очищаем пробелы по краям
+    // Убираем лишние слова и размеры
+    const cleanName = formName
+        .replace(/ТЕПЛИЦА\s*/g, "")  // Убираем "ТЕПЛИЦА"
+        .replace(/\d+(\.\d+)?М/g, "") // Убираем размеры
+        .replace(/\s{2,}/g, " ") // Убираем лишние пробелы
+        .trim();
 
-                console.log("Очищенное имя для анализа:", cleanName);
+    console.log("Очищенное имя для анализа:", cleanName);
 
-                // Определяем форму теплицы по ключевым словам
-                if (cleanName.includes("БОЯРСКАЯ")) {
-                    return "Арочная";
-                }
+    if (cleanName.includes("БОЯРСКАЯ")) return "Арочная";
+    if (cleanName.includes("СТРЕЛЕЦКАЯ")) return "Каплевидная";
+    if (cleanName.includes("ЦАРСКАЯ")) return "Прямостенная"; // Исправлено
+    if (cleanName.includes("ДОМИК")) return "Домиком";
+    if (cleanName.includes("ПРИСТЕННАЯ")) return "Пристенная";
+    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЛЮКС")) return "Митлайдер арочная";
+    if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЭЛИТ")) return "Митлайдер прямостенная";
+    if (cleanName.includes("ПРЕМЬЕР")) return "Промышленная прямостенная";
+    if (cleanName.includes("МОНАРХ")) return "Промышленная домиком";
+    if (cleanName.includes("НАВЕС")) return "Навес";
 
-                if (cleanName.includes("СТРЕЛЕЦКАЯ")) {
-                    return "Каплевидная";
-                }
-
-                if (cleanName.includes("ЦАРСКАЯ")) {
-                    return "Прямостенная";
-                }
-
-                if (cleanName.includes("ДОМИК")) {
-                    return "Домиком";
-                }
-
-                if (cleanName.includes("ПРИСТЕННАЯ")) {
-                    return "Пристенная";
-                }
-
-                if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЛЮКС")) {
-                    return "Митлайдер арочная";
-                }
-
-                if (cleanName.includes("МИТЛАЙДЕР") && cleanName.includes("ЭЛИТ")) {
-                    return "Митлайдер прямостенная";
-                }
-
-                if (cleanName.includes("ПРЕМЬЕР")) {
-                    return "Промышленная прямостенная";
-                }
-
-                if (cleanName.includes("МОНАРХ")) {
-                    return "Промышленная домиком";
-                }
-
-                if (cleanName.includes("НАВЕС")) {
-                    return "Навес";
-                }
-
-                return "Прочие";
-            }
+    return "Прочие";
+}
 
             // Пользователи
             const users = [
