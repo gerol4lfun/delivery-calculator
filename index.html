@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор доставки и стоимости теплиц</title>
     <!-- Яндекс.Карты -->
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=YOUR_YANDEX_API_KEY&lang=ru_RU" type="text/javascript"></script>
+     <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
     <!-- Supabase JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
@@ -671,8 +671,8 @@
 
                 // Заполняем выпадающий список каркаса с упрощённым отображением
                 uniqueFrames.forEach(frame => {
-                    // Извлечение числовой части каркаса
-                    const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})/);
+                    // Извлечение числовой части каркаса, включая возможный знак +
+                    const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})(?:\s?\+\s?\d{1,2}х\d{1,2})?/);
                     const numericFrame = numericFrameMatch ? numericFrameMatch[0] : frame; // Если совпадение найдено, используем его
 
                     const option = document.createElement('option');
@@ -809,7 +809,7 @@
                 console.log("Загрузка городов завершена.");
             }
 
-            // Функция расчёта доставки (оставлена без изменений)
+            // Функция расчёта доставки
             async function calculateDelivery() {
                 console.log("Начинается расчёт доставки...");
                 const addressInput = document.getElementById("address");
@@ -1010,7 +1010,7 @@
                 console.log("Яндекс.Карты инициализированы.");
             });
 
-            // Функция расчёта доставки (оставлена без изменений)
+            // Функция расчёта доставки
             async function calculateDelivery() {
                 console.log("Начинается расчёт доставки...");
                 const addressInput = document.getElementById("address");
@@ -1127,85 +1127,204 @@
                 }
             }
 
-            // Функция обновления опций ширины и длины
-            async function updateWidthAndLengthOptions() {
-                const form = document.getElementById('form').value;
+            // Регионы доставки
+            const deliveryRegions = [
+                { city: "Москва", region: "Московская область" },
+                { city: "Санкт-Петербург", region: "Ленинградская область" },
+                { city: "Белгород", region: "Белгородская область" },
+                { city: "Великий Новгород", region: "Новгородская область" },
+                { city: "Владимир", region: "Владимирская область" },
+                { city: "Вологда", region: "Вологодская область" },
+                { city: "Воронеж", region: "Воронежская область" },
+                { city: "Екатеринбург", region: "Свердловская область" },
+                { city: "Иваново", region: "Ивановская область" },
+                { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+                { city: "Казань", region: "Республика Татарстан" },
+                { city: "Калуга", region: "Калужская область" },
+                { city: "Кемерово", region: "Кемеровская область" },
+                { city: "Кострома", region: "Костромская область" },
+                { city: "Краснодар", region: "Краснодарский край" },
+                { city: "Курск", region: "Курская область" },
+                { city: "Липецк", region: "Липецкая область" },
+                { city: "Майкоп", region: "Республика Адыгея" },
+                { city: "Набережные Челны", region: "Республика Татарстан" },
+                { city: "Нижний Новгород", region: "Нижегородская область" },
+                { city: "Новосибирск", region: "Новосибирская область" },
+                { city: "Орёл", region: "Орловская область" },
+                { city: "Рязань", region: "Рязанская область" },
+                { city: "Ставрополь", region: "Ставропольский край" },
+                { city: "Тамбов", region: "Тамбовская область" },
+                { city: "Тверь", region: "Тверская область" },
+                { city: "Тула", region: "Тульская область" },
+                { city: "Ульяновск", region: "Ульяновская область" },
+                { city: "Чебоксары", region: "Чувашская Республика" },
+                { city: "Челябинск", region: "Челябинская область" },
+                { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+                { city: "Ярославль", region: "Ярославская область" }
+            ];
 
-                if (!form) {
-                    document.getElementById('width').innerHTML = '<option value="">Выберите ширину</option>';
-                    document.getElementById('length').innerHTML = '<option value="">Выберите длину</option>';
+            // Города для карты
+            const citiesForMap = [
+                { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
+                { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
+                { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
+                { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
+                { name: "Владимир", coords: [56.129057, 40.407031], boundaryDistance: 12 },
+                { name: "Вологда", coords: [59.220492, 39.891568], boundaryDistance: 10 },
+                { name: "Воронеж", coords: [51.661535, 39.200287], boundaryDistance: 15 },
+                { name: "Екатеринбург", coords: [56.838926, 60.605703], boundaryDistance: 15 },
+                { name: "Иваново", coords: [57.000348, 40.973921], boundaryDistance: 12 },
+                { name: "Йошкар-Ола", coords: [56.634431, 47.899888], boundaryDistance: 12 },
+                { name: "Казань", coords: [55.796391, 49.108891], boundaryDistance: 15 },
+                { name: "Калуга", coords: [54.506043, 36.251593], boundaryDistance: 12 },
+                { name: "Кемерово", coords: [55.354968, 86.087314], boundaryDistance: 15 },
+                { name: "Кострома", coords: [57.767961, 40.926858], boundaryDistance: 10 },
+                { name: "Краснодар", coords: [45.035470, 38.975313], boundaryDistance: 12 },
+                { name: "Курск", coords: [51.730361, 36.192647], boundaryDistance: 10 },
+                { name: "Липецк", coords: [52.610150, 39.594180], boundaryDistance: 12 },
+                { name: "Майкоп", coords: [44.607782, 40.105690], boundaryDistance: 10 },
+                { name: "Набережные Челны", coords: [55.727110, 52.404913], boundaryDistance: 12 },
+                { name: "Нижний Новгород", coords: [56.296504, 43.936059], boundaryDistance: 15 },
+                { name: "Новосибирск", coords: [55.008352, 82.935733], boundaryDistance: 15 },
+                { name: "Орёл", coords: [52.967257, 36.069647], boundaryDistance: 10 },
+                { name: "Рязань", coords: [54.629704, 39.741146], boundaryDistance: 12 },
+                { name: "Ставрополь", coords: [45.044838, 41.969230], boundaryDistance: 10 },
+                { name: "Тамбов", coords: [52.721219, 41.452274], boundaryDistance: 10 },
+                { name: "Тверь", coords: [56.858539, 35.917596], boundaryDistance: 12 },
+                { name: "Тула", coords: [54.193122, 37.617348], boundaryDistance: 12 },
+                { name: "Ульяновск", coords: [54.316685, 48.403123], boundaryDistance: 12 },
+                { name: "Чебоксары", coords: [56.146223, 47.251931], boundaryDistance: 12 },
+                { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
+                { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
+                { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
+            ];
+
+            let mapInstance;
+            let currentRoute;
+
+            ymaps.ready(() => {
+                console.log("Инициализация Яндекс.Карт...");
+                mapInstance = new ymaps.Map("map", {
+                    center: [55.751244, 37.618423],
+                    zoom: 7
+                });
+                console.log("Яндекс.Карты инициализированы.");
+            });
+
+            // Функция расчёта доставки
+            async function calculateDelivery() {
+                console.log("Начинается расчёт доставки...");
+                const addressInput = document.getElementById("address");
+                const address = addressInput.value.trim().toLowerCase();
+                const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+
+                console.log("Введённый адрес:", address);
+                console.log("Тип доставки:", deliveryType);
+
+                if (!address) {
+                    console.warn("Адрес не введён.");
+                    document.getElementById('result').innerText = "Введите адрес!";
                     return;
                 }
 
-                // Фильтруем данные по выбранной форме
-                const filteredData = currentCityData.filter(g => getFormCategory(g.form_name) === form);
-                console.log("Отфильтрованные теплицы по форме:", filteredData);
+                try {
+                    console.log("Выполняется геокодирование адреса...");
+                    const res = await ymaps.geocode(address);
+                    const geoObject = res.geoObjects.get(0);
+                    console.log("Результат геокодирования:", geoObject);
 
-                // Получаем уникальные значения ширины
-                const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
-                console.log("Уникальные ширины для формы:", uniqueWidths);
+                    if (!geoObject) {
+                        console.warn("Адрес не найден.");
+                        document.getElementById('result').innerText = "Адрес не найден!";
+                        return;
+                    }
 
-                // Обновляем выпадающий список ширины
-                const widthDropdown = document.getElementById('width');
-                widthDropdown.innerHTML = '<option value="">Выберите ширину</option>';
-                uniqueWidths.forEach(width => {
-                    widthDropdown.innerHTML += `<option value="${width}">${width} м</option>`;
-                });
+                    const localities = geoObject.getLocalities().map(locality => locality.toLowerCase());
+                    const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
 
-                console.log("Выпадающий список ширины обновлён.");
+                    console.log("Найденные населённые пункты:", localities);
+                    console.log("Найденные административные области:", administrativeAreas);
 
-                // Сбрасываем длину и каркас
-                document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
-                console.log("Длина и каркас сброшены.");
-            }
+                    const isInDeliveryRegion = deliveryRegions.some(region => 
+                        localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
+                    );
 
-            // Функция обновления опций каркаса
-            async function updateFrameOptions() {
-                const form = document.getElementById('form').value;
-                const width = parseFloat(document.getElementById('width').value);
-                const length = parseFloat(document.getElementById('length').value);
+                    console.log("Находится ли адрес в зоне доставки:", isInDeliveryRegion);
 
-                console.log(`Форма: ${form}, Ширина: ${width} м, Длина: ${length} м`);
+                    if (!isInDeliveryRegion) {
+                        console.warn("Адрес вне зоны доставки.");
+                        document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
+                        return;
+                    }
 
-                if (!form || isNaN(width) || isNaN(length)) {
-                    console.warn("Недостаточно данных для обновления каркаса.");
-                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
-                    return;
-                }
+                    const coords = geoObject.geometry.getCoordinates();
+                    const destinationLat = coords[0];
+                    const destinationLon = coords[1];
 
-                // Фильтруем данные по выбранной форме, ширине и длине
-                const filteredData = currentCityData.filter(g => 
-                    getFormCategory(g.form_name) === form &&
-                    g.width === width &&
-                    g.length === length
-                );
-                console.log("Отфильтрованные теплицы по форме, ширине и длине:", filteredData);
+                    console.log("Координаты адреса:", [destinationLat, destinationLon]);
 
-                // Получаем уникальные описания каркасов
-                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
-                console.log("Уникальные каркасы:", uniqueFrames);
+                    let nearestCity = null;
+                    let minDistance = Infinity;
 
-                // Заполняем выпадающий список каркаса с упрощённым отображением
-                const frameSelect = document.getElementById("frame");
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
-                uniqueFrames.forEach(frame => {
-                    // Извлечение числовой части каркаса
-                    const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})/);
-                    const numericFrame = numericFrameMatch ? numericFrameMatch[0] : frame; // Если совпадение найдено, используем его
+                    citiesForMap.forEach(city => {
+                        const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                        console.log(`Расстояние до города ${city.name}: ${cityDistance} км`);
+                        if (cityDistance < minDistance) {
+                            minDistance = cityDistance;
+                            nearestCity = city;
+                        }
+                    });
 
-                    const option = document.createElement('option');
-                    option.value = frame; // Сохраняем оригинальное описание для запроса
-                    option.textContent = numericFrame; // Отображаем только числовую часть
-                    frameSelect.appendChild(option);
-                });
+                    console.log("Ближайший город:", nearestCity, "Расстояние:", minDistance, "км");
 
-                console.log("Выпадающий список каркаса обновлён.");
+                    if (!nearestCity) {
+                        console.warn("Не удалось определить ближайший город.");
+                        document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                        return;
+                    }
 
-                // Автоматически выбираем каркас, если доступен только один
-                if (uniqueFrames.length === 1) {
-                    frameSelect.value = uniqueFrames[0];
-                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
+                    mapInstance.setCenter(nearestCity.coords, 7);
+                    console.log(`Центр карты установлен на ${nearestCity.name}`);
+
+                    if (currentRoute) {
+                        mapInstance.geoObjects.remove(currentRoute);
+                        console.log("Предыдущий маршрут удалён.");
+                    }
+
+                    try {
+                        console.log("Выполняется расчёт маршрута...");
+                        const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
+                        currentRoute = route;
+                        mapInstance.geoObjects.add(route);
+                        console.log("Маршрут добавлен на карту:", route);
+
+                        const distanceInKm = route.getLength() / 1000;
+                        console.log("Длина маршрута:", distanceInKm, "км");
+
+                        const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+                        console.log("Расстояние от границы города:", distanceFromBoundary, "км");
+
+                        let cost;
+                        if (deliveryType === "withoutAssembly") {
+                            cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                            console.log("Стоимость доставки без сборки:", cost, "руб.");
+                        } else {
+                            cost = Math.max(1000, 40 * distanceFromBoundary);
+                            console.log("Стоимость доставки со сборкой:", cost, "руб.");
+                        }
+
+                        const roundedCost = Math.ceil(cost / 50) * 50;
+                        console.log("Округленная стоимость доставки:", roundedCost, "руб.");
+
+                        document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                    } catch (routeError) {
+                        console.error("Ошибка при расчёте маршрута:", routeError);
+                        document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                    }
+
+                } catch (geocodeError) {
+                    console.error("Ошибка при геокодировании адреса:", geocodeError);
+                    document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
                 }
             }
 
