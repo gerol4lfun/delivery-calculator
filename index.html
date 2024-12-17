@@ -811,62 +811,77 @@
                     polycarbonate
                 });
 
-                // Запрос к Supabase с фильтрацией по всем параметрам
-                console.log("Отправка запроса к Supabase для получения цены теплицы...");
-                let { data, error } = await supabaseClient
+                // Запрос к Supabase с фильтрацией по городу
+console.log("Отправка запроса к Supabase для получения данных по городу...");
+let { data, error } = await supabaseClient
     .from('prices')
     .select('*')
     .eq('city_name', city) // Запрашиваем только по городу
-    .limit(10); // Ограничиваем результат 10 строками
+    .limit(100); // Ограничиваем результат 100 строками для проверки
 
 console.log("Данные из Supabase по городу:", data);
 console.log("Ошибка при запросе данных:", error);
 
-                console.log("Данные для расчета цены:", data);
-                console.log("Ошибка для расчета цены:", error);
+if (error || !data) {
+    console.error("Ошибка при получении данных:", error);
+    alert("Теплица с заданными параметрами не найдена.");
+    return;
+}
 
-                if (error || !data) {
-                    console.error('Ошибка при получении данных для расчета:', error);
-                    alert("Теплица с заданными параметрами не найдена.");
-                    return;
-                }
+// Фильтрация вручную
+const filteredResult = data.filter(item => 
+    item.city_name.trim().toLowerCase() === city.trim().toLowerCase() &&
+    item.form_name.trim().toLowerCase() === form.trim().toLowerCase() &&
+    parseFloat(item.width) === width &&
+    parseFloat(item.length) === length &&
+    item.frame_description.trim().toLowerCase() === frame.trim().toLowerCase() &&
+    item.polycarbonate_type.trim().toLowerCase() === polycarbonate.trim().toLowerCase()
+);
 
-                let basePrice = data.price;
-                console.log("Базовая цена теплицы:", basePrice);
+console.log("Результаты фильтрации вручную:", filteredResult);
 
-                // Дополнительные услуги
-                const assembly = document.getElementById('assembly').checked ? 5000 : 0;
-                const bracing = document.getElementById('bracing').checked ? 2000 : 0;
-                const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
+if (filteredResult.length === 0) {
+    console.error("Теплица с такими параметрами не найдена.");
+    alert("Теплица с заданными параметрами не найдена.");
+    return;
+}
 
-                console.log("Дополнительные услуги:", { assembly, bracing, groundHooks });
+let basePrice = filteredResult[0].price;
+console.log("Базовая цена теплицы:", basePrice);
 
-                // Дополнительные товары
-                const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
-                const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
-                const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
+// Дополнительные услуги
+const assembly = document.getElementById('assembly').checked ? 5000 : 0;
+const bracing = document.getElementById('bracing').checked ? 2000 : 0;
+const groundHooks = document.getElementById('ground-hooks').checked ? 1500 : 0;
 
-                console.log("Дополнительные товары:", { dripIrrigation, windowAutomation, galvanizedTape });
+console.log("Дополнительные услуги:", { assembly, bracing, groundHooks });
 
-                const additionalServices = assembly + bracing + groundHooks;
-                const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
+// Дополнительные товары
+const dripIrrigation = document.getElementById('drip-irrigation').checked ? 1000 : 0;
+const windowAutomation = document.getElementById('window-automation').checked ? 2500 : 0;
+const galvanizedTape = document.getElementById('galvanized-tape').checked ? 800 : 0;
 
-                console.log("Итого дополнительные услуги:", additionalServices);
-                console.log("Итого дополнительные товары:", additionalProducts);
+console.log("Дополнительные товары:", { dripIrrigation, windowAutomation, galvanizedTape });
 
-                // Стоимость дуг
-                const arcCost = arcStep * 1000; 
-                console.log("Стоимость дуг (arcCost):", arcCost);
+const additionalServices = assembly + bracing + groundHooks;
+const additionalProducts = dripIrrigation + windowAutomation + galvanizedTape;
 
-                // Итоговая стоимость
-                const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
-                console.log("Общая стоимость до округления:", totalPrice);
+console.log("Итого дополнительные услуги:", additionalServices);
+console.log("Итого дополнительные товары:", additionalProducts);
 
-                const roundedPrice = Math.ceil(totalPrice / 50) * 50;
-                console.log("Итоговая стоимость после округления:", roundedPrice);
+// Стоимость дуг
+const arcCost = arcStep * 1000; 
+console.log("Стоимость дуг (arcCost):", arcCost);
 
-                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
-            }
+// Итоговая стоимость
+const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
+console.log("Общая стоимость до округления:", totalPrice);
+
+const roundedPrice = Math.ceil(totalPrice / 50) * 50;
+console.log("Итоговая стоимость после округления:", roundedPrice);
+
+document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
+
 
             // Функция расчёта доставки
             async function calculateDelivery() {
