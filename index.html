@@ -597,15 +597,25 @@ async function loadCities() {
 
             // Функция обработки изменения города
 async function onCityChange() {
-    const city = document.getElementById('city').value;
+    const city = document.getElementById('city')?.value;
     console.log("Выбран город:", city);
 
-    // Если город не выбран – сбрасываем все поля
+    // Проверяем элементы перед их использованием
+    const formDropdown = document.getElementById('form');
+    const modelDropdown = document.getElementById('model');
+    const frameDropdown = document.getElementById('frame');
+    const polycarbonateDropdown = document.getElementById('polycarbonate');
+
+    if (!formDropdown || !modelDropdown || !frameDropdown || !polycarbonateDropdown) {
+        console.error("Один из элементов не найден в DOM!");
+        return;
+    }
+
     if (!city) {
         console.log("Город не выбран, сбрасываем формы, модели и каркасы");
-        document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
-        document.getElementById('model').innerHTML = '<option value="">Сначала выберите форму</option>';
-        document.getElementById('frame').innerHTML = '<option value="">Сначала выберите модель</option>';
+        formDropdown.innerHTML = '<option value="">Сначала выберите город</option>';
+        modelDropdown.innerHTML = '<option value="">Сначала выберите форму</option>';
+        frameDropdown.innerHTML = '<option value="">Сначала выберите модель</option>';
         return;
     }
 
@@ -615,10 +625,6 @@ async function onCityChange() {
         .select('form_name, polycarbonate_type')
         .eq('city_name', city)
         .limit(30000);
-
-    // Логи для отладки
-    console.log("Данные для выбранного города:", data);
-    console.log("Ошибка при получении данных по городу:", error);
 
     if (error) {
         console.error('Ошибка при получении данных по городу:', error);
@@ -673,10 +679,14 @@ async function onCityChange() {
             
             // Функция обработки изменения формы
 function onFormChange() {
-    const form = document.getElementById("form").value;
-    console.log(`Выбрана форма: ${form}`);
+    const form = document.getElementById('form')?.value;
+    const frameSelect = document.getElementById('frame');
 
-    const frameSelect = document.getElementById("frame");
+    if (!frameSelect) {
+        console.error("Элемент 'frame' не найден!");
+        return;
+    }
+
     frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
     if (!form) {
@@ -684,14 +694,10 @@ function onFormChange() {
         return;
     }
 
-    // Фильтрация данных по выбранной форме
     const framesForForm = [...new Set(currentCityData
         .filter(item => getFormCategory(item.form_name) === form)
         .map(item => item.frame_description))];
 
-    console.log(`Доступные каркасы для формы "${form}":`, framesForForm);
-
-    // Заполняем выпадающий список каркасов
     framesForForm.forEach(frame => {
         const option = document.createElement("option");
         option.value = frame;
@@ -699,7 +705,6 @@ function onFormChange() {
         frameSelect.appendChild(option);
     });
 
-    // Если доступен только один каркас – выбираем его автоматически
     if (framesForForm.length === 1) {
         frameSelect.value = framesForForm[0];
         console.log("Автоматически выбран каркас:", framesForForm[0]);
