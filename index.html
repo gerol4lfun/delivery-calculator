@@ -758,11 +758,14 @@
                     console.warn("Форма не выбрана!");
                     return;
                 }
-
+                
                 if (!availableForms[form]) {
-                    console.warn(`Не найдены доступные формы для: ${form}`);
-                    return;
-                }
+    console.log("Все формы из базы:", currentCityData.map(item => item.form_name));
+    console.log("Фильтруемая форма:", form);
+    console.log("Доступные формы для фильтрации:", availableForms[form]);
+    console.warn(`Не найдены доступные формы для: ${form}`);
+    return;
+}
 
                 console.log("Фильтруемая форма:", form);
                 console.log("Все доступные form_name:", currentCityData.map(g => g.form_name));
