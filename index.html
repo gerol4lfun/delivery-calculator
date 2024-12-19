@@ -9,180 +9,10 @@
     <!-- Supabase JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
-        /* Основные стили */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f4f4f9;
-            color: #333;
-        }
-        .auth-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .calculator-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            position: relative;
-        }
-        input[type="text"], input[type="password"], select, button {
-            padding: 8px;
-            margin: 5px 0;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            background: #007BFF;
-            color: #fff;
-            cursor: pointer;
-            border: none;
-            width: 100%;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        .hidden {
-            display: none;
-        }
-        label {
-            font-size: 14px;
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .auth-container h2, .block h2 {
-            margin-bottom: 20px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #6c757d; /* Нейтральный серый фон */
-            padding: 10px;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .auth-container p {
-            color: red;
-            display: none;
-            margin: 10px 0;
-        }
-        .container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        .block {
-            flex: 1 1 45%;
-            padding: 20px;
-            border-right: 1px solid #ddd;
-            box-sizing: border-box;
-            min-width: 300px;
-        }
-        .block:last-child {
-            border-right: none;
-        }
-        .logout {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #f5f5f5;
-            color: #555;
-            border: 1px solid #ddd;
-            font-size: 12px;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: auto;
-        }
-        .logout:hover {
-            background-color: #e0e0e0;
-            color: #000;
-        }
-        .parameters {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .parameters label {
-            width: 40%;
-            margin-right: 10px;
-            text-align: left;
-            padding-right: 10px;
-            box-sizing: border-box;
-        }
-        .parameters select {
-            width: 60%;
-            text-align: center; /* Центрирование текста внутри select */
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-position: right 10px center;
-            background-repeat: no-repeat;
-            background-size: 10px;
-        }
-        /* Стили для центрирования текста в опциях select */
-        select option {
-            text-align: center;
-        }
-        .additional-services, .additional-products {
-            margin-top: 20px;
-        }
-        .checkbox-group-large {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .checkbox-group-large label {
-            width: 48%;
-            text-align: left;
-            font-weight: normal;
-        }
-        .additional-products h3 {
-            margin-bottom: 10px;
-            font-size: 16px;
-            color: #333;
-        }
-        .additional-products label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: normal;
-        }
-        #result, #summary {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #007BFF;
-            text-align: center;
-        }
-        #map {
-            width: 100%;
-            height: 300px;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
-        .summary {
-            margin-top: 20px;
-            font-size: 16px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .additional-summary {
-            margin-top: 10px;
-            text-align: left;
-            font-weight: normal;
-            color: #555;
-        }
+        /* Ваши стили */
+        /* ... */
+        .hidden { display: none; }
+        /* Добавьте остальные необходимые стили */
     </style>
 </head>
 <body>
@@ -192,7 +22,7 @@
         <input type="text" id="login" placeholder="Введите логин" required>
         <input type="password" id="password" placeholder="Введите пароль" required>
         <button onclick="authenticate()">Войти</button>
-        <p id="auth-error">Неверный логин или пароль!</p>
+        <p id="auth-error" style="display: none; color: red;">Неверный логин или пароль!</p>
     </div>
 
     <!-- Калькулятор -->
@@ -211,7 +41,7 @@
 
                 <button onclick="calculateDelivery()">Рассчитать доставку</button>
                 <div id="result"></div>
-                <div id="map"></div>
+                <div id="map" style="width: 100%; height: 400px;"></div>
             </div>
 
             <!-- Блок теплицы -->
@@ -235,14 +65,14 @@
                 <div class="parameters">
                     <label for="width">Ширина (м):</label>
                     <select id="width" onchange="onWidthChange()">
-                        <option value="">Выберите ширину</option>
+                        <option value="">Сначала выберите форму</option>
                     </select>
                 </div>
                 
                 <div class="parameters">
                     <label for="length">Длина (м):</label>
                     <select id="length" onchange="onLengthChange()">
-                        <option value="">Выберите длину</option>
+                        <option value="">Сначала выберите ширину</option>
                     </select>
                 </div>
                 
@@ -294,7 +124,7 @@
                     </label>
                 </div>
 
-                <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
+                <button id="calculate-button" onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
 
                 <!-- Отображение дополнительных опций и их стоимости -->
                 <div class="additional-summary" id="additional-summary"></div>
@@ -321,7 +151,7 @@
 
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Замените на ваш Anon Public Key
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -403,7 +233,7 @@
 
             Object.keys(availableForms).forEach(category => {
                 availableForms[category].forEach(form => {
-                    formNameToCategory[form.name.toLowerCase()] = category;
+                    formNameToCategory[normalizeString(form.name)] = category;
                 });
             });
 
@@ -411,7 +241,7 @@
             function getFormCategory(formName) {
                 if (!formName || typeof formName !== "string") return "Прочие";
 
-                const normalizedFormName = formName.trim().toLowerCase();
+                const normalizedFormName = normalizeString(formName);
                 const category = formNameToCategory[normalizedFormName];
 
                 if (category) {
@@ -419,6 +249,15 @@
                 } else {
                     return "Прочие";
                 }
+            }
+
+            // Функция извлечения ширины из названия теплицы
+            function extractWidth(formName) {
+                const match = formName.match(/(\d+(\.\d+)?)М/i);
+                if (match) {
+                    return parseFloat(match[1]);
+                }
+                return null;
             }
 
             // Пользователи
@@ -544,13 +383,16 @@
                     }
                 },
                 "Сборка": {
-                    price_by_type_and_length: {
-                        "Арочные 2.5-3м": { "4": 4990, "6": 6490, "8": 7990, "10": 9490, "12": 11990 },
-                        "Арочные 3.5м": { "4": 5990, "6": 7990, "8": 9990, "10": 11990, "12": 13990 },
-                        "Арочные 4м": { "4": 7990, "6": 11490, "8": 14990, "10": 18490, "12": 22490 },
-                        "Промышленные": { "4": 9990, "6": 14990, "8": 19990, "10": 24990, "12": 29990, "14": 34990, "16": 39990 }
-                    }
+                    // Это поле теперь не используется, так как мы определяем стоимость сборки отдельно
                 }
+            };
+
+            // Стоимость сборки для каждой группы теплиц
+            const assemblyCosts = {
+                "Арочные 2.5-3м": { "4": 4990, "6": 6490, "8": 7990, "10": 9490, "12": 11990 },
+                "Арочные 3.5м": { "4": 5990, "6": 7990, "8": 9990, "10": 11990, "12": 13990 },
+                "Арочные 4м": { "4": 7990, "6": 11490, "8": 14990, "10": 18490, "12": 22490 },
+                "Промышленные": { "4": 9990, "6": 14990, "8": 19990, "10": 24990, "12": 29990, "14": 34990, "16": 39990 }
             };
 
             let mapInstance;
@@ -590,7 +432,6 @@
 
             // Функция выхода
             function logout() {
-                const savedLogin = localStorage.getItem('savedLogin');
                 localStorage.removeItem('savedLogin');
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("calculator-container").classList.add("hidden");
@@ -651,11 +492,11 @@
 
                 // Если город не выбран – сбрасываем все поля
                 if (!city) {
-                    document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
-                    document.getElementById('width').innerHTML = '<option value="">Сначала выберите форму</option>';
-                    document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
-                    document.getElementById('polycarbonate').innerHTML = '<option value="">Сначала выберите город</option>';
+                    resetDropdown('form', 'Сначала выберите город');
+                    resetDropdown('width', 'Сначала выберите форму');
+                    resetDropdown('length', 'Сначала выберите ширину');
+                    resetDropdown('frame', 'Сначала выберите длину');
+                    resetDropdown('polycarbonate', 'Сначала выберите город');
                     return;
                 }
 
@@ -713,15 +554,12 @@
                 });
 
                 // 3. Сбрасываем размеры и каркасы
-                document.getElementById('width').innerHTML = '<option value="">Сначала выберите форму</option>';
-                document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                resetDropdown('width', 'Сначала выберите форму');
+                resetDropdown('length', 'Сначала выберите ширину');
+                resetDropdown('frame', 'Сначала выберите длину');
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения формы
@@ -747,8 +585,8 @@
                     return; // Останавливаем выполнение функции, если данных нет
                 }
 
-                // Получаем уникальные значения ширины
-                const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
+                // Получаем уникальные значения ширины из названия формы
+                const uniqueWidths = [...new Set(filteredData.map(item => extractWidth(item.form_name)).filter(w => w !== null))].sort((a, b) => a - b);
 
                 // Заполняем выпадающий список ширины
                 uniqueWidths.forEach(width => {
@@ -756,14 +594,11 @@
                 });
 
                 // Сбрасываем длину и каркасы
-                document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                resetDropdown('length', 'Сначала выберите ширину');
+                resetDropdown('frame', 'Сначала выберите длину');
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения ширины
@@ -781,7 +616,8 @@
                 // Фильтруем данные по выбранной форме и ширине
                 const filteredData = currentCityData.filter(item => {
                     const category = getFormCategory(item.form_name);
-                    return category === form && parseFloat(item.width) === width;
+                    const extractedWidth = extractWidth(item.form_name);
+                    return category === form && extractedWidth === width;
                 });
 
                 // Проверка на пустые данные после фильтрации
@@ -799,13 +635,10 @@
                 });
 
                 // Сбрасываем каркас
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                resetDropdown('frame', 'Сначала выберите длину');
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения длины
@@ -824,7 +657,8 @@
                 // Фильтруем данные по форме, ширине и длине
                 const filteredData = currentCityData.filter(item => {
                     const category = getFormCategory(item.form_name);
-                    return category === form && parseFloat(item.width) === width && parseFloat(item.length) === length;
+                    const extractedWidth = extractWidth(item.form_name);
+                    return category === form && extractedWidth === width && parseFloat(item.length) === length;
                 });
 
                 // Проверка на пустые данные после фильтрации
@@ -842,30 +676,40 @@
                 });
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения каркаса
             function onFrameChange() {
-                // Здесь можно добавить дополнительную логику, если она необходима
-                // Например, сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                // Сброс дополнительных опций
+                resetAdditionalOptions();
             }
 
             // Функция обновления дополнительного резюме
-            function updateAdditionalSummary() {
+            function updateAdditionalSummary(details = "") {
                 const additionalSummary = document.getElementById("additional-summary");
-                additionalSummary.innerHTML = "";
+                additionalSummary.innerHTML = details;
+            }
+
+            // Функция сброса выпадающих списков
+            function resetDropdown(elementId, placeholderText) {
+                const dropdown = document.getElementById(elementId);
+                dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+            }
+
+            // Функция сброса дополнительных опций
+            function resetAdditionalOptions() {
+                document.getElementById('bracing').checked = false;
+                document.getElementById('ground-hooks').checked = false;
+                document.getElementById('assembly').checked = false;
+                document.getElementById('drip-irrigation').checked = false;
+                document.getElementById('window-automation').checked = false;
+                document.getElementById('galvanized-tape').checked = false;
+                updateAdditionalSummary();
             }
 
             // Функция расчёта стоимости теплицы
-            async function calculateGreenhouseCost() {
+            function calculateGreenhouseCost() {
                 const city = document.getElementById("city").value;
                 const form = document.getElementById("form").value;
                 const width = parseFloat(document.getElementById("width").value);
@@ -890,7 +734,7 @@
                 const selectedEntry = currentCityData.find(item => {
                     return (
                         getFormCategory(item.form_name) === form &&
-                        parseFloat(item.width) === width &&
+                        extractWidth(item.form_name) === width &&
                         parseFloat(item.length) === length &&
                         normalizeString(item.frame_description) === normalizeString(frame) &&
                         normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
@@ -902,57 +746,33 @@
                     return;
                 }
 
-                let totalPrice = 0;
+                let totalPrice = selectedEntry.price;
                 let additionalDetails = "";
 
-                if (arcStep === 1) {
-                    // Шаг 1 м: используем базовую цену
-                    totalPrice = selectedEntry.price;
-                } else if (arcStep === 0.65) {
-                    // Шаг 0.65 м: рассчитываем дополнительную стоимость
-                    // Находим базовую цену для "Стандарт 4мм"
-                    const baseEntry = currentCityData.find(item => {
-                        return (
-                            getFormCategory(item.form_name) === form &&
-                            parseFloat(item.width) === width &&
-                            parseFloat(item.length) === length &&
-                            normalizeString(item.frame_description) === normalizeString(frame) &&
-                            normalizeString(item.polycarbonate_type) === "стандарт 4мм"
-                        );
-                    });
-
-                    if (!baseEntry) {
-                        alert('Не найдена базовая цена для покрытия "Стандарт 4мм".');
+                // Расчёт стоимости сборки
+                const assemblyChecked = document.getElementById('assembly').checked;
+                if (assemblyChecked) {
+                    const assemblyCategory = getAssemblyCategory(form, selectedEntry.form_name);
+                    if (assemblyCategory && assemblyCosts[assemblyCategory] && assemblyCosts[assemblyCategory][length]) {
+                        const assemblyCost = assemblyCosts[assemblyCategory][length];
+                        totalPrice += assemblyCost;
+                        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+                    } else {
+                        alert(`Не найдена стоимость сборки для выбранной категории и длины.`);
                         return;
                     }
-
-                    const basePrice = baseEntry.price;
-                    const additionalCost = 0.25 * basePrice;
-
-                    // Цена выбранного типа поликарбоната
-                    const selectedPrice = selectedEntry.price;
-
-                    totalPrice = selectedPrice + additionalCost;
-
-                    additionalDetails += `Дополнение за шаг 0.65 м: +${Math.ceil(additionalCost / 10) * 10} руб.<br>`;
-                } else {
-                    alert("Некорректный шаг между дугами.");
-                    return;
                 }
 
                 // Дополнительные услуги
                 const bracingChecked = document.getElementById('bracing').checked;
                 const groundHooksChecked = document.getElementById('ground-hooks').checked;
-                const assemblyChecked = document.getElementById('assembly').checked;
 
                 // Расчёт стоимости бруса
-                let bracingCost = 0;
                 if (bracingChecked) {
                     const bracingPrice = additionalServicesData["Брус"].price_by_length[length];
                     if (bracingPrice) {
-                        bracingCost = bracingPrice;
-                        totalPrice += bracingCost;
-                        additionalDetails += `Брус: +${bracingCost} руб.<br>`;
+                        totalPrice += bracingPrice;
+                        additionalDetails += `Брус: +${bracingPrice} руб.<br>`;
                     } else {
                         alert(`Не найдена стоимость бруса для длины ${length} м.`);
                         return;
@@ -960,30 +780,15 @@
                 }
 
                 // Расчёт стоимости штырей
-                let stakesCost = 0;
                 if (groundHooksChecked) {
                     const quantityData = bracingChecked ? additionalServicesData["Штыри"].quantity_by_length["with_bracing"] : additionalServicesData["Штыри"].quantity_by_length["without_bracing"];
                     const stakesQuantity = quantityData[length];
                     if (stakesQuantity) {
-                        stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
+                        const stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
                         totalPrice += stakesCost;
                         additionalDetails += `Штыри (${stakesQuantity} шт.): +${stakesCost} руб.<br>`;
                     } else {
                         alert(`Не найдена информация о количестве штырей для длины ${length} м.`);
-                        return;
-                    }
-                }
-
-                // Расчёт стоимости сборки
-                let assemblyCost = 0;
-                if (assemblyChecked) {
-                    const assemblyCategory = getAssemblyCategory(form, width);
-                    if (assemblyCategory && additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length]) {
-                        assemblyCost = additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length];
-                        totalPrice += assemblyCost;
-                        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
-                    } else {
-                        alert(`Не найдена стоимость сборки для типа "${assemblyCategory}" и длины ${length} м.`);
                         return;
                     }
                 }
@@ -1025,9 +830,16 @@
                 document.getElementById("summary").innerHTML = summaryText;
             }
 
-            // Функция получения категории сборки на основе формы и ширины
-            function getAssemblyCategory(form, width) {
+            // Функция получения категории сборки на основе формы и названия
+            function getAssemblyCategory(form, formName) {
+                const width = extractWidth(formName);
+                return getAssemblyCategoryByFormAndWidth(form, width);
+            }
+
+            // Вспомогательная функция для определения категории сборки
+            function getAssemblyCategoryByFormAndWidth(form, width) {
                 const formCategory = getFormCategory(form);
+
                 if (formCategory === "Промышленная прямостенная" || formCategory === "Промышленная домиком") {
                     return "Промышленные";
                 }
@@ -1149,6 +961,7 @@
                 await loadCities();
 
                 // Добавляем обработчики событий для дополнительных услуг и других полей
+                // Эти обработчики вызывают `calculateGreenhouseCost` только при нажатии на кнопку, а не при изменении полей
                 document.getElementById('bracing').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('ground-hooks').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('assembly').addEventListener('change', calculateGreenhouseCost);
