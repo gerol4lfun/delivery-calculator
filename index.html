@@ -309,10 +309,10 @@
             const DEBUG = true; // Включение режима отладки
 
             // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
-           function normalizeString(str) {
-    if (!str) return ""; // Проверяем, что значение существует
-    return str.trim().toLowerCase();
-}
+            function normalizeString(str) {
+                if (!str) return ""; // Проверяем, что значение существует
+                return str.trim().toLowerCase();
+            }
 
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
@@ -320,23 +320,21 @@
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            // Объявляем currentCityData перед использованием
-let currentCityData = []; // Данные для текущего города
+            // Объявляем currentCityData только один раз
+            let currentCityData = []; // Данные для текущего города
             
-console.log("Данные для проверки form_name:", currentCityData.map(item => item.form_name));
+            console.log("Данные для проверки form_name:", currentCityData.map(item => item.form_name));
 
             // Приведение названий форм к единому виду
-function normalizeFormName(name) {
-    if (!name || typeof name !== "string") return ""; // Проверяем, что name существует и является строкой
-    return name
-        .replace(/ТЕПЛИЦА|ЛЮКС|ПРЕМИУМ|ДЕЛЮКС|ЭЛИТ|БОЯРСКАЯ|ЦАРСКАЯ|СТРЕЛЕЦКАЯ/gi, "") // Убираем лишние слова
-        .replace(/[\s\-]/g, "") // Убираем пробелы и дефисы
-        .replace(/м/gi, "") // Убираем символ "М"
-        .trim()
-        .toLowerCase(); // Приводим к нижнему регистру
-}
-
-            let currentCityData = []; // Данные по выбранному городу
+            function normalizeFormName(name) {
+                if (!name || typeof name !== "string") return ""; // Проверяем, что name существует и является строкой
+                return name
+                    .replace(/ТЕПЛИЦА|ЛЮКС|ПРЕМИУМ|ДЕЛЮКС|ЭЛИТ|БОЯРСКАЯ|ЦАРСКАЯ|СТРЕЛЕЦКАЯ/gi, "") // Убираем лишние слова
+                    .replace(/[\s\-]/g, "") // Убираем пробелы и дефисы
+                    .replace(/м/gi, "") // Убираем символ "М"
+                    .trim()
+                    .toLowerCase(); // Приводим к нижнему регистру
+            }
 
             // Определение доступных форм теплиц и их названий
             const availableForms = {
@@ -711,30 +709,24 @@ function normalizeFormName(name) {
                     return;
                 }
 
-currentCityData = data;
+                // Заменяем объявление переменной на присваивание
+                currentCityData = data;
 
-// Приведение названий форм к единому виду
-function normalizeFormName(name) {
-    return name
-        .replace(/ТЕПЛИЦА|ЛЮКС|ПРЕМИУМ|ДЕЛЮКС|ЭЛИТ|БОЯРСКАЯ|ЦАРСКАЯ|СТРЕЛЕЦКАЯ/gi, "") // Убираем лишние слова
-        .replace(/[\s\-]/g, "") // Убираем пробелы и дефисы
-        .replace(/м/gi, "") // Убираем символ "М"
-        .trim()
-        .toLowerCase(); // Приводим к нижнему регистру
-}
+                // Приведение названий форм к единому виду
+                // Удаляем повторное объявление функции normalizeFormName, так как она уже объявлена выше
 
-// Проверка совпадений между availableForms и currentCityData
-console.log("Проверяем совпадение названий форм из базы и availableForms...");
-Object.keys(availableForms).forEach(formType => {
-    const formNames = availableForms[formType].map(f => normalizeFormName(f.name));
-    const matches = currentCityData.filter(item =>
-        formNames.includes(normalizeFormName(item.form_name))
-    );
-    console.log(`Совпадения для формы "${formType}":`, matches.map(m => m.form_name));
-    if (matches.length === 0) {
-        console.warn(`Нет совпадений для формы "${formType}"!`);
-    }
-});
+                // Проверка совпадений между availableForms и currentCityData
+                console.log("Проверяем совпадение названий форм из базы и availableForms...");
+                Object.keys(availableForms).forEach(formType => {
+                    const formNames = availableForms[formType].map(f => normalizeFormName(f));
+                    const matches = currentCityData.filter(item =>
+                        formNames.includes(normalizeFormName(item.form_name))
+                    );
+                    console.log(`Совпадения для формы "${formType}":`, matches.map(m => m.form_name));
+                    if (matches.length === 0) {
+                        console.warn(`Нет совпадений для формы "${formType}"!`);
+                    }
+                });
 
                 // 1. Обновляем выпадающий список поликарбоната
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
@@ -800,12 +792,12 @@ Object.keys(availableForms).forEach(formType => {
                 }
                 
                 if (!availableForms[form]) {
-    console.log("Все формы из базы:", currentCityData.map(item => item.form_name));
-    console.log("Фильтруемая форма:", form);
-    console.log("Доступные формы для фильтрации:", availableForms[form]);
-    console.warn(`Не найдены доступные формы для: ${form}`);
-    return;
-}
+                    console.log("Все формы из базы:", currentCityData.map(item => item.form_name));
+                    console.log("Фильтруемая форма:", form);
+                    console.log("Доступные формы для фильтрации:", availableForms[form]);
+                    console.warn(`Не найдены доступные формы для: ${form}`);
+                    return;
+                }
 
                 console.log("Фильтруемая форма:", form);
                 console.log("Все доступные form_name:", currentCityData.map(g => g.form_name));
@@ -916,7 +908,7 @@ Object.keys(availableForms).forEach(formType => {
                 // Проверка на пустые данные после фильтрации
                 if (filteredData.length === 0) {
                     console.warn("Данные после фильтрации пусты. Проверьте параметры.");
-                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    alert("Теплица с заданными параметрами не найдена. Попробуйте выбрать другие параметры.");
                     return;
                 }
 
@@ -1066,8 +1058,8 @@ Object.keys(availableForms).forEach(formType => {
                 console.log("Итого дополнительные услуги:", additionalServices);
                 console.log("Итого дополнительные товары:", additionalProducts);
 
-             // Итоговая стоимость
-const totalPrice = basePrice + additionalServices + additionalProducts;
+                // Итоговая стоимость
+                const totalPrice = basePrice + additionalServices + additionalProducts;
 
                 console.log("Итоговая стоимость теплицы:", totalPrice);
 
