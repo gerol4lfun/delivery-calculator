@@ -1023,18 +1023,13 @@
                 console.log("Итого дополнительные услуги:", additionalServices);
                 console.log("Итого дополнительные товары:", additionalProducts);
 
-                // Стоимость дуг
-                const arcCost = arcStep * 1000; 
-                console.log("Стоимость дуг (arcCost):", arcCost);
+             // Итоговая стоимость
+const totalPrice = basePrice + additionalServices + additionalProducts;
 
-                // Итоговая стоимость
-                const totalPrice = basePrice + additionalServices + additionalProducts + arcCost;
-                const roundedPrice = Math.ceil(totalPrice / 50) * 50;
-
-                console.log("Итоговая стоимость теплицы:", roundedPrice);
+                console.log("Итоговая стоимость теплицы:", totalPrice);
 
                 // Выводим итоговую стоимость
-                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${roundedPrice} руб.`;
+                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${totalPrice} руб.`;
             }
 
             // Функция расчёта доставки
