@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор доставки и стоимости теплиц</title>
     <!-- Яндекс.Карты -->
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=YOUR_API_KEY&lang=ru_RU" type="text/javascript"></script>
     <!-- Supabase JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
@@ -177,6 +177,12 @@
             text-align: center;
             font-weight: bold;
         }
+        .additional-summary {
+            margin-top: 10px;
+            text-align: left;
+            font-weight: normal;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -266,14 +272,9 @@
                 <!-- Дополнительные услуги -->
                 <div class="additional-services">
                     <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="bracing"> Брус (+2000 руб.)</label>
-                        <label><input type="checkbox" id="assembly"> Сборка (+5000 руб.)</label>
-                        <label><input type="checkbox" id="ground-hooks"> Штыри (+1500 руб.)</label>
-                    </div>
-                    <p>Монтаж на фундамент клиента</p>
-                    <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="on-wood"> На брус</label>
-                        <label><input type="checkbox" id="on-concrete"> На бетон</label>
+                        <label><input type="checkbox" id="bracing"> Брус</label>
+                        <label><input type="checkbox" id="ground-hooks"> Штыри</label>
+                        <label><input type="checkbox" id="assembly"> Сборка</label>
                     </div>
                 </div>
 
@@ -294,6 +295,9 @@
                 </div>
 
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
+
+                <!-- Отображение дополнительных опций и их стоимости -->
+                <div class="additional-summary" id="additional-summary"></div>
             </div>
 
             <!-- Блок итогового расчета -->
@@ -317,7 +321,7 @@
 
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
+            const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Замените на ваш Anon Public Key
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -519,6 +523,36 @@
                 { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
             ];
 
+            // Дополнительные услуги данные
+            const additionalServicesData = {
+                "Брус": {
+                    price_by_length: {
+                        4: 4790,
+                        6: 6290,
+                        8: 7790,
+                        10: 9290,
+                        12: 10790,
+                        14: 12290,
+                        16: 13790
+                    }
+                },
+                "Штыри": {
+                    price_per_unit: 249,
+                    quantity_by_length: {
+                        "without_bracing": { "4": 10, "6": 14, "8": 18, "10": 22, "12": 26, "14": 30, "16": 34 },
+                        "with_bracing": { "4": 6, "6": 10, "8": 14, "10": 18, "12": 22, "14": 26, "16": 30 }
+                    }
+                },
+                "Сборка": {
+                    price_by_type_and_length: {
+                        "Арочные 2.5-3м": { "4": 4990, "6": 6490, "8": 7990, "10": 9490, "12": 11990 },
+                        "Арочные 3.5м": { "4": 5990, "6": 7990, "8": 9990, "10": 11990, "12": 13990 },
+                        "Арочные 4м": { "4": 7990, "6": 11490, "8": 14990, "10": 18490, "12": 22490 },
+                        "Промышленные": { "4": 9990, "6": 14990, "8": 19990, "10": 24990, "12": 29990, "14": 34990, "16": 39990 }
+                    }
+                }
+            };
+
             let mapInstance;
             let currentRoute;
 
@@ -682,6 +716,12 @@
                 document.getElementById('width').innerHTML = '<option value="">Сначала выберите форму</option>';
                 document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
                 document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+
+                // Сброс дополнительных опций
+                document.getElementById('bracing').checked = false;
+                document.getElementById('ground-hooks').checked = false;
+                document.getElementById('assembly').checked = false;
+                updateAdditionalSummary();
             }
 
             // Функция обработки изменения формы
@@ -718,6 +758,12 @@
                 // Сбрасываем длину и каркасы
                 document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
                 document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+
+                // Сброс дополнительных опций
+                document.getElementById('bracing').checked = false;
+                document.getElementById('ground-hooks').checked = false;
+                document.getElementById('assembly').checked = false;
+                updateAdditionalSummary();
             }
 
             // Функция обработки изменения ширины
@@ -754,6 +800,12 @@
 
                 // Сбрасываем каркас
                 document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+
+                // Сброс дополнительных опций
+                document.getElementById('bracing').checked = false;
+                document.getElementById('ground-hooks').checked = false;
+                document.getElementById('assembly').checked = false;
+                updateAdditionalSummary();
             }
 
             // Функция обработки изменения длины
@@ -788,11 +840,28 @@
                 uniqueFrames.forEach(frame => {
                     frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
                 });
+
+                // Сброс дополнительных опций
+                document.getElementById('bracing').checked = false;
+                document.getElementById('ground-hooks').checked = false;
+                document.getElementById('assembly').checked = false;
+                updateAdditionalSummary();
             }
 
             // Функция обработки изменения каркаса
             function onFrameChange() {
                 // Здесь можно добавить дополнительную логику, если она необходима
+                // Например, сброс дополнительных опций
+                document.getElementById('bracing').checked = false;
+                document.getElementById('ground-hooks').checked = false;
+                document.getElementById('assembly').checked = false;
+                updateAdditionalSummary();
+            }
+
+            // Функция обновления дополнительного резюме
+            function updateAdditionalSummary() {
+                const additionalSummary = document.getElementById("additional-summary");
+                additionalSummary.innerHTML = "";
             }
 
             // Функция расчёта стоимости теплицы
@@ -834,6 +903,7 @@
                 }
 
                 let totalPrice = 0;
+                let additionalDetails = "";
 
                 if (arcStep === 1) {
                     // Шаг 1 м: используем базовую цену
@@ -863,32 +933,118 @@
                     const selectedPrice = selectedEntry.price;
 
                     totalPrice = selectedPrice + additionalCost;
+
+                    additionalDetails += `Дополнение за шаг 0.65 м: +${Math.ceil(additionalCost / 10) * 10} руб.<br>`;
                 } else {
                     alert("Некорректный шаг между дугами.");
                     return;
                 }
 
                 // Дополнительные услуги
-                const assemblyCost = document.getElementById('assembly').checked ? 5000 : 0;
-                const bracingCost = document.getElementById('bracing').checked ? 2000 : 0;
-                const groundHooksCost = document.getElementById('ground-hooks').checked ? 1500 : 0;
+                const bracingChecked = document.getElementById('bracing').checked;
+                const groundHooksChecked = document.getElementById('ground-hooks').checked;
+                const assemblyChecked = document.getElementById('assembly').checked;
+
+                // Расчёт стоимости бруса
+                let bracingCost = 0;
+                if (bracingChecked) {
+                    const bracingPrice = additionalServicesData["Брус"].price_by_length[length];
+                    if (bracingPrice) {
+                        bracingCost = bracingPrice;
+                        totalPrice += bracingCost;
+                        additionalDetails += `Брус: +${bracingCost} руб.<br>`;
+                    } else {
+                        alert(`Не найдена стоимость бруса для длины ${length} м.`);
+                        return;
+                    }
+                }
+
+                // Расчёт стоимости штырей
+                let stakesCost = 0;
+                if (groundHooksChecked) {
+                    const quantityData = bracingChecked ? additionalServicesData["Штыри"].quantity_by_length["with_bracing"] : additionalServicesData["Штыри"].quantity_by_length["without_bracing"];
+                    const stakesQuantity = quantityData[length];
+                    if (stakesQuantity) {
+                        stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
+                        totalPrice += stakesCost;
+                        additionalDetails += `Штыри (${stakesQuantity} шт.): +${stakesCost} руб.<br>`;
+                    } else {
+                        alert(`Не найдена информация о количестве штырей для длины ${length} м.`);
+                        return;
+                    }
+                }
+
+                // Расчёт стоимости сборки
+                let assemblyCost = 0;
+                if (assemblyChecked) {
+                    const assemblyCategory = getAssemblyCategory(form, width);
+                    if (assemblyCategory && additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length]) {
+                        assemblyCost = additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length];
+                        totalPrice += assemblyCost;
+                        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+                    } else {
+                        alert(`Не найдена стоимость сборки для типа "${assemblyCategory}" и длины ${length} м.`);
+                        return;
+                    }
+                }
 
                 // Дополнительные товары
-                const dripIrrigationCost = document.getElementById('drip-irrigation').checked ? 1000 : 0;
-                const windowAutomationCost = document.getElementById('window-automation').checked ? 2500 : 0;
-                const galvanizedTapeCost = document.getElementById('galvanized-tape').checked ? 800 : 0;
+                const additionalProducts = [];
+                const dripIrrigationChecked = document.getElementById('drip-irrigation').checked;
+                const windowAutomationChecked = document.getElementById('window-automation').checked;
+                const galvanizedTapeChecked = document.getElementById('galvanized-tape').checked;
 
-                const additionalServices = assemblyCost + bracingCost + groundHooksCost;
-                const additionalProducts = dripIrrigationCost + windowAutomationCost + galvanizedTapeCost;
+                if (dripIrrigationChecked) {
+                    additionalProducts.push({ name: "Капельный полив", cost: 1000 });
+                    totalPrice += 1000;
+                }
+                if (windowAutomationChecked) {
+                    additionalProducts.push({ name: "Автомат для форточки", cost: 2500 });
+                    totalPrice += 2500;
+                }
+                if (galvanizedTapeChecked) {
+                    additionalProducts.push({ name: "Оцинкованная лента", cost: 800 });
+                    totalPrice += 800;
+                }
 
-                // Итоговая стоимость
-                totalPrice += additionalServices + additionalProducts;
+                // Добавление стоимости дополнительных товаров в резюме
+                additionalProducts.forEach(product => {
+                    additionalDetails += `${product.name}: +${product.cost} руб.<br>`;
+                });
 
                 // Округление вверх до ближайшего десятка
                 totalPrice = Math.ceil(totalPrice / 10) * 10;
 
+                // Формирование итогового резюме
+                let summaryText = `Итоговая стоимость теплицы: ${totalPrice} руб.<br>`;
+                if (additionalDetails) {
+                    summaryText += `<hr>Дополнительные товары и услуги:<br>${additionalDetails}`;
+                }
+
                 // Выводим итоговую стоимость
-                document.getElementById("summary").innerText = `Итоговая стоимость теплицы: ${totalPrice} руб.`;
+                document.getElementById("summary").innerHTML = summaryText;
+            }
+
+            // Функция получения категории сборки на основе формы и ширины
+            function getAssemblyCategory(form, width) {
+                const formCategory = getFormCategory(form);
+                if (formCategory === "Промышленная прямостенная" || formCategory === "Промышленная домиком") {
+                    return "Промышленные";
+                }
+
+                if ((formCategory === "Арочная" || formCategory === "Каплевидная") && (width === 2.5 || width === 3)) {
+                    return "Арочные 2.5-3м";
+                }
+
+                if ((formCategory === "Арочная" || formCategory === "Каплевидная" || formCategory === "Прямостенная" || formCategory === "Домиком") && width === 3.5) {
+                    return "Арочные 3.5м";
+                }
+
+                if ((formCategory === "Арочная" || formCategory === "Прямостенная" || formCategory === "Домиком" || formCategory === "Митлайдер арочная" || formCategory === "Митлайдер прямостенная" || formCategory === "Навес") && (width === 4 || width === 5 || width === 6)) {
+                    return "Арочные 4м";
+                }
+
+                return null; // Если не подходит ни одна категория
             }
 
             // Функция расчёта доставки
@@ -991,6 +1147,21 @@
             // Функция загрузки городов при инициализации калькулятора
             async function initializeCalculator() {
                 await loadCities();
+
+                // Добавляем обработчики событий для дополнительных услуг
+                document.getElementById('bracing').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('ground-hooks').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('assembly').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('drip-irrigation').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('window-automation').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('galvanized-tape').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('arcStep').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('polycarbonate').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('frame').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('length').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('width').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('form').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('city').addEventListener('change', calculateGreenhouseCost);
             }
         </script>
     </div>
