@@ -321,7 +321,7 @@
 
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Замените на ваш Anon Public Key
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -403,7 +403,7 @@
 
             Object.keys(availableForms).forEach(category => {
                 availableForms[category].forEach(form => {
-                    formNameToCategory[form.name.toLowerCase()] = category;
+                    formNameToCategory[normalizeString(form.name)] = category;
                 });
             });
 
@@ -411,7 +411,7 @@
             function getFormCategory(formName) {
                 if (!formName || typeof formName !== "string") return "Прочие";
 
-                const normalizedFormName = formName.trim().toLowerCase();
+                const normalizedFormName = normalizeString(formName);
                 const category = formNameToCategory[normalizedFormName];
 
                 if (category) {
@@ -590,7 +590,6 @@
 
             // Функция выхода
             function logout() {
-                const savedLogin = localStorage.getItem('savedLogin');
                 localStorage.removeItem('savedLogin');
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("calculator-container").classList.add("hidden");
@@ -651,11 +650,11 @@
 
                 // Если город не выбран – сбрасываем все поля
                 if (!city) {
-                    document.getElementById('form').innerHTML = '<option value="">Сначала выберите город</option>';
-                    document.getElementById('width').innerHTML = '<option value="">Сначала выберите форму</option>';
-                    document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                    document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
-                    document.getElementById('polycarbonate').innerHTML = '<option value="">Сначала выберите город</option>';
+                    resetDropdown('form', 'Сначала выберите город');
+                    resetDropdown('width', 'Сначала выберите форму');
+                    resetDropdown('length', 'Сначала выберите ширину');
+                    resetDropdown('frame', 'Сначала выберите длину');
+                    resetDropdown('polycarbonate', 'Сначала выберите город');
                     return;
                 }
 
@@ -713,19 +712,16 @@
                 });
 
                 // 3. Сбрасываем размеры и каркасы
-                document.getElementById('width').innerHTML = '<option value="">Сначала выберите форму</option>';
-                document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                resetDropdown('width', 'Сначала выберите форму');
+                resetDropdown('length', 'Сначала выберите ширину');
+                resetDropdown('frame', 'Сначала выберите длину');
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения формы
-            async function onFormChange() {
+            function onFormChange() {
                 const form = document.getElementById("form").value;
 
                 const widthSelect = document.getElementById("width");
@@ -756,18 +752,15 @@
                 });
 
                 // Сбрасываем длину и каркасы
-                document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                resetDropdown('length', 'Сначала выберите ширину');
+                resetDropdown('frame', 'Сначала выберите длину');
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения ширины
-            async function onWidthChange() {
+            function onWidthChange() {
                 const form = document.getElementById("form").value;
                 const width = parseFloat(document.getElementById("width").value);
 
@@ -799,13 +792,10 @@
                 });
 
                 // Сбрасываем каркас
-                document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                resetDropdown('frame', 'Сначала выберите длину');
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения длины
@@ -842,26 +832,36 @@
                 });
 
                 // Сброс дополнительных опций
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                updateAdditionalSummary();
+                resetAdditionalOptions();
             }
 
             // Функция обработки изменения каркаса
             function onFrameChange() {
-                // Здесь можно добавить дополнительную логику, если она необходима
-                // Например, сброс дополнительных опций
+                // Сброс дополнительных опций
+                resetAdditionalOptions();
+            }
+
+            // Функция сброса выпадающих списков
+            function resetDropdown(elementId, placeholderText) {
+                const dropdown = document.getElementById(elementId);
+                dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+            }
+
+            // Функция сброса дополнительных опций
+            function resetAdditionalOptions() {
                 document.getElementById('bracing').checked = false;
                 document.getElementById('ground-hooks').checked = false;
                 document.getElementById('assembly').checked = false;
+                document.getElementById('drip-irrigation').checked = false;
+                document.getElementById('window-automation').checked = false;
+                document.getElementById('galvanized-tape').checked = false;
                 updateAdditionalSummary();
             }
 
             // Функция обновления дополнительного резюме
-            function updateAdditionalSummary() {
+            function updateAdditionalSummary(details = "") {
                 const additionalSummary = document.getElementById("additional-summary");
-                additionalSummary.innerHTML = "";
+                additionalSummary.innerHTML = details;
             }
 
             // Функция расчёта стоимости теплицы
@@ -905,6 +905,7 @@
                 let totalPrice = 0;
                 let additionalDetails = "";
 
+                // Расчёт стоимости базовой теплицы с учётом шага дуг
                 if (arcStep === 1) {
                     // Шаг 1 м: используем базовую цену
                     totalPrice = selectedEntry.price;
@@ -1148,6 +1149,8 @@
             async function initializeCalculator() {
                 await loadCities();
 
+                // **УДАЛИТЕ** следующие строки, чтобы избежать автоматического вызова расчета при изменении полей
+                /*
                 // Добавляем обработчики событий для дополнительных услуг
                 document.getElementById('bracing').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('ground-hooks').addEventListener('change', calculateGreenhouseCost);
@@ -1162,6 +1165,9 @@
                 document.getElementById('width').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('form').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('city').addEventListener('change', calculateGreenhouseCost);
+                */
+
+                // **Вместо этого**, функция `calculateGreenhouseCost()` будет вызываться только при нажатии на кнопку
             }
         </script>
     </div>
