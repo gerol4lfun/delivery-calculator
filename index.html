@@ -320,6 +320,15 @@
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+            // Приведение названий форм к единому виду
+function normalizeFormName(name) {
+    return name
+        .replace(/ТЕПЛИЦА|ЛЮКС|ПРЕМИУМ|ДЕЛЮКС|ЭЛИТ|БОЯРСКАЯ|ЦАРСКАЯ|СТРЕЛЕЦКАЯ/gi, "") // Убираем ненужные слова
+        .replace(/[\s\-]/g, "") // Убираем пробелы и дефисы
+        .trim()
+        .toLowerCase(); // Приводим к нижнему регистру
+}
+
             let currentCityData = []; // Данные по выбранному городу
 
             // Определение доступных форм теплиц и их названий
@@ -695,35 +704,26 @@
                     return;
                 }
 
-                currentCityData = data;
+currentCityData = data;
 
 // Приведение названий форм к единому виду
 function normalizeFormName(name) {
-    return name.replace(/ТЕПЛИЦА|ЛЮКС|ПРЕМИУМ|ДЕЛЮКС/gi, "").trim().toLowerCase();
+    return name
+        .replace(/ТЕПЛИЦА|ЛЮКС|ПРЕМИУМ|ДЕЛЮКС|ЭЛИТ|БОЯРСКАЯ|ЦАРСКАЯ|СТРЕЛЕЦКАЯ/gi, "") // Убираем лишние слова
+        .replace(/[\s\-]/g, "") // Убираем пробелы и дефисы
+        .replace(/м/gi, "") // Убираем символ "М"
+        .trim()
+        .toLowerCase(); // Приводим к нижнему регистру
 }
 
-// Проверяем совпадение названий форм из базы и availableForms
-console.log("Проверяем совпадение названий форм из базы и availableForms...");
-Object.keys(availableForms).forEach(formKey => {
-    const normalizedKey = normalizeFormName(formKey);
-    const matches = currentCityData.filter(item => 
-        normalizeFormName(item.form_name).includes(normalizedKey)
-    );
-    if (matches.length > 0) {
-        console.log(`Совпадения для нормализованной формы "${formKey}":`, matches.map(m => m.form_name));
-    } else {
-        console.warn(`Нет совпадений для формы "${formKey}" после нормализации!`);
-    }
-});
-
-                // Проверка совпадений между availableForms и currentCityData
+// Проверка совпадений между availableForms и currentCityData
 console.log("Проверяем совпадение названий форм из базы и availableForms...");
 Object.keys(availableForms).forEach(formType => {
-    const formNames = availableForms[formType].map(f => normalizeString(f.name));
+    const formNames = availableForms[formType].map(f => normalizeFormName(f.name));
     const matches = currentCityData.filter(item =>
-        formNames.includes(normalizeString(item.form_name))
+        formNames.includes(normalizeFormName(item.form_name))
     );
-    console.log(`Совпадения для формы "${formType}":`, matches);
+    console.log(`Совпадения для формы "${formType}":`, matches.map(m => m.form_name));
     if (matches.length === 0) {
         console.warn(`Нет совпадений для формы "${formType}"!`);
     }
