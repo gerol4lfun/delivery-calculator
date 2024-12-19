@@ -382,9 +382,7 @@
                         "with_bracing": { "4": 6, "6": 10, "8": 14, "10": 18, "12": 22, "14": 26, "16": 30 }
                     }
                 },
-                "Сборка": {
-                    // Это поле теперь не используется, так как мы определяем стоимость сборки отдельно
-                }
+                // Сборка теперь определяется отдельно
             };
 
             // Стоимость сборки для каждой группы теплиц
@@ -563,7 +561,7 @@
             }
 
             // Функция обработки изменения формы
-            async function onFormChange() {
+            function onFormChange() {
                 const form = document.getElementById("form").value;
 
                 const widthSelect = document.getElementById("width");
@@ -602,7 +600,7 @@
             }
 
             // Функция обработки изменения ширины
-            async function onWidthChange() {
+            function onWidthChange() {
                 const form = document.getElementById("form").value;
                 const width = parseFloat(document.getElementById("width").value);
 
@@ -752,7 +750,7 @@
                 // Расчёт стоимости сборки
                 const assemblyChecked = document.getElementById('assembly').checked;
                 if (assemblyChecked) {
-                    const assemblyCategory = getAssemblyCategory(form, selectedEntry.form_name);
+                    const assemblyCategory = getAssemblyCategoryByFormAndWidth(form, selectedEntry.form_name);
                     if (assemblyCategory && assemblyCosts[assemblyCategory] && assemblyCosts[assemblyCategory][length]) {
                         const assemblyCost = assemblyCosts[assemblyCategory][length];
                         totalPrice += assemblyCost;
@@ -830,14 +828,9 @@
                 document.getElementById("summary").innerHTML = summaryText;
             }
 
-            // Функция получения категории сборки на основе формы и названия
-            function getAssemblyCategory(form, formName) {
+            // Функция получения категории сборки на основе формы и ширины
+            function getAssemblyCategoryByFormAndWidth(form, formName) {
                 const width = extractWidth(formName);
-                return getAssemblyCategoryByFormAndWidth(form, width);
-            }
-
-            // Вспомогательная функция для определения категории сборки
-            function getAssemblyCategoryByFormAndWidth(form, width) {
                 const formCategory = getFormCategory(form);
 
                 if (formCategory === "Промышленная прямостенная" || formCategory === "Промышленная домиком") {
@@ -961,7 +954,8 @@
                 await loadCities();
 
                 // Добавляем обработчики событий для дополнительных услуг и других полей
-                // Эти обработчики вызывают `calculateGreenhouseCost` только при нажатии на кнопку, а не при изменении полей
+                // Эти обработчики вызывают `calculateGreenhouseCost` только при изменении опций
+                // и не вызывают её автоматически при изменении других полей
                 document.getElementById('bracing').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('ground-hooks').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('assembly').addEventListener('change', calculateGreenhouseCost);
