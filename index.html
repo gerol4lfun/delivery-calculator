@@ -309,9 +309,10 @@
             const DEBUG = true; // Включение режима отладки
 
             // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
-            function normalizeString(str) {
-                return str.trim().toLowerCase();
-            }
+           function normalizeString(str) {
+    if (!str) return ""; // Проверяем, что значение существует
+    return str.trim().toLowerCase();
+}
 
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
