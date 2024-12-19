@@ -527,13 +527,13 @@
             const additionalServicesData = {
                 "Брус": {
                     price_by_length: {
-                        "4": 4790,
-                        "6": 6290,
-                        "8": 7790,
-                        "10": 9290,
-                        "12": 10790,
-                        "14": 12290,
-                        "16": 13790
+                        4: 4790,
+                        6: 6290,
+                        8: 7790,
+                        10: 9290,
+                        12: 10790,
+                        14: 12290,
+                        16: 13790
                     }
                 },
                 "Штыри": {
@@ -744,7 +744,7 @@
                 }
 
                 // Получаем уникальные значения ширины
-                const uniqueWidths = [...new Set(filteredData.map(item => parseFloat(item.width))).filter(w => !isNaN(w))].sort((a, b) => a - b);
+                const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
 
                 // Заполняем выпадающий список ширины
                 uniqueWidths.forEach(width => {
@@ -784,7 +784,7 @@
                 }
 
                 // Получаем уникальные значения длины
-                const uniqueLengths = [...new Set(filteredData.map(item => parseFloat(item.length))).filter(l => !isNaN(l))].sort((a, b) => a - b);
+                const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
 
                 // Заполняем выпадающий список длины
                 uniqueLengths.forEach(length => {
@@ -824,7 +824,7 @@
                 }
 
                 // Получаем уникальные значения каркаса
-                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description)).sort()];
+                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
 
                 // Заполняем выпадающий список каркаса
                 uniqueFrames.forEach(frame => {
@@ -949,7 +949,7 @@
                 // Расчёт стоимости бруса
                 let bracingCost = 0;
                 if (bracingChecked) {
-                    const bracingPrice = additionalServicesData["Брус"].price_by_length[length.toString()];
+                    const bracingPrice = additionalServicesData["Брус"].price_by_length[length];
                     if (bracingPrice) {
                         bracingCost = bracingPrice;
                         totalPrice += bracingCost;
@@ -964,7 +964,7 @@
                 let stakesCost = 0;
                 if (groundHooksChecked) {
                     const quantityData = bracingChecked ? additionalServicesData["Штыри"].quantity_by_length["with_bracing"] : additionalServicesData["Штыри"].quantity_by_length["without_bracing"];
-                    const stakesQuantity = quantityData[length.toString()];
+                    const stakesQuantity = quantityData[length];
                     if (stakesQuantity) {
                         stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
                         totalPrice += stakesCost;
@@ -979,18 +979,12 @@
                 let assemblyCost = 0;
                 if (assemblyChecked) {
                     const assemblyCategory = getAssemblyCategory(form, width);
-                    if (assemblyCategory) {
-                        const assemblyPrice = additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length.toString()];
-                        if (assemblyPrice) {
-                            assemblyCost = assemblyPrice;
-                            totalPrice += assemblyCost;
-                            additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
-                        } else {
-                            alert(`Не найдена стоимость сборки для типа "${assemblyCategory}" и длины ${length} м.`);
-                            return;
-                        }
+                    if (assemblyCategory && additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length]) {
+                        assemblyCost = additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length];
+                        totalPrice += assemblyCost;
+                        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
                     } else {
-                        alert(`Не удалось определить категорию сборки для формы "${form}" и ширины ${width} м.`);
+                        alert(`Не найдена стоимость сборки для типа "${assemblyCategory}" и длины ${length} м.`);
                         return;
                     }
                 }
