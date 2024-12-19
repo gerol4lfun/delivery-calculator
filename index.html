@@ -696,6 +696,19 @@
 
                 currentCityData = data;
 
+                // Проверка совпадений между availableForms и currentCityData
+console.log("Проверяем совпадение названий форм из базы и availableForms...");
+Object.keys(availableForms).forEach(formType => {
+    const formNames = availableForms[formType].map(f => normalizeString(f.name));
+    const matches = currentCityData.filter(item =>
+        formNames.includes(normalizeString(item.form_name))
+    );
+    console.log(`Совпадения для формы "${formType}":`, matches);
+    if (matches.length === 0) {
+        console.warn(`Нет совпадений для формы "${formType}"!`);
+    }
+});
+
                 // 1. Обновляем выпадающий список поликарбоната
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
                 polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
