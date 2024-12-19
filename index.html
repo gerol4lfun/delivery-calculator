@@ -325,135 +325,99 @@
             
             console.log("Данные для проверки form_name:", currentCityData.map(item => item.form_name));
 
-            // Приведение названий форм к единому виду
-            function normalizeFormName(name) {
-                if (!name || typeof name !== "string") return ""; // Проверяем, что name существует и является строкой
-                return name
-                    .replace(/ТЕПЛИЦА|ЛЮКС|ПРЕМИУМ|ДЕЛЮКС|ЭЛИТ|БОЯРСКАЯ|ЦАРСКАЯ|СТРЕЛЕЦКАЯ/gi, "") // Убираем лишние слова
-                    .replace(/[\s\-]/g, "") // Убираем пробелы и дефисы
-                    .replace(/м/gi, "") // Убираем символ "М"
-                    .trim()
-                    .toLowerCase(); // Приводим к нижнему регистру
-            }
-
             // Определение доступных форм теплиц и их названий
             const availableForms = {
                 "Арочная": [
-                    "ТЕПЛИЦА БОЯРСКАЯ 2.5М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ 3М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", 
-                    "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М"
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 3М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
                 ],
                 "Каплевидная": [
-                    "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", 
-                    "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", 
-                    "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М"
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М", frame: "40х20" }
                 ],
                 "Прямостенная": [
-                    "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", 
-                    "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", 
-                    "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", 
-                    "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", 
-                    "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", 
-                    "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", 
-                    "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М"
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
                 ],
                 "Домиком": [
-                    "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", 
-                    "ТЕПЛИЦА ДОМИК ЛЮКС 3М", 
-                    "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", 
-                    "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", 
-                    "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", 
-                    "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", 
-                    "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М"
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М", frame: "40х20+20х20" }
                 ],
                 "Пристенная": [
-                    "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", 
-                    "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", 
-                    "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", 
-                    "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М"
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" }
                 ],
                 "Митлайдер арочная": [
-                    "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", 
-                    "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", 
-                    "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", 
-                    "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М"
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М", frame: "40х20+20х20" }
                 ],
                 "Митлайдер прямостенная": [
-                    "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", 
-                    "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М"
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М", frame: "40х20+20х20" }
                 ],
                 "Промышленная прямостенная": [
-                    "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", 
-                    "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М"
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М", frame: "40х20+40х20" }
                 ],
                 "Промышленная домиком": [
-                    "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", 
-                    "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М"
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М", frame: "40х20+40х20" }
                 ],
                 "Навес": [
-                    "НАВЕС ЛЮКС 3.5М", 
-                    "НАВЕС ЛЮКС 4М", 
-                    "НАВЕС ПРЕМИУМ 5М", 
-                    "НАВЕС ПРЕМИУМ 6М"
+                    { name: "НАВЕС ЛЮКС 3.5М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ЛЮКС 4М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "НАВЕС ПРЕМИУМ 6М", frame: "40х20+40х20" }
                 ]
             };
 
+            // Создание обратной карты: form_name -> category
+            const formNameToCategory = {};
+
+            Object.keys(availableForms).forEach(category => {
+                availableForms[category].forEach(form => {
+                    formNameToCategory[form.name.toLowerCase()] = category;
+                });
+            });
+
+            // Обновлённая функция определения категории формы
             function getFormCategory(formName) {
-                console.log("Анализ form_name:", formName); // Лог для отладки
+                if (!formName || typeof formName !== "string") return "Прочие";
 
-                // Приводим название к удобному формату:
-                const cleanName = formName
-                    .replace(/ТЕПЛИЦА\s*/gi, "")       // Убираем слово "ТЕПЛИЦА" и пробелы
-                    .replace(/\d+(\.\d+)?М/gi, "")     // Удаляем размеры, например "2.5М", "3М"
-                    .replace(/\s{2,}/g, " ")           // Убираем лишние пробелы
-                    .trim();                           // Очищаем пробелы по краям
+                const normalizedFormName = formName.trim().toLowerCase();
+                const category = formNameToCategory[normalizedFormName];
 
-                console.log("Очищенное имя для анализа:", cleanName);
-
-                // Категории форм теплиц с ключевыми словами
-                if (/БОЯРСКАЯ/gi.test(cleanName)) {
-                    return "Арочная";
+                if (category) {
+                    console.log(`Категория для формы "${formName}": ${category}`);
+                    return category;
+                } else {
+                    console.warn(`Не удалось определить категорию для формы: "${formName}"`);
+                    return "Прочие";
                 }
-                if (/СТРЕЛЕЦКАЯ/gi.test(cleanName)) {
-                    return "Каплевидная";
-                }
-                if (/ЦАРСКАЯ|ПРЯМОСТЕННАЯ/gi.test(cleanName)) {
-                    return "Прямостенная";
-                }
-                if (/ДОМИК/gi.test(cleanName)) {
-                    return "Домиком";
-                }
-                if (/ПРИСТЕННАЯ/gi.test(cleanName)) {
-                    return "Пристенная";
-                }
-                if (/МИТЛАЙДЕР/gi.test(cleanName)) {
-                    return "Митлайдер";
-                }
-                if (/НАВЕС/gi.test(cleanName)) {
-                    return "Навес";
-                }
-                if (/ПРОМЫШЛЕННАЯ|ПРОМЫШЛЕННЫЕ/gi.test(cleanName)) {
-                    return "Промышленная";
-                }
-                if (/ЭКОНОМ/gi.test(cleanName)) {
-                    return "Эконом";
-                }
-                if (/ЛЮКС/gi.test(cleanName)) {
-                    return "Люкс";
-                }
-                if (/ПОЛИКАРБОНАТ/gi.test(cleanName)) {
-                    return "Поликарбонат";
-                }
-
-                return "Прочие"; // Если ничего не совпадает
             }
 
             // Пользователи
@@ -482,8 +446,8 @@
                 "Митлайдер прямостенная": 7,
                 "Промышленная прямостенная": 8,
                 "Промышленная домиком": 9,
-                "Навес": 10
-                // "Прочие": 11
+                "Навес": 10,
+                "Прочие": 11
             };
 
             // Регионы доставки
@@ -677,13 +641,14 @@
                     document.getElementById('width').innerHTML = '<option value="">Сначала выберите форму</option>';
                     document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
                     document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
+                    document.getElementById('polycarbonate').innerHTML = '<option value="">Сначала выберите город</option>';
                     return;
                 }
 
                 console.log(`Получение данных для города: ${city}`);
                 let { data, error } = await supabaseClient
                     .from('prices')
-                    .select('form_name, polycarbonate_type, width, length, frame_description') // Добавляем необходимые поля
+                    .select('form_name, polycarbonate_type, width, length, frame_description, price') // Добавляем поле price
                     .eq('city_name', city)
                     .limit(30000);
 
@@ -709,18 +674,15 @@
                     return;
                 }
 
-                // Заменяем объявление переменной на присваивание
+                // Присваиваем данные текущему городу
                 currentCityData = data;
-
-                // Приведение названий форм к единому виду
-                // Удаляем повторное объявление функции normalizeFormName, так как она уже объявлена выше
 
                 // Проверка совпадений между availableForms и currentCityData
                 console.log("Проверяем совпадение названий форм из базы и availableForms...");
                 Object.keys(availableForms).forEach(formType => {
-                    const formNames = availableForms[formType].map(f => normalizeFormName(f));
+                    const formNames = availableForms[formType].map(f => normalizeString(f.name));
                     const matches = currentCityData.filter(item =>
-                        formNames.includes(normalizeFormName(item.form_name))
+                        formNames.includes(normalizeString(item.form_name))
                     );
                     console.log(`Совпадения для формы "${formType}":`, matches.map(m => m.form_name));
                     if (matches.length === 0) {
@@ -743,24 +705,25 @@
                 });
 
                 console.log("Выпадающий список поликарбоната обновлён.");
-                
+
                 if (!availableForms) {
                     console.warn("Список доступных форм не загружен!");
                     return; // Остановить выполнение функции
                 }
 
                 // Фильтруем формы на основе availableForms
-                const formNames = Object.keys(availableForms).filter(formType =>
-                    data.some(item => availableForms[formType].some(name => item.form_name.includes(name)))
+                const formCategories = Object.keys(availableForms);
+                const formsAvailable = formCategories.filter(formType =>
+                    data.some(item => availableForms[formType].some(form => normalizeString(item.form_name) === normalizeString(form.name)))
                 );
 
                 // Сортируем формы по приоритету
-                formNames.sort((a, b) => (formPriority[a] || 100) - (formPriority[b] || 100)); // Прочие формы получат низкий приоритет
+                formsAvailable.sort((a, b) => (formPriority[a] || 100) - (formPriority[b] || 100)); // Прочие формы получат низкий приоритет
 
                 // Обновляем выпадающий список форм теплиц
                 const formDropdown = document.getElementById('form');
                 formDropdown.innerHTML = '<option value="">Выберите форму</option>';
-                formNames.forEach(form => {
+                formsAvailable.forEach(form => {
                     if (form && form !== "Прочие") { // Исключаем пустые и ненужные категории
                         const option = document.createElement('option');
                         option.value = form;
@@ -790,24 +753,12 @@
                     console.warn("Форма не выбрана!");
                     return;
                 }
-                
-                if (!availableForms[form]) {
-                    console.log("Все формы из базы:", currentCityData.map(item => item.form_name));
-                    console.log("Фильтруемая форма:", form);
-                    console.log("Доступные формы для фильтрации:", availableForms[form]);
-                    console.warn(`Не найдены доступные формы для: ${form}`);
-                    return;
-                }
-
-                console.log("Фильтруемая форма:", form);
-                console.log("Все доступные form_name:", currentCityData.map(g => g.form_name));
 
                 // Фильтруем данные по выбранной форме на основе availableForms
-                const filteredData = currentCityData.filter(item =>
-                    availableForms[form] && availableForms[form].some(name => 
-                        normalizeString(item.form_name).includes(normalizeString(name))
-                    )
-                );
+                const filteredData = currentCityData.filter(item => {
+                    const category = getFormCategory(item.form_name);
+                    return category === form;
+                });
 
                 // Проверка на пустые данные
                 if (filteredData.length === 0) {
@@ -829,7 +780,7 @@
 
                 console.log("Выпадающий список ширины обновлён.");
 
-                // Сбрасываем длину и каркас
+                // Сбрасываем длину и каркасы
                 document.getElementById('length').innerHTML = '<option value="">Сначала выберите ширину</option>';
                 document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
                 console.log("Длина и каркас сброшены.");
@@ -850,13 +801,12 @@
                 }
 
                 console.log("Форма для фильтрации:", form);
-                console.log("Очищенные названия form_name:", currentCityData.map(item => getFormCategory(item.form_name)));
 
                 // Фильтруем данные по выбранной форме и ширине
-                const filteredData = currentCityData.filter(item =>
-                    availableForms[form].some(name => item.form_name.includes(name)) &&
-                    item.width === width
-                );
+                const filteredData = currentCityData.filter(item => {
+                    const category = getFormCategory(item.form_name);
+                    return category === form && parseFloat(item.width) === width;
+                });
 
                 // Проверка на пустые данные после фильтрации
                 if (filteredData.length === 0) {
@@ -883,60 +833,10 @@
                 console.log("Каркас сброшен.");
             }
 
-            // Функция обработки изменения длины
-            async function onLengthChange() {
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
-                console.log(`Выбрана длина: ${length} м для формы: ${form} и ширины: ${width} м`);
-
-                const frameSelect = document.getElementById("frame");
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
-
-                if (isNaN(length)) {
-                    console.warn("Длина не выбрана!");
-                    return;
-                }
-
-                // Фильтруем данные по выбранной форме, ширине и длине
-                const filteredData = currentCityData.filter(item =>
-                    availableForms[form].some(name => item.form_name.includes(name)) &&
-                    item.width === width &&
-                    item.length === length
-                );
-
-                // Проверка на пустые данные после фильтрации
-                if (filteredData.length === 0) {
-                    console.warn("Данные после фильтрации пусты. Проверьте параметры.");
-                    alert("Теплица с заданными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                    return;
-                }
-
-                console.log("Отфильтрованные данные по длине:", filteredData);
-
-                // Получаем уникальные описания каркасов
-                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
-                console.log("Уникальные каркасы для выбранных параметров:", uniqueFrames);
-
-                // Заполняем выпадающий список каркаса
-                uniqueFrames.forEach(frame => {
-                    // Извлечение числовой части каркаса, включая возможный знак "+"
-                    const numericFrameMatch = frame.match(/(\d{1,2})х(\d{1,2})(?:\s?\+\s?\d{1,2}х\d{1,2})?/);
-                    const numericFrame = numericFrameMatch ? numericFrameMatch[0] : frame; // Если совпадение найдено, используем его
-
-                    const option = document.createElement('option');
-                    option.value = frame; // Сохраняем оригинальное описание для запроса
-                    option.textContent = numericFrame; // Отображаем только числовую часть
-                    frameSelect.appendChild(option);
-                });
-
-                console.log("Выпадающий список каркаса обновлён.");
-
-                // Автоматический выбор каркаса, если доступен только один
-                if (uniqueFrames.length === 1) {
-                    frameSelect.value = uniqueFrames[0];
-                    console.log("Автоматически выбран каркас:", uniqueFrames[0]);
-                }
+            // Функция обработки изменения каркаса
+            function onFrameChange() {
+                console.log("Каркас изменён.");
+                // Здесь можно добавить дополнительную логику, если она необходима
             }
 
             // Функция расчёта стоимости теплицы
@@ -970,32 +870,23 @@
                     polycarbonate
                 });
 
-                // Запрос к Supabase с фильтрацией по городу
-                console.log("Отправка запроса к Supabase для получения данных по городу...");
-                let { data, error } = await supabaseClient
-                    .from('prices')
-                    .select('*')
-                    .eq('city_name', city) // Запрашиваем только по городу
-                    .limit(100); // Ограничиваем результат 100 строками для проверки
-
-                console.log("Данные из Supabase по городу:", data);
-                console.log("Ошибка при запросе данных:", error);
-
-                if (error || !data) { // Проверяем ошибку сразу
-                    console.error("Ошибка при получении данных:", error);
-                    alert("Теплица с заданными параметрами не найдена.");
+                // Используем уже загруженные данные currentCityData
+                if (!currentCityData || currentCityData.length === 0) {
+                    console.warn("Данные для текущего города не загружены.");
+                    alert("Данные для текущего города не загружены. Попробуйте снова.");
                     return;
                 }
 
                 // Логируем все строки из Supabase для проверки
                 console.log("Все строки из Supabase по городу:");
-                data.forEach((item, index) => {
+                currentCityData.forEach((item, index) => {
                     console.log(`Строка ${index + 1}:`, {
                         form_name: item.form_name,
                         width: item.width,
                         length: item.length,
                         frame_description: item.frame_description,
-                        polycarbonate_type: item.polycarbonate_type
+                        polycarbonate_type: item.polycarbonate_type,
+                        price: item.price // Предполагается, что есть поле price
                     });
                 });
 
@@ -1009,18 +900,17 @@
                 });
 
                 // Фильтрация вручную
-                const filteredResult = data.filter(item => {
+                const filteredResult = currentCityData.filter(item => {
                     // Логируем категорию формы для отладки
                     const category = getFormCategory(item.form_name);
                     console.log("Анализ категории формы:", item.form_name, "Результат:", category);
 
                     return (
-                        item.city_name.trim().toLowerCase() === city.trim().toLowerCase() &&
                         category === form &&
                         parseFloat(item.width) === width &&
                         parseFloat(item.length) === length &&
-                        item.frame_description.trim().toLowerCase() === frame.trim().toLowerCase() &&
-                        item.polycarbonate_type.trim().toLowerCase() === polycarbonate.trim().toLowerCase()
+                        normalizeString(item.frame_description) === normalizeString(frame) &&
+                        normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
                     );
                 });
 
