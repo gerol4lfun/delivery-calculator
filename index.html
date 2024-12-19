@@ -833,6 +833,48 @@
                 console.log("Каркас сброшен.");
             }
 
+            // Функция обработки изменения длины
+            async function onLengthChange() {
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+                console.log(`Выбрана длина: ${length} м для формы: ${form} и ширины: ${width} м`);
+
+                const frameSelect = document.getElementById("frame");
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+
+                if (isNaN(length)) {
+                    console.warn("Длина не выбрана!");
+                    return;
+                }
+
+                // Фильтруем данные по форме, ширине и длине
+                const filteredData = currentCityData.filter(item => {
+                    const category = getFormCategory(item.form_name);
+                    return category === form && parseFloat(item.width) === width && parseFloat(item.length) === length;
+                });
+
+                // Проверка на пустые данные после фильтрации
+                if (filteredData.length === 0) {
+                    console.warn("Данные после фильтрации по форме, ширине и длине пусты. Проверьте параметры.");
+                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    return; // Останавливаем выполнение функции
+                }
+
+                console.log("Отфильтрованные данные по форме, ширине и длине:", filteredData);
+
+                // Получаем уникальные значения каркаса
+                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
+                console.log("Уникальные каркасы для выбранной формы, ширины и длины:", uniqueFrames);
+
+                // Заполняем выпадающий список каркаса
+                uniqueFrames.forEach(frame => {
+                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
+                });
+
+                console.log("Выпадающий список каркаса обновлён.");
+            }
+
             // Функция обработки изменения каркаса
             function onFrameChange() {
                 console.log("Каркас изменён.");
