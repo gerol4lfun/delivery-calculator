@@ -756,6 +756,40 @@
                 document.getElementById('frame').innerHTML = '<option value="">Сначала выберите длину</option>';
             }
 
+            // Функция обработки изменения длины
+            function onLengthChange() {
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+
+                const frameSelect = document.getElementById("frame");
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+
+                if (isNaN(length)) {
+                    return;
+                }
+
+                // Фильтруем данные по форме, ширине и длине
+                const filteredData = currentCityData.filter(item => {
+                    const category = getFormCategory(item.form_name);
+                    return category === form && parseFloat(item.width) === width && parseFloat(item.length) === length;
+                });
+
+                // Проверка на пустые данные после фильтрации
+                if (filteredData.length === 0) {
+                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    return; // Останавливаем выполнение функции
+                }
+
+                // Получаем уникальные значения каркаса
+                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
+
+                // Заполняем выпадающий список каркаса
+                uniqueFrames.forEach(frame => {
+                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
+                });
+            }
+
             // Функция обработки изменения каркаса
             function onFrameChange() {
                 // Здесь можно добавить дополнительную логику, если она необходима
