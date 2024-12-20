@@ -311,7 +311,7 @@
 
         <script>
             // Константа для контроля отладки
-            const DEBUG = false; // Выключено
+            const DEBUG = true; // Включено для отладки
 
             // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
             function normalizeString(str) {
@@ -553,6 +553,60 @@
                 }
             };
 
+            // Структура данных для сборки теплиц
+            const assemblyPrices = {
+                "Арочная": {
+                    "2.5М": { 4: 4990, 6: 6490, 8: 7990, 10: 9490, 12: 11990 },
+                    "3М": { 4: 4990, 6: 6490, 8: 7990, 10: 9490, 12: 11990 },
+                    "3.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "4М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
+                },
+                "Каплевидная": {
+                    "2.5М": { 4: 4990, 6: 6490, 8: 7990, 10: 9490, 12: 11990 },
+                    "3М": { 4: 4990, 6: 6490, 8: 7990, 10: 9490, 12: 11990 },
+                    "3.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 }
+                },
+                "Прямостенная": {
+                    "2.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "3М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "3.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "4М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
+                },
+                "Домиком": {
+                    "2.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "3М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "3.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "4М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
+                },
+                "Пристенная": {
+                    "2.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "3М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 }
+                },
+                "Митлайдер арочная": {
+                    "3М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
+                    "3.5М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
+                },
+                "Митлайдер прямостенная": {
+                    "3М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
+                    "3.5М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
+                },
+                "Промышленная прямостенная": {
+                    "5М": { 4: 9990, 6: 14990, 8: 19990, 10: 24990, 12: 29990, 14: 34990, 16: 39990 },
+                    "6М": { 4: 9990, 6: 14990, 8: 19990, 10: 24990, 12: 29990, 14: 34990, 16: 39990 }
+                },
+                "Промышленная домиком": {
+                    "7М": { 4: 9990, 6: 14990, 8: 19990, 10: 24990, 12: 29990, 14: 34990, 16: 39990 },
+                    "8М": { 4: 9990, 6: 14990, 8: 19990, 10: 24990, 12: 29990, 14: 34990, 16: 39990 }
+                },
+                "Навес": {
+                    "3М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "3.5М": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
+                    "4М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
+                    "5М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
+                    "6М": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
+                }
+            };
+
             let mapInstance;
             let currentRoute;
 
@@ -561,6 +615,7 @@
                     center: [55.751244, 37.618423],
                     zoom: 7
                 });
+                if (DEBUG) console.log("Карта Яндекс инициализирована.");
             });
 
             // Функция аутентификации
@@ -572,6 +627,8 @@
                 const login = loginInput.value.trim();
                 const password = passwordInput.value.trim();
 
+                if (DEBUG) console.log(`Попытка аутентификации пользователя: ${login}`);
+
                 // Проверяем логин и пароль
                 const user = users.find(u => u.login === login && u.password === password);
 
@@ -581,15 +638,19 @@
                     localStorage.setItem('savedLogin', login); // Сохраняем логин
                     document.getElementById("auth-container").classList.add("hidden");
                     document.getElementById("calculator-container").classList.remove("hidden");
+                    if (DEBUG) console.log(`Пользователь ${login} успешно аутентифицирован.`);
                     initializeCalculator();
                 } else {
                     // Если пользователь не найден — показываем ошибку
                     authError.style.display = "block";
+                    if (DEBUG) console.log(`Ошибка аутентификации для пользователя: ${login}`);
                 }
             }
 
             // Функция выхода
             function logout() {
+                const savedLogin = localStorage.getItem('savedLogin');
+                if (DEBUG) console.log(`Пользователь ${savedLogin} выходит из системы.`);
                 localStorage.removeItem('savedLogin');
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("calculator-container").classList.add("hidden");
@@ -600,6 +661,8 @@
                 const pageSize = 1000; // Максимальное количество строк за один запрос
                 let allCities = [];
                 let page = 0;
+
+                if (DEBUG) console.log("Загрузка городов из Supabase...");
 
                 while (true) {
                     // Запрос данных с пагинацией
@@ -621,6 +684,8 @@
                     page++;
                 }
 
+                if (DEBUG) console.log(`Всего загружено городов: ${allCities.length}`);
+
                 // Убираем дубликаты городов
                 let uniqueCities = [...new Set(allCities)];
 
@@ -636,17 +701,23 @@
                 // Объединяем приоритетные города и отсортированные города
                 const finalCities = [...priorityCities, ...uniqueCities];
 
+                if (DEBUG) console.log("Города после сортировки и приоритезации:", finalCities);
+
                 // Обновляем выпадающий список
                 const cityDropdown = document.getElementById('city');
                 cityDropdown.innerHTML = '<option value="">Выберите город</option>';
                 finalCities.forEach(city => {
                     cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
                 });
+
+                if (DEBUG) console.log("Выпадающий список городов обновлен.");
             }
 
             // Функция обработки изменения города
             async function onCityChange() {
                 const city = document.getElementById('city').value;
+
+                if (DEBUG) console.log(`Выбран город: ${city}`);
 
                 // Если город не выбран – сбрасываем все поля
                 if (!city) {
@@ -664,8 +735,11 @@
                     .eq('city_name', city)
                     .limit(30000);
 
+                if (DEBUG) console.log(`Получены данные для города ${city}:`, data);
+
                 if (!data || data.length === 0) {
                     alert("Данные для выбранного города не найдены. Попробуйте другой город.");
+                    if (DEBUG) console.log(`Нет данных для города: ${city}`);
                     return; // Остановить выполнение функции
                 }
 
@@ -676,6 +750,8 @@
 
                 // Присваиваем данные текущему городу
                 currentCityData = data;
+
+                if (DEBUG) console.log(`Данные текущего города (${city}) присвоены currentCityData.`);
 
                 // 1. Обновляем выпадающий список поликарбоната
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
@@ -690,14 +766,20 @@
                     polycarbonateDropdown.appendChild(option);
                 });
 
+                if (DEBUG) console.log("Выпадающий список поликарбоната обновлен.");
+
                 // Фильтруем формы на основе availableForms
                 const formCategories = Object.keys(availableForms);
                 const formsAvailable = formCategories.filter(formType =>
-                    data.some(item => availableForms[formType].some(form => normalizeString(item.form_name) === normalizeString(form.name)))
+                    currentCityData.some(item => availableForms[formType].some(form => normalizeString(item.form_name) === normalizeString(form.name)))
                 );
+
+                if (DEBUG) console.log("Доступные формы для выбранного города:", formsAvailable);
 
                 // Сортируем формы по приоритету
                 formsAvailable.sort((a, b) => (formPriority[a] || 100) - (formPriority[b] || 100)); // Прочие формы получат низкий приоритет
+
+                if (DEBUG) console.log("Формы после сортировки по приоритету:", formsAvailable);
 
                 // Обновляем выпадающий список форм теплиц
                 const formDropdown = document.getElementById('form');
@@ -710,6 +792,8 @@
                         formDropdown.appendChild(option);
                     }
                 });
+
+                if (DEBUG) console.log("Выпадающий список форм теплиц обновлен.");
 
                 // 3. Сбрасываем размеры и каркасы
                 resetDropdown('width', 'Сначала выберите форму');
@@ -724,6 +808,8 @@
             function onFormChange() {
                 const form = document.getElementById("form").value;
 
+                if (DEBUG) console.log(`Выбрана форма теплицы: ${form}`);
+
                 const widthSelect = document.getElementById("width");
                 widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
 
@@ -737,19 +823,26 @@
                     return category === form;
                 });
 
+                if (DEBUG) console.log(`Данные после фильтрации по форме (${form}):`, filteredData);
+
                 // Проверка на пустые данные
                 if (filteredData.length === 0) {
                     alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    if (DEBUG) console.log(`Нет теплиц с формой ${form}`);
                     return; // Останавливаем выполнение функции, если данных нет
                 }
 
                 // Получаем уникальные значения ширины
                 const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
 
+                if (DEBUG) console.log("Уникальные ширины:", uniqueWidths);
+
                 // Заполняем выпадающий список ширины
                 uniqueWidths.forEach(width => {
                     widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
                 });
+
+                if (DEBUG) console.log("Выпадающий список ширины обновлен.");
 
                 // Сбрасываем длину и каркасы
                 resetDropdown('length', 'Сначала выберите ширину');
@@ -764,6 +857,8 @@
                 const form = document.getElementById("form").value;
                 const width = parseFloat(document.getElementById("width").value);
 
+                if (DEBUG) console.log(`Выбрана ширина: ${width} м для формы: ${form}`);
+
                 const lengthSelect = document.getElementById("length");
                 lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
 
@@ -777,21 +872,28 @@
                     return category === form && parseFloat(item.width) === width;
                 });
 
-                // Проверка на пустые данные после фильтрации
+                if (DEBUG) console.log(`Данные после фильтрации по форме (${form}) и ширине (${width}):`, filteredData);
+
+                // Проверка на пустые данные
                 if (filteredData.length === 0) {
                     alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    if (DEBUG) console.log(`Нет теплиц с формой ${form} и шириной ${width} м`);
                     return; // Останавливаем выполнение функции
                 }
 
                 // Получаем уникальные значения длины
                 const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
 
+                if (DEBUG) console.log("Уникальные длины:", uniqueLengths);
+
                 // Заполняем выпадающий список длины
                 uniqueLengths.forEach(length => {
                     lengthSelect.innerHTML += `<option value="${length}">${length} м</option>`;
                 });
 
-                // Сбрасываем каркас
+                if (DEBUG) console.log("Выпадающий список длины обновлен.");
+
+                // Сброс каркаса
                 resetDropdown('frame', 'Сначала выберите длину');
 
                 // Сброс дополнительных опций
@@ -803,6 +905,8 @@
                 const form = document.getElementById("form").value;
                 const width = parseFloat(document.getElementById("width").value);
                 const length = parseFloat(document.getElementById("length").value);
+
+                if (DEBUG) console.log(`Выбрана длина: ${length} м для формы: ${form} и ширины: ${width} м`);
 
                 const frameSelect = document.getElementById("frame");
                 frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
@@ -817,19 +921,26 @@
                     return category === form && parseFloat(item.width) === width && parseFloat(item.length) === length;
                 });
 
-                // Проверка на пустые данные после фильтрации
+                if (DEBUG) console.log(`Данные после фильтрации по форме (${form}), ширине (${width}) и длине (${length}):`, filteredData);
+
+                // Проверка на пустые данные
                 if (filteredData.length === 0) {
                     alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    if (DEBUG) console.log(`Нет теплиц с формой ${form}, шириной ${width} м и длиной ${length} м`);
                     return; // Останавливаем выполнение функции
                 }
 
                 // Получаем уникальные значения каркаса
                 const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
 
+                if (DEBUG) console.log("Уникальные каркасы:", uniqueFrames);
+
                 // Заполняем выпадающий список каркаса
                 uniqueFrames.forEach(frame => {
                     frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
                 });
+
+                if (DEBUG) console.log("Выпадающий список каркаса обновлен.");
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -837,6 +948,7 @@
 
             // Функция обработки изменения каркаса
             function onFrameChange() {
+                if (DEBUG) console.log("Каркас изменен.");
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
             }
@@ -845,6 +957,7 @@
             function resetDropdown(elementId, placeholderText) {
                 const dropdown = document.getElementById(elementId);
                 dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+                if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
             }
 
             // Функция сброса дополнительных опций
@@ -856,12 +969,92 @@
                 document.getElementById('window-automation').checked = false;
                 document.getElementById('galvanized-tape').checked = false;
                 updateAdditionalSummary();
+                if (DEBUG) console.log("Дополнительные опции сброшены.");
             }
 
             // Функция обновления дополнительного резюме
             function updateAdditionalSummary(details = "") {
                 const additionalSummary = document.getElementById("additional-summary");
                 additionalSummary.innerHTML = details;
+                if (DEBUG) console.log("Дополнительное резюме обновлено.");
+            }
+
+            // Функция получения категории сборки на основе формы и ширины
+            function getAssemblyCategory(form, width) {
+                console.log("Определение категории сборки...");
+                console.log("Форма:", form);
+                console.log("Ширина:", width);
+
+                // Определение категории на основе формы и ширины
+                if (form === "Арочная" && (width === 2.5 || width === 3)) {
+                    return "Арочная_2.5м_3м";
+                }
+                if (form === "Арочная" && width === 3.5) {
+                    return "Арочная_3.5м";
+                }
+                if (form === "Арочная" && width === 4) {
+                    return "Арочная_4м";
+                }
+                if (form === "Каплевидная" && (width === 2.5 || width === 3)) {
+                    return "Каплевидная_2.5м_3м";
+                }
+                if (form === "Каплевидная" && width === 3.5) {
+                    return "Каплевидная_3.5м";
+                }
+                if (form === "Прямостенная" && (width === 2.5 || width === 3 || width === 3.5)) {
+                    return "Прямостенная_2.5м_3м_3.5м";
+                }
+                if (form === "Прямостенная" && width === 4) {
+                    return "Прямостенная_4м";
+                }
+                if (form === "Домиком" && (width === 2.5 || width === 3 || width === 3.5)) {
+                    return "Домиком_2.5м_3м_3.5м";
+                }
+                if (form === "Домиком" && width === 4) {
+                    return "Домиком_4м";
+                }
+                if (form === "Пристенная" && (width === 2.5 || width === 3)) {
+                    return "Пристенная_2.5м_3м";
+                }
+                if (form === "Митлайдер арочная" && (width === 3 || width === 3.5)) {
+                    return "Митлайдер арочная_3м_3.5м";
+                }
+                if (form === "Митлайдер прямостенная" && (width === 3 || width === 3.5)) {
+                    return "Митлайдер прямостенная_3м_3.5м";
+                }
+                if (form === "Промышленная прямостенная" && (width === 5 || width === 6)) {
+                    return "Промышленная прямостенная_5м_6м";
+                }
+                if (form === "Промышленная домиком" && (width === 7 || width === 8)) {
+                    return "Промышленная домиком_7м_8м";
+                }
+                if (form === "Навес" && (width === 3 || width === 3.5)) {
+                    return "Навес_3м_3.5м";
+                }
+                if (form === "Навес" && (width === 4 || width === 5 || width === 6)) {
+                    return "Навес_4м_5м_6м";
+                }
+
+                console.log("Категория сборки не определена. Возвращаем null.");
+                return null; // Если категория не определена
+            }
+
+            // Функция расчёта стоимости сборки
+            function calculateAssemblyCost(category, length) {
+                console.log(`Расчёт стоимости сборки для категории: ${category}, длины: ${length} м`);
+                if (!category || !assemblyPrices[category]) {
+                    console.log("Категория сборки не найдена в assemblyPrices.");
+                    return 0;
+                }
+
+                const price = assemblyPrices[category][length];
+                if (!price) {
+                    console.log(`Стоимость сборки не найдена для длины ${length} м в категории ${category}.`);
+                    return 0;
+                }
+
+                console.log(`Найдена стоимость сборки: ${price} руб.`);
+                return price;
             }
 
             // Функция расчёта стоимости теплицы
@@ -874,15 +1067,19 @@
                 const polycarbonate = document.getElementById("polycarbonate").value;
                 const arcStep = parseFloat(document.getElementById("arcStep").value);
 
+                if (DEBUG) console.log("Начало расчёта стоимости теплицы.");
+
                 // Проверка на заполнение всех обязательных полей
                 if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
                     alert("Пожалуйста, заполните все обязательные поля.");
+                    if (DEBUG) console.log("Не все обязательные поля заполнены.");
                     return;
                 }
 
                 // Используем уже загруженные данные currentCityData
                 if (!currentCityData || currentCityData.length === 0) {
                     alert("Данные для текущего города не загружены. Попробуйте снова.");
+                    if (DEBUG) console.log("currentCityData пуст или не загружены.");
                     return;
                 }
 
@@ -897,8 +1094,11 @@
                     );
                 });
 
+                if (DEBUG) console.log("Найденная запись для выбранной комбинации:", selectedEntry);
+
                 if (!selectedEntry) {
                     alert("Теплица с заданными параметрами не найдена.");
+                    if (DEBUG) console.log("selectedEntry не найден.");
                     return;
                 }
 
@@ -909,6 +1109,7 @@
                 if (arcStep === 1) {
                     // Шаг 1 м: используем базовую цену
                     totalPrice = selectedEntry.price;
+                    if (DEBUG) console.log(`Цена теплицы без добавок: ${totalPrice} руб.`);
                 } else if (arcStep === 0.65) {
                     // Шаг 0.65 м: рассчитываем дополнительную стоимость
                     // Находим базовую цену для "Стандарт 4мм"
@@ -924,6 +1125,7 @@
 
                     if (!baseEntry) {
                         alert('Не найдена базовая цена для покрытия "Стандарт 4мм".');
+                        if (DEBUG) console.log('Не найдена baseEntry для "стандарт 4мм".');
                         return;
                     }
 
@@ -936,8 +1138,10 @@
                     totalPrice = selectedPrice + additionalCost;
 
                     additionalDetails += `Дополнение за шаг 0.65 м: +${Math.ceil(additionalCost / 10) * 10} руб.<br>`;
+                    if (DEBUG) console.log(`Дополнительная стоимость за шаг 0.65 м: ${additionalCost} руб.`);
                 } else {
                     alert("Некорректный шаг между дугами.");
+                    if (DEBUG) console.log("Некорректный arcStep:", arcStep);
                     return;
                 }
 
@@ -945,6 +1149,8 @@
                 const bracingChecked = document.getElementById('bracing').checked;
                 const groundHooksChecked = document.getElementById('ground-hooks').checked;
                 const assemblyChecked = document.getElementById('assembly').checked;
+
+                if (DEBUG) console.log(`Дополнительные услуги - Брус: ${bracingChecked}, Штыри: ${groundHooksChecked}, Сборка: ${assemblyChecked}`);
 
                 // Расчёт стоимости бруса
                 let bracingCost = 0;
@@ -954,8 +1160,10 @@
                         bracingCost = bracingPrice;
                         totalPrice += bracingCost;
                         additionalDetails += `Брус: +${bracingCost} руб.<br>`;
+                        if (DEBUG) console.log(`Стоимость бруса: ${bracingCost} руб.`);
                     } else {
                         alert(`Не найдена стоимость бруса для длины ${length} м.`);
+                        if (DEBUG) console.log(`Не найдена стоимость бруса для длины ${length} м.`);
                         return;
                     }
                 }
@@ -969,8 +1177,10 @@
                         stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
                         totalPrice += stakesCost;
                         additionalDetails += `Штыри (${stakesQuantity} шт.): +${stakesCost} руб.<br>`;
+                        if (DEBUG) console.log(`Стоимость штырей: ${stakesCost} руб. (${stakesQuantity} шт.)`);
                     } else {
                         alert(`Не найдена информация о количестве штырей для длины ${length} м.`);
+                        if (DEBUG) console.log(`Не найдена информация о количестве штырей для длины ${length} м.`);
                         return;
                     }
                 }
@@ -979,12 +1189,20 @@
                 let assemblyCost = 0;
                 if (assemblyChecked) {
                     const assemblyCategory = getAssemblyCategory(form, width);
-                    if (assemblyCategory && additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length]) {
-                        assemblyCost = additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length];
-                        totalPrice += assemblyCost;
-                        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+                    if (assemblyCategory) {
+                        assemblyCost = calculateAssemblyCost(assemblyCategory, length);
+                        if (assemblyCost > 0) {
+                            totalPrice += assemblyCost;
+                            additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+                            if (DEBUG) console.log(`Стоимость сборки: ${assemblyCost} руб. (${assemblyCategory}, ${length} м)`);
+                        } else {
+                            alert(`Не найдена стоимость сборки для категории "${assemblyCategory}" и длины ${length} м.`);
+                            if (DEBUG) console.log(`Стоимость сборки не найдена для категории "${assemblyCategory}" и длины ${length} м.`);
+                            return;
+                        }
                     } else {
-                        alert(`Не найдена стоимость сборки для типа "${assemblyCategory}" и длины ${length} м.`);
+                        alert(`Категория сборки для формы "${form}" и ширины "${width} м" не определена.`);
+                        if (DEBUG) console.log(`Категория сборки не определена для формы "${form}" и ширины "${width} м".`);
                         return;
                     }
                 }
@@ -998,14 +1216,17 @@
                 if (dripIrrigationChecked) {
                     additionalProducts.push({ name: "Капельный полив", cost: 1000 });
                     totalPrice += 1000;
+                    if (DEBUG) console.log("Добавлен товар: Капельный полив - 1000 руб.");
                 }
                 if (windowAutomationChecked) {
                     additionalProducts.push({ name: "Автомат для форточки", cost: 2500 });
                     totalPrice += 2500;
+                    if (DEBUG) console.log("Добавлен товар: Автомат для форточки - 2500 руб.");
                 }
                 if (galvanizedTapeChecked) {
                     additionalProducts.push({ name: "Оцинкованная лента", cost: 800 });
                     totalPrice += 800;
+                    if (DEBUG) console.log("Добавлен товар: Оцинкованная лента - 800 руб.");
                 }
 
                 // Добавление стоимости дополнительных товаров в резюме
@@ -1013,8 +1234,12 @@
                     additionalDetails += `${product.name}: +${product.cost} руб.<br>`;
                 });
 
+                if (DEBUG) console.log(`Дополнительные товары добавлены: ${JSON.stringify(additionalProducts)}`);
+
                 // Округление вверх до ближайшего десятка
                 totalPrice = Math.ceil(totalPrice / 10) * 10;
+
+                if (DEBUG) console.log(`Общая стоимость после округления: ${totalPrice} руб.`);
 
                 // Формирование итогового резюме
                 let summaryText = `Итоговая стоимость теплицы: ${totalPrice} руб.<br>`;
@@ -1024,28 +1249,85 @@
 
                 // Выводим итоговую стоимость
                 document.getElementById("summary").innerHTML = summaryText;
+                if (DEBUG) console.log("Итоговая стоимость отображена.");
             }
 
             // Функция получения категории сборки на основе формы и ширины
             function getAssemblyCategory(form, width) {
-                const formCategory = getFormCategory(form);
-                if (formCategory === "Промышленная прямостенная" || formCategory === "Промышленная домиком") {
-                    return "Промышленные";
+                console.log("Определение категории сборки...");
+                console.log("Форма:", form);
+                console.log("Ширина:", width);
+
+                // Определение категории на основе формы и ширины
+                if (form === "Арочная" && (width === 2.5 || width === 3)) {
+                    return "Арочная_2.5м_3м";
+                }
+                if (form === "Арочная" && width === 3.5) {
+                    return "Арочная_3.5м";
+                }
+                if (form === "Арочная" && width === 4) {
+                    return "Арочная_4м";
+                }
+                if (form === "Каплевидная" && (width === 2.5 || width === 3)) {
+                    return "Каплевидная_2.5м_3м";
+                }
+                if (form === "Каплевидная" && width === 3.5) {
+                    return "Каплевидная_3.5м";
+                }
+                if (form === "Прямостенная" && (width === 2.5 || width === 3 || width === 3.5)) {
+                    return "Прямостенная_2.5м_3м_3.5м";
+                }
+                if (form === "Прямостенная" && width === 4) {
+                    return "Прямостенная_4м";
+                }
+                if (form === "Домиком" && (width === 2.5 || width === 3 || width === 3.5)) {
+                    return "Домиком_2.5м_3м_3.5м";
+                }
+                if (form === "Домиком" && width === 4) {
+                    return "Домиком_4м";
+                }
+                if (form === "Пристенная" && (width === 2.5 || width === 3)) {
+                    return "Пристенная_2.5м_3м";
+                }
+                if (form === "Митлайдер арочная" && (width === 3 || width === 3.5)) {
+                    return "Митлайдер арочная_3м_3.5м";
+                }
+                if (form === "Митлайдер прямостенная" && (width === 3 || width === 3.5)) {
+                    return "Митлайдер прямостенная_3м_3.5м";
+                }
+                if (form === "Промышленная прямостенная" && (width === 5 || width === 6)) {
+                    return "Промышленная прямостенная_5м_6м";
+                }
+                if (form === "Промышленная домиком" && (width === 7 || width === 8)) {
+                    return "Промышленная домиком_7м_8м";
+                }
+                if (form === "Навес" && (width === 3 || width === 3.5)) {
+                    return "Навес_3м_3.5м";
+                }
+                if (form === "Навес" && (width === 4 || width === 5 || width === 6)) {
+                    return "Навес_4м_5м_6м";
                 }
 
-                if ((formCategory === "Арочная" || formCategory === "Каплевидная") && (width === 2.5 || width === 3)) {
-                    return "Арочные 2.5-3м";
+                console.log("Категория сборки не определена. Возвращаем null.");
+                return null; // Если категория не определена
+            }
+
+            // Функция расчёта стоимости сборки
+            function calculateAssemblyCost(category, length) {
+                console.log(`Расчёт стоимости сборки для категории: ${category}, длины: ${length} м`);
+                if (!category || !assemblyPrices[category]) {
+                    console.log("Категория сборки не найдена в assemblyPrices.");
+                    return 0;
                 }
 
-                if ((formCategory === "Арочная" || formCategory === "Каплевидная" || formCategory === "Прямостенная" || formCategory === "Домиком") && width === 3.5) {
-                    return "Арочные 3.5м";
+                const price = assemblyPrices[category][length];
+                if (!price) {
+                    console.log(`Стоимость сборки не найдена для длины ${length} м в категории ${category}.`);
+                    return 0;
                 }
 
-                if ((formCategory === "Арочная" || formCategory === "Прямостенная" || formCategory === "Домиком" || formCategory === "Митлайдер арочная" || formCategory === "Митлайдер прямостенная" || formCategory === "Навес") && (width === 4 || width === 5 || width === 6)) {
-                    return "Арочные 4м";
-                }
-
-                return null; // Если не подходит ни одна категория
+                console.log(`Найдена стоимость сборки: ${price} руб.`);
+                return price;
             }
 
             // Функция расчёта доставки
@@ -1054,8 +1336,11 @@
                 const address = addressInput.value.trim().toLowerCase();
                 const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
+                if (DEBUG) console.log(`Расчёт доставки для адреса: "${address}" с типом доставки: "${deliveryType}"`);
+
                 if (!address) {
                     document.getElementById('result').innerText = "Введите адрес!";
+                    if (DEBUG) console.log("Адрес не введен.");
                     return;
                 }
 
@@ -1065,6 +1350,7 @@
 
                     if (!geoObject) {
                         document.getElementById('result').innerText = "Адрес не найден!";
+                        if (DEBUG) console.log("Геокодирование: адрес не найден.");
                         return;
                     }
 
@@ -1077,6 +1363,7 @@
 
                     if (!isInDeliveryRegion) {
                         document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
+                        if (DEBUG) console.log("Регион доставки не поддерживается.");
                         return;
                     }
 
@@ -1097,8 +1384,11 @@
 
                     if (!nearestCity) {
                         document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                        if (DEBUG) console.log("Ближайший город не найден.");
                         return;
                     }
+
+                    if (DEBUG) console.log(`Ближайший город: ${nearestCity.name} на расстоянии ${minDistance} км.`);
 
                     mapInstance.setCenter(nearestCity.coords, 7);
 
@@ -1124,12 +1414,16 @@
                         const roundedCost = Math.ceil(cost / 50) * 50;
 
                         document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+
+                        if (DEBUG) console.log(`Расчёт стоимости доставки: ${roundedCost} руб. (${nearestCity.name})`);
                     } catch (routeError) {
                         document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                        if (DEBUG) console.log("Ошибка при расчёте маршрута:", routeError);
                     }
 
                 } catch (geocodeError) {
                     document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
+                    if (DEBUG) console.log("Ошибка при геокодировании:", geocodeError);
                 }
             }
 
@@ -1141,6 +1435,7 @@
                     document.getElementById("password").focus();
                     document.getElementById("auth-container").classList.add("hidden");
                     document.getElementById("calculator-container").classList.remove("hidden");
+                    if (DEBUG) console.log(`Пользователь ${savedLogin} уже аутентифицирован. Инициализация калькулятора.`);
                     await initializeCalculator();
                 }
             }
@@ -1166,8 +1461,9 @@
                 document.getElementById('form').addEventListener('change', calculateGreenhouseCost);
                 document.getElementById('city').addEventListener('change', calculateGreenhouseCost);
                 */
-
+    
                 // **Вместо этого**, функция `calculateGreenhouseCost()` будет вызываться только при нажатии на кнопку
+                if (DEBUG) console.log("Инициализация калькулятора завершена.");
             }
         </script>
     </div>
