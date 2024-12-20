@@ -6,7 +6,7 @@
     <title>Калькулятор доставки и стоимости теплиц</title>
     <!-- Яндекс.Карты -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
-    <!-- Supabase JavaScript SDK -->
+    <!-- Supabase JavaаScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
         /* Основные стили */
@@ -488,22 +488,6 @@ function getAssemblyCategory(form, width) {
     console.log("Категория сборки не определена. Возвращаем null.");
     return null; // Если категория не определена
 }
-
-            // Создание обратной карты: form_name -> category
-            const formNameToCategory = {};
-
-            Object.keys(availableForms).forEach(category => {
-                availableForms[category].forEach(form => {
-                    formNameToCategory[normalizeString(form.name)] = category;
-                });
-            });
-
-            // Обновлённая функция определения категории формы
-            function getFormCategory(formName) {
-    if (!formName || typeof formName !== "string") {
-        console.log("getFormCategory: Некорректное имя формы или отсутствует.");
-        return "Прочие";
-    }
 
     console.log(`getFormCategory: Обрабатываем форму "${formName}".`);
 
