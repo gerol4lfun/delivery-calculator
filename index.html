@@ -995,20 +995,21 @@ const assemblyPrices = {
                     }
                 }
 
-                // Расчёт стоимости сборки
-                let assemblyCost = 0;
-                if (assemblyChecked) {
-                    const assemblyCategory = getAssemblyCategory(form, width);
-                    if (assemblyCategory && additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length]) {
-                        assemblyCost = additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length];
-                        totalPrice += assemblyCost;
-                        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
-                    } else {
-                        alert(`Не найдена стоимость сборки для типа "${assemblyCategory}" и длины ${length} м.`);
-                        return;
-                    }
-                }
+               // Расчёт стоимости сборки
+let assemblyCost = 0;
+if (assemblyChecked) {
+    const assemblyCategory = getAssemblyCategory(form, width);
+    console.log("Категория сборки:", assemblyCategory);
 
+    assemblyCost = calculateAssemblyCost(assemblyCategory, width, length);
+    if (assemblyCost > 0) {
+        totalPrice += assemblyCost; // Добавляем стоимость сборки к общей сумме
+        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+    } else {
+        alert(`Не найдена стоимость сборки для категории "${assemblyCategory}" и длины ${length} м.`);
+        return;
+    }
+}
                 // Дополнительные товары
                 const additionalProducts = [];
                 const dripIrrigationChecked = document.getElementById('drip-irrigation').checked;
@@ -1048,6 +1049,9 @@ const assemblyPrices = {
 
             // Функция получения категории сборки на основе формы и ширины
             function getAssemblyCategory(form, width) {
+                console.log("Форма:", form);
+                console.log("Ширина:", width);
+                
                 const formCategory = getFormCategory(form);
                 if (formCategory === "Промышленная прямостенная" || formCategory === "Промышленная домиком") {
                     return "Промышленные";
@@ -1076,6 +1080,11 @@ const assemblyPrices = {
           * @returns {number} Стоимость сборки (или 0, если параметры некорректны).
           */
          function calculateAssemblyCost(form, width, length) {
+             console.log("Расчёт стоимости сборки:");
+             console.log("Форма:", form);
+             console.log("Ширина:", width);
+             console.log("Длина:", length);
+             
              // Преобразуем ширину в строку с "м" для соответствия формату в assemblyPrices
              const widthString = width + "м";
 
