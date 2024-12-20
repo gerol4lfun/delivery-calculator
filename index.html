@@ -1,1268 +1,1175 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Калькулятор доставки и стоимости теплиц</title>
-   <!-- Яндекс.Карты -->
-   <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
-   <!-- Supabase JavaScript SDK -->
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
-   <style>
-       /* Основные стили */
-       body {
-           font-family: Arial, sans-serif;
-           margin: 0;
-           padding: 0;
-           background: #f4f4f9;
-           color: #333;
-       }
-       .auth-container {
-           max-width: 400px;
-           margin: 50px auto;
-           padding: 20px;
-           background: #fff;
-           border-radius: 8px;
-           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-           text-align: center;
-       }
-       .calculator-container {
-           max-width: 1200px;
-           margin: 20px auto;
-           padding: 20px;
-           background: #fff;
-           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-           border-radius: 8px;
-           position: relative;
-       }
-       input[type="text"], input[type="password"], select, button {
-           padding: 8px;
-           margin: 5px 0;
-           font-size: 14px;
-           border: 1px solid #ddd;
-           border-radius: 4px;
-           width: 100%;
-           box-sizing: border-box;
-       }
-       button {
-           background: #007BFF;
-           color: #fff;
-           cursor: pointer;
-           border: none;
-           width: 100%;
-       }
-       button:hover {
-           background: #0056b3;
-       }
-       .hidden {
-           display: none;
-       }
-       label {
-           font-size: 14px;
-           display: block;
-           margin-bottom: 5px;
-           font-weight: bold;
-       }
-       .auth-container h2, .block h2 {
-           margin-bottom: 20px;
-           font-size: 18px;
-           color: #fff;
-           background-color: #6c757d; /* Нейтральный серый фон */
-           padding: 10px;
-           border-radius: 4px;
-           text-align: center;
-       }
-       .auth-container p {
-           color: red;
-           display: none;
-           margin: 10px 0;
-       }
-       .container {
-           display: flex;
-           justify-content: space-between;
-           flex-wrap: wrap;
-       }
-       .block {
-           flex: 1 1 45%;
-           padding: 20px;
-           border-right: 1px solid #ddd;
-           box-sizing: border-box;
-           min-width: 300px;
-       }
-       .block:last-child {
-           border-right: none;
-       }
-       .logout {
-           position: absolute;
-           top: 10px;
-           right: 10px;
-           background: #f5f5f5;
-           color: #555;
-           border: 1px solid #ddd;
-           font-size: 12px;
-           padding: 5px 10px;
-           border-radius: 4px;
-           cursor: pointer;
-           width: auto;
-       }
-       .logout:hover {
-           background-color: #e0e0e0;
-           color: #000;
-       }
-       .parameters {
-           display: flex;
-           align-items: center;
-           margin-bottom: 15px;
-       }
-       .parameters label {
-           width: 40%;
-           margin-right: 10px;
-           text-align: left;
-           padding-right: 10px;
-           box-sizing: border-box;
-       }
-       .parameters select {
-           width: 60%;
-           text-align: center; /* Центрирование текста внутри select */
-           -webkit-appearance: none;
-           -moz-appearance: none;
-           appearance: none;
-           background-position: right 10px center;
-           background-repeat: no-repeat;
-           background-size: 10px;
-       }
-       /* Стили для центрирования текста в опциях select */
-       select option {
-           text-align: center;
-       }
-       .additional-services, .additional-products {
-           margin-top: 20px;
-       }
-       .checkbox-group-large {
-           display: flex;
-           flex-wrap: wrap;
-           gap: 10px;
-           margin-bottom: 10px;
-       }
-       .checkbox-group-large label {
-           width: 48%;
-           text-align: left;
-           font-weight: normal;
-       }
-       .additional-products h3 {
-           margin-bottom: 10px;
-           font-size: 16px;
-           color: #333;
-       }
-       .additional-products label {
-           display: block;
-           margin-bottom: 5px;
-           font-weight: normal;
-       }
-       #result, #summary {
-           margin-top: 20px;
-           font-size: 16px;
-           color: #007BFF;
-           text-align: center;
-       }
-       #map {
-           width: 100%;
-           height: 300px;
-           margin-top: 20px;
-           border-radius: 8px;
-       }
-       .summary {
-           margin-top: 20px;
-           font-size: 16px;
-           text-align: center;
-           font-weight: bold;
-       }
-       .additional-summary {
-           margin-top: 10px;
-           text-align: left;
-           font-weight: normal;
-           color: #555;
-       }
-   </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор доставки и стоимости теплиц</title>
+    <!-- Яндекс.Карты -->
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
+    <!-- Supabase JavaScript SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
+    <style>
+        /* Основные стили */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+        }
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .calculator-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+        input[type="text"], input[type="password"], select, button {
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        label {
+            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .auth-container h2, .block h2 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #6c757d; /* Нейтральный серый фон */
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .auth-container p {
+            color: red;
+            display: none;
+            margin: 10px 0;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .block {
+            flex: 1 1 45%;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            box-sizing: border-box;
+            min-width: 300px;
+        }
+        .block:last-child {
+            border-right: none;
+        }
+        .logout {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+        }
+        .logout:hover {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+        .parameters {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .parameters label {
+            width: 40%;
+            margin-right: 10px;
+            text-align: left;
+            padding-right: 10px;
+            box-sizing: border-box;
+        }
+        .parameters select {
+            width: 60%;
+            text-align: center; /* Центрирование текста внутри select */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-position: right 10px center;
+            background-repeat: no-repeat;
+            background-size: 10px;
+        }
+        /* Стили для центрирования текста в опциях select */
+        select option {
+            text-align: center;
+        }
+        .additional-services, .additional-products {
+            margin-top: 20px;
+        }
+        .checkbox-group-large {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .checkbox-group-large label {
+            width: 48%;
+            text-align: left;
+            font-weight: normal;
+        }
+        .additional-products h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+        .additional-products label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+        #result, #summary {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007BFF;
+            text-align: center;
+        }
+        #map {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .summary {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .additional-summary {
+            margin-top: 10px;
+            text-align: left;
+            font-weight: normal;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-   <!-- Авторизация -->
-   <div class="auth-container" id="auth-container">
-       <h2>Вход в систему</h2>
-       <input type="text" id="login" placeholder="Введите логин" required>
-       <input type="password" id="password" placeholder="Введите пароль" required>
-       <button onclick="authenticate()">Войти</button>
-       <p id="auth-error">Неверный логин или пароль!</p>
-   </div>
- 
-   <!-- Калькулятор -->
-   <div class="calculator-container hidden" id="calculator-container">
-       <div class="container">
-           <button class="logout" onclick="logout()">Выйти</button>
-           
-           <!-- Блок доставки -->
-           <div class="block">
-               <h2>Доставка</h2>
-               <label for="address">Введите адрес доставки:</label>
-               <input type="text" id="address" placeholder="Например, Санкт-Петербург, Невский пр." required autocomplete="off">
-               
-               <label><input type="radio" name="deliveryType" value="withoutAssembly" checked> Без сборки</label>
-               <label><input type="radio" name="deliveryType" value="withAssembly"> Со сборкой</label>
- 
-               <button onclick="calculateDelivery()">Рассчитать доставку</button>
-               <div id="result"></div>
-               <div id="map"></div>
-           </div>
- 
-           <!-- Блок теплицы -->
-           <div class="block">
-               <h2>Стоимость теплицы</h2>
-               
-               <div class="parameters">
-                   <label for="city">Город:</label>
-                   <select id="city" onchange="onCityChange()">
-                       <option value="">Выберите город</option>
-                   </select>
-               </div>
- 
-               <div class="parameters">
-                   <label for="form">Форма теплицы:</label>
-                   <select id="form" onchange="onFormChange()">
-                       <option value="">Сначала выберите город</option>
-                   </select>
-               </div>
-               
-               <div class="parameters">
-                   <label for="width">Ширина (м):</label>
-                   <select id="width" onchange="onWidthChange()">
-                       <option value="">Выберите ширину</option>
-                   </select>
-               </div>
-               
-               <div class="parameters">
-                   <label for="length">Длина (м):</label>
-                   <select id="length" onchange="onLengthChange()">
-                       <option value="">Выберите длину</option>
-                   </select>
-               </div>
-               
-               <div class="parameters">
-                   <label for="frame">Каркас:</label>
-                   <select id="frame" onchange="onFrameChange()">
-                       <option value="">Сначала выберите длину</option>
-                   </select>
-               </div>
- 
-               <div class="parameters">
-                   <label for="polycarbonate">Поликарбонат:</label>
-                   <select id="polycarbonate">
-                       <option value="">Сначала выберите город</option>
-                   </select>
-               </div>
- 
-               <div class="parameters">
-                   <label for="arcStep">Шаг между дугами:</label>
-                   <select id="arcStep">
-                       <option value="">Выберите шаг</option>
-                       <option value="1">1 м</option>
-                       <option value="0.65">0.65 м</option>
-                   </select>
-               </div>
- 
-               <!-- Дополнительные услуги -->
-               <div class="additional-services">
-                   <div class="checkbox-group-large">
-                       <label><input type="checkbox" id="bracing"> Брус</label>
-                       <label><input type="checkbox" id="ground-hooks"> Штыри</label>
-                       <label><input type="checkbox" id="assembly"> Сборка</label>
-                   </div>
-               </div>
- 
-               <div class="additional-products">
-                   <h3>Дополнительные товары:</h3>
-                   <label>
-                       Капельный полив
-                       <input type="checkbox" id="drip-irrigation">
-                   </label>
-                   <label>
-                       Автомат для форточки
-                       <input type="checkbox" id="window-automation">
-                   </label>
-                   <label>
-                       Оцинкованная лента
-                       <input type="checkbox" id="galvanized-tape">
-                   </label>
-               </div>
- 
-               <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
- 
-               <!-- Отображение дополнительных опций и их стоимости -->
-               <div class="additional-summary" id="additional-summary"></div>
-           </div>
- 
-           <!-- Блок итогового расчета -->
-           <div class="block">
-               <h2>Итоговый расчет</h2>
-               <div class="summary" id="summary">
-                   Здесь будет выводиться итоговая сумма и детали расчета.
-               </div>
-           </div>
-       </div>
- 
-       <script>
-           // Константа для контроля отладки
-           const DEBUG = false; // Выключено
- 
-           // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
-           function normalizeString(str) {
-               if (!str) return ""; // Проверяем, что значение существует
-               return str.trim().toLowerCase();
-           }
- 
-           // Инициализация Supabase
-           const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-           const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
- 
-           const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
- 
-           // Объявляем currentCityData только один раз
-           let currentCityData = []; // Данные для текущего города
- 
-           // Определение доступных форм теплиц и их названий
-           const availableForms = {
-               "Арочная": [
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М", frame: "20х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ 3М", frame: "20х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", frame: "20х20+20х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", frame: "20х20+20х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
-               ],
-               "Каплевидная": [
-                   { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М", frame: "40х20" }
-               ],
-               "Прямостенная": [
-                   { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
-               ],
-               "Домиком": [
-                   { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М", frame: "40х20+20х20" }
-               ],
-               "Пристенная": [
-                   { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" }
-               ],
-               "Митлайдер арочная": [
-                   { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", frame: "40х20" },
-                   { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М", frame: "40х20+20х20" }
-               ],
-               "Митлайдер прямостенная": [
-                   { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", frame: "40х20+20х20" },
-                   { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М", frame: "40х20+20х20" }
-               ],
-               "Промышленная прямостенная": [
-                   { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", frame: "40х20+40х20" },
-                   { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М", frame: "40х20+40х20" }
-               ],
-               "Промышленная домиком": [
-                   { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", frame: "40х20+40х20" },
-                   { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М", frame: "40х20+40х20" }
-               ],
-               "Навес": [
-                   { name: "НАВЕС ЛЮКС 3.5М", frame: "40х20+20х20" },
-                   { name: "НАВЕС ЛЮКС 4М", frame: "40х20+20х20" },
-                   { name: "НАВЕС ПРЕМИУМ 5М", frame: "40х20+40х20" },
-                   { name: "НАВЕС ПРЕМИУМ 6М", frame: "40х20+40х20" }
-               ]
-           };
- 
-           // Создание обратной карты: form_name -> category
-           const formNameToCategory = {};
- 
-           Object.keys(availableForms).forEach(category => {
-               availableForms[category].forEach(form => {
-                   const normalizedName = normalizeString(form.name);
-                   formNameToCategory[normalizedName] = category;
-                   console.log(`Добавлено в formNameToCategory: "${normalizedName}" -> "${category}"`);
-               });
-           });
- 
-           // Цены на сборку теплиц по форме, ширине и длине
-           const assemblyPrices = {
-               "Арочная_2.5м_3м": { 4: 4990, 6: 6490, 8: 7990, 10: 9490, 12: 11990 },
-               "Арочная_3.5м": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
-               "Арочная_4м": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
-               "Каплевидная_2.5м_3м": { 4: 4990, 6: 6490, 8: 7990, 10: 9490, 12: 11990 },
-               "Каплевидная_3.5м": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
-               "Прямостенная_2.5м_3м_3.5м": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
-               "Прямостенная_4м": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
-               "Домиком_2.5м_3м_3.5м": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
-               "Домиком_4м": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
-               "Пристенная_2.5м_3м": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
-               "Митлайдер арочная_3м_3.5м": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
-               "Митлайдер прямостенная_3м_3.5м": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 },
-               "Промышленная прямостенная_5м_6м": { 4: 9990, 6: 14990, 8: 19990, 10: 24990, 12: 29990, 14: 34990, 16: 39990 },
-               "Промышленная домиком_7м_8м": { 4: 9990, 6: 14990, 8: 19990, 10: 24990, 12: 29990, 14: 34990, 16: 39990 },
-               "Навес_3м_3.5м": { 4: 5990, 6: 7990, 8: 9990, 10: 11990, 12: 13990 },
-               "Навес_4м_5м_6м": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
-           };
- 
-           // Функция получения категории сборки на основе формы и ширины
-           function getAssemblyCategory(form, width) {
-               console.log("Определение категории сборки...");
-               console.log("Форма:", form);
-               console.log("Ширина:", width);
- 
-               // Определение категории на основе формы и ширины
-               if (form === "Арочная" && (width === 2.5 || width === 3)) {
-                   return "Арочная_2.5м_3м";
-               }
-               if (form === "Арочная" && width === 3.5) {
-                   return "Арочная_3.5м";
-               }
-               if (form === "Арочная" && width === 4) {
-                   return "Арочная_4м";
-               }
-               if (form === "Каплевидная" && (width === 2.5 || width === 3)) {
-                   return "Каплевидная_2.5м_3м";
-               }
-               if (form === "Каплевидная" && width === 3.5) {
-                   return "Каплевидная_3.5м";
-               }
-               if (form === "Прямостенная" && (width === 2.5 || width === 3 || width === 3.5)) {
-                   return "Прямостенная_2.5м_3м_3.5м";
-               }
-               if (form === "Прямостенная" && width === 4) {
-                   return "Прямостенная_4м";
-               }
-               if (form === "Домиком" && (width === 2.5 || width === 3 || width === 3.5)) {
-                   return "Домиком_2.5м_3м_3.5м";
-               }
-               if (form === "Домиком" && width === 4) {
-                   return "Домиком_4м";
-               }
-               if (form === "Пристенная" && (width === 2.5 || width === 3)) {
-                   return "Пристенная_2.5м_3м";
-               }
-               if (form === "Митлайдер арочная" && (width === 3 || width === 3.5)) {
-                   return "Митлайдер арочная_3м_3.5м";
-               }
-               if (form === "Митлайдер прямостенная" && (width === 3 || width === 3.5)) {
-                   return "Митлайдер прямостенная_3м_3.5м";
-               }
-               if (form === "Промышленная прямостенная" && (width === 5 || width === 6)) {
-                   return "Промышленная прямостенная_5м_6м";
-               }
-               if (form === "Промышленная домиком" && (width === 7 || width === 8)) {
-                   return "Промышленная домиком_7м_8м";
-               }
-               if (form === "Навес" && (width === 3 || width === 3.5)) {
-                   return "Навес_3м_3.5м";
-               }
-               if (form === "Навес" && (width === 4 || width === 5 || width === 6)) {
-                   return "Навес_4м_5м_6м";
-               }
- 
-               console.log("Категория сборки не определена. Возвращается null.");
-               return null; // Если не подходит ни одна категория
-           }
- 
-           // Функция получения категории формы теплицы на основе имени формы
-           function getFormCategory(formName) {
-               console.log(`getFormCategory: Обрабатываем форму "${formName}".`);
- 
-               // Нормализуем строку
-               const normalizedFormName = normalizeString(formName);
-               console.log(`getFormCategory: Нормализованное имя формы: "${normalizedFormName}".`);
- 
-               // Ищем категорию
-               const category = formNameToCategory[normalizedFormName];
-               if (category) {
-                   console.log(`getFormCategory: Найдена категория "${category}" для формы "${normalizedFormName}".`);
-                   return category;
-               } else {
-                   console.log(`getFormCategory: Категория для формы "${normalizedFormName}" не найдена. Возвращаем "Прочие".`);
-                   return "Прочие";
-               }
-           }
- 
-           // Пример вызова getFormCategory
-           console.log(getFormCategory("ТЕПЛИЦА БОЯРСКАЯ 2.5М")); // Ожидаемый результат: "Арочная"
-           console.log(getFormCategory("ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М")); // Ожидаемый результат: "Каплевидная"
-           console.log(getFormCategory("ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М")); // Ожидаемый результат: "Митлайдер арочная"
-           console.log(getFormCategory("ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М")); // Ожидаемый результат: "Промышленная прямостенная"
-           console.log(getFormCategory("НЕСУЩЕСТВУЮЩАЯ ТЕПЛИЦА")); // Ожидаемый результат: "Прочие"
- 
- 
-           // Пользователи
-           const users = [
-               { login: "admin", password: "Admin#2024" },
-               { login: "Manager1", password: "Mng1!Secure" },
-               { login: "Manager2", password: "Mng2#Strong" },
-               { login: "Manager3", password: "Mng3!Complex" },
-               { login: "Manager4", password: "Mng4#Robust" },
-               { login: "Manager5", password: "Mng5!Power" },
-               { login: "Manager6", password: "Mng6#Safety" },
-               { login: "Manager7", password: "Mng7!Stable" },
-               { login: "Manager8", password: "Mng8#Access" },
-               { login: "Manager9", password: "Mng9!Control" },
-               { login: "Manager10", password: "Mng10#Secure" }
-           ];
- 
-           // Приоритеты форм (чем меньше число, тем выше в списке)
-           const formPriority = {
-               "Арочная": 1,
-               "Каплевидная": 2,
-               "Прямостенная": 3,
-               "Домиком": 4,
-               "Пристенная": 5,
-               "Митлайдер арочная": 6,
-               "Митлайдер прямостенная": 7,
-               "Промышленная прямостенная": 8,
-               "Промышленная домиком": 9,
-               "Навес": 10,
-               "Прочие": 11
-           };
- 
-           // Регионы доставки
-           const deliveryRegions = [
-               { city: "Москва", region: "Московская область" },
-               { city: "Санкт-Петербург", region: "Ленинградская область" },
-               { city: "Белгород", region: "Белгородская область" },
-               { city: "Великий Новгород", region: "Новгородская область" },
-               { city: "Владимир", region: "Владимирская область" },
-               { city: "Вологда", region: "Вологодская область" },
-               { city: "Воронеж", region: "Воронежская область" },
-               { city: "Екатеринбург", region: "Свердловская область" },
-               { city: "Иваново", region: "Ивановская область" },
-               { city: "Йошкар-Ола", region: "Республика Марий Эл" },
-               { city: "Казань", region: "Республика Татарстан" },
-               { city: "Калуга", region: "Калужская область" },
-               { city: "Кемерово", region: "Кемеровская область" },
-               { city: "Кострома", region: "Костромская область" },
-               { city: "Краснодар", region: "Краснодарский край" },
-               { city: "Курск", region: "Курская область" },
-               { city: "Липецк", region: "Липецкая область" },
-               { city: "Майкоп", region: "Республика Адыгея" },
-               { city: "Набережные Челны", region: "Республика Татарстан" },
-               { city: "Нижний Новгород", region: "Нижегородская область" },
-               { city: "Новосибирск", region: "Новосибирская область" },
-               { city: "Орёл", region: "Орловская область" },
-               { city: "Рязань", region: "Рязанская область" },
-               { city: "Ставрополь", region: "Ставропольский край" },
-               { city: "Тамбов", region: "Тамбовская область" },
-               { city: "Тверь", region: "Тверская область" },
-               { city: "Тула", region: "Тульская область" },
-               { city: "Ульяновск", region: "Ульяновская область" },
-               { city: "Чебоксары", region: "Чувашская Республика" },
-               { city: "Челябинск", region: "Челябинская область" },
-               { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
-               { city: "Ярославль", region: "Ярославская область" }
-           ];
- 
-           // Города для карты
-           const citiesForMap = [
-               { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
-               { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
-               { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
-               { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
-               { name: "Владимир", coords: [56.129057, 40.407031], boundaryDistance: 12 },
-               { name: "Вологда", coords: [59.220492, 39.891568], boundaryDistance: 10 },
-               { name: "Воронеж", coords: [51.661535, 39.200287], boundaryDistance: 15 },
-               { name: "Екатеринбург", coords: [56.838926, 60.605703], boundaryDistance: 15 },
-               { name: "Иваново", coords: [57.000348, 40.973921], boundaryDistance: 12 },
-               { name: "Йошкар-Ола", coords: [56.634431, 47.899888], boundaryDistance: 12 },
-               { name: "Казань", coords: [55.796391, 49.108891], boundaryDistance: 15 },
-               { name: "Калуга", coords: [54.506043, 36.251593], boundaryDistance: 12 },
-               { name: "Кемерово", coords: [55.354968, 86.087314], boundaryDistance: 15 },
-               { name: "Кострома", coords: [57.767961, 40.926858], boundaryDistance: 10 },
-               { name: "Краснодар", coords: [45.035470, 38.975313], boundaryDistance: 12 },
-               { name: "Курск", coords: [51.730361, 36.192647], boundaryDistance: 10 },
-               { name: "Липецк", coords: [52.610150, 39.594180], boundaryDistance: 12 },
-               { name: "Майкоп", coords: [44.607782, 40.105690], boundaryDistance: 10 },
-               { name: "Набережные Челны", coords: [55.727110, 52.404913], boundaryDistance: 12 },
-               { name: "Нижний Новгород", coords: [56.296504, 43.936059], boundaryDistance: 15 },
-               { name: "Новосибирск", coords: [55.008352, 82.935733], boundaryDistance: 15 },
-               { name: "Орёл", coords: [52.967257, 36.069647], boundaryDistance: 10 },
-               { name: "Рязань", coords: [54.629704, 39.741146], boundaryDistance: 12 },
-               { name: "Ставрополь", coords: [45.044838, 41.969230], boundaryDistance: 10 },
-               { name: "Тамбов", coords: [52.721219, 41.452274], boundaryDistance: 10 },
-               { name: "Тверь", coords: [56.858539, 35.917596], boundaryDistance: 12 },
-               { name: "Тула", coords: [54.193122, 37.617348], boundaryDistance: 12 },
-               { name: "Ульяновск", coords: [54.316685, 48.403123], boundaryDistance: 12 },
-               { name: "Чебоксары", coords: [56.146223, 47.251931], boundaryDistance: 12 },
-               { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
-               { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
-               { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
-           ];
- 
-           // Дополнительные услуги данные
-           const additionalServicesData = {
-               "Брус": {
-                   price_by_length: {
-                       4: 4790,
-                       6: 6290,
-                       8: 7790,
-                       10: 9290,
-                       12: 10790,
-                       14: 12290,
-                       16: 13790
-                   }
-               },
-               "Штыри": {
-                   price_per_unit: 249,
-                   quantity_by_length: {
-                       "without_bracing": { "4": 10, "6": 14, "8": 18, "10": 22, "12": 26, "14": 30, "16": 34 },
-                       "with_bracing": { "4": 6, "6": 10, "8": 14, "10": 18, "12": 22, "14": 26, "16": 30 }
-                   }
-               },
-               "Сборка": {
-                   price_by_type_and_length: {
-                       "Арочные 2.5-3м": { "4": 4990, "6": 6490, "8": 7990, "10": 9490, "12": 11990 },
-                       "Арочные 3.5м": { "4": 5990, "6": 7990, "8": 9990, "10": 11990, "12": 13990 },
-                       "Арочные 4м": { "4": 7990, "6": 11490, "8": 14990, "10": 18490, "12": 22490 },
-                       "Промышленные": { "4": 9990, "6": 14990, "8": 19990, "10": 24990, "12": 29990, "14": 34990, "16": 39990 }
-                   }
-               }
-           };
- 
-           let mapInstance;
-           let currentRoute;
- 
-           ymaps.ready(() => {
-               mapInstance = new ymaps.Map("map", {
-                   center: [55.751244, 37.618423],
-                   zoom: 7
-               });
-           });
- 
-           // Функция аутентификации
-           function authenticate() {
-               const loginInput = document.getElementById("login");
-               const passwordInput = document.getElementById("password");
-               const authError = document.getElementById("auth-error");
- 
-               const login = loginInput.value.trim();
-               const password = passwordInput.value.trim();
- 
-               // Проверяем логин и пароль
-               const user = users.find(u => u.login === login && u.password === password);
- 
-               if (user) {
-                   // Если пользователь найден, скрываем окно авторизации и показываем калькулятор
-                   authError.style.display = "none";
-                   localStorage.setItem('savedLogin', login); // Сохраняем логин
-                   document.getElementById("auth-container").classList.add("hidden");
-                   document.getElementById("calculator-container").classList.remove("hidden");
-                   initializeCalculator();
-               } else {
-                   // Если пользователь не найден — показываем ошибку
-                   authError.style.display = "block";
-               }
-           }
- 
-           // Функция выхода
-           function logout() {
-               localStorage.removeItem('savedLogin');
-               document.getElementById("auth-container").classList.remove("hidden");
-               document.getElementById("calculator-container").classList.add("hidden");
-           }
- 
-           // Функция для загрузки городов из Supabase с учётом пагинации
-           async function loadCities() {
-               const pageSize = 1000; // Максимальное количество строк за один запрос
-               let allCities = [];
-               let page = 0;
- 
-               while (true) {
-                   // Запрос данных с пагинацией
-                   let { data, error } = await supabaseClient
-                       .from('prices')
-                       .select('city_name') // Запрашиваем города
-                       .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
- 
-                   if (error) {
-                       console.error("Ошибка при загрузке городов из Supabase:", error);
-                       return;
-                   }
- 
-                   // Если данных на странице меньше, чем pageSize, значит, это последняя страница
-                   if (data.length === 0) break;
- 
-                   // Добавляем города в общий массив
-                   allCities = allCities.concat(data.map(item => item.city_name));
-                   page++;
-               }
- 
-               // Убираем дубликаты городов
-               let uniqueCities = [...new Set(allCities)];
- 
-               // Приоритетные города
-               const priorityCities = ["Москва", "Санкт-Петербург"];
- 
-               // Удаляем приоритетные города из основного списка
-               uniqueCities = uniqueCities.filter(city => !priorityCities.includes(city));
- 
-               // Сортируем оставшиеся города по алфавиту
-               uniqueCities.sort((a, b) => a.localeCompare(b, 'ru'));
- 
-               // Объединяем приоритетные города и отсортированные города
-               const finalCities = [...priorityCities, ...uniqueCities];
- 
-               // Обновляем выпадающий список
-               const cityDropdown = document.getElementById('city');
-               cityDropdown.innerHTML = '<option value="">Выберите город</option>';
-               finalCities.forEach(city => {
-                   cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
-               });
-           }
- 
-           // Функция обработки изменения города
-           async function onCityChange() {
-               const city = document.getElementById('city').value;
- 
-               // Если город не выбран – сбрасываем все поля
-               if (!city) {
-                   resetDropdown('form', 'Сначала выберите город');
-                   resetDropdown('width', 'Сначала выберите форму');
-                   resetDropdown('length', 'Сначала выберите ширину');
-                   resetDropdown('frame', 'Сначала выберите длину');
-                   resetDropdown('polycarbonate', 'Сначала выберите город');
-                   return;
-               }
- 
-               let { data, error } = await supabaseClient
-                   .from('prices')
-                   .select('form_name, polycarbonate_type, width, length, frame_description, price') // Добавляем поле price
-                   .eq('city_name', city)
-                   .limit(30000);
- 
-               if (!data || data.length === 0) {
-                   alert("Данные для выбранного города не найдены. Попробуйте другой город.");
-                   return; // Остановить выполнение функции
-               }
- 
-               if (error) {
-                   console.error('Ошибка при получении данных по городу:', error);
-                   return;
-               }
- 
-               // Присваиваем данные текущему городу
-               currentCityData = data;
- 
-               // 1. Обновляем выпадающий список поликарбоната
-               const polycarbonateDropdown = document.getElementById('polycarbonate');
-               polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
- 
-               const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
- 
-               uniquePoly.forEach(poly => {
-                   const option = document.createElement('option');
-                   option.value = poly;
-                   option.textContent = poly;
-                   polycarbonateDropdown.appendChild(option);
-               });
- 
-               // Фильтруем формы на основе availableForms
-               const formCategories = Object.keys(availableForms);
-               const formsAvailable = formCategories.filter(formType =>
-                   data.some(item => availableForms[formType].some(form => normalizeString(item.form_name) === normalizeString(form.name)))
-               );
- 
-               // Сортируем формы по приоритету
-               formsAvailable.sort((a, b) => (formPriority[a] || 100) - (formPriority[b] || 100)); // Прочие формы получат низкий приоритет
- 
-               // Обновляем выпадающий список форм теплиц
-               const formDropdown = document.getElementById('form');
-               formDropdown.innerHTML = '<option value="">Выберите форму</option>';
-               formsAvailable.forEach(form => {
-                   if (form && form !== "Прочие") { // Исключаем пустые и ненужные категории
-                       const option = document.createElement('option');
-                       option.value = form;
-                       option.textContent = form;
-                       formDropdown.appendChild(option);
-                   }
-               });
- 
-               // 3. Сбрасываем размеры и каркасы
-               resetDropdown('width', 'Сначала выберите форму');
-               resetDropdown('length', 'Сначала выберите ширину');
-               resetDropdown('frame', 'Сначала выберите длину');
- 
-               // Сброс дополнительных опций
-               resetAdditionalOptions();
-           }
- 
-           // Функция обработки изменения формы
-           function onFormChange() {
-               const form = document.getElementById("form").value;
- 
-               const widthSelect = document.getElementById("width");
-               widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
- 
-               if (!form) {
-                   return;
-               }
- 
-               // Фильтруем данные по выбранной форме на основе availableForms
-               const filteredData = currentCityData.filter(item => {
-                   const category = getFormCategory(item.form_name);
-                   return category === form;
-               });
- 
-               // Проверка на пустые данные
-               if (filteredData.length === 0) {
-                   alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                   return; // Останавливаем выполнение функции, если данных нет
-               }
- 
-               // Получаем уникальные значения ширины
-               const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
- 
-               // Заполняем выпадающий список ширины
-               uniqueWidths.forEach(width => {
-                   widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
-               });
- 
-               // Сбрасываем длину и каркасы
-               resetDropdown('length', 'Сначала выберите ширину');
-               resetDropdown('frame', 'Сначала выберите длину');
- 
-               // Сброс дополнительных опций
-               resetAdditionalOptions();
-           }
- 
-           // Функция обработки изменения ширины
-           function onWidthChange() {
-               const form = document.getElementById("form").value;
-               const width = parseFloat(document.getElementById("width").value);
- 
-               // Определяем категорию формы
-               const formCategory = getFormCategory(form);
-               console.log("Категория формы:", formCategory); // Лог для проверки
- 
-               const lengthSelect = document.getElementById("length");
-               lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
- 
-               if (isNaN(width)) {
-                   return;
-               }
- 
-               // Фильтруем данные по выбранной форме и ширине
-               const filteredData = currentCityData.filter(item => {
-                   const category = getFormCategory(item.form_name);
-                   return category === formCategory && parseFloat(item.width) === width;
-               });
- 
-               // Проверка на пустые данные после фильтрации
-               if (filteredData.length === 0) {
-                   alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                   return; // Останавливаем выполнение функции
-               }
- 
-               // Получаем уникальные значения длины
-               const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
- 
-               // Заполняем выпадающий список длины
-               uniqueLengths.forEach(length => {
-                   lengthSelect.innerHTML += `<option value="${length}">${length} м</option>`;
-               });
- 
-               // Сбрасываем каркас
-               resetDropdown('frame', 'Сначала выберите длину');
- 
-               // Сброс дополнительных опций
-               resetAdditionalOptions();
-           }
- 
-           // Функция обработки изменения длины
-           function onLengthChange() {
-               const form = document.getElementById("form").value;
-               const width = parseFloat(document.getElementById("width").value);
-               const length = parseFloat(document.getElementById("length").value);
- 
-               const frameSelect = document.getElementById("frame");
-               frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
- 
-               if (isNaN(width) || isNaN(length)) {
-                   console.warn("Ширина или длина теплицы не выбраны.");
-                   return;
-               }
- 
-               // Фильтруем данные по форме, ширине и длине
-               const filteredData = currentCityData.filter(item => {
-                   const category = getFormCategory(item.form_name); // Определяем категорию формы из данных
-                   return category === getFormCategory(form) &&
-                       parseFloat(item.width) === width &&
-                       parseFloat(item.length) === length;
-               });
- 
-               // Проверка на пустые данные после фильтрации
-               if (filteredData.length === 0) {
-                   alert("Каркас для выбранных параметров теплицы не найден. Попробуйте изменить параметры.");
-                   return; // Останавливаем выполнение функции
-               }
- 
-               // Получаем уникальные значения каркаса
-               const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
- 
-               // Заполняем выпадающий список каркасов
-               uniqueFrames.forEach(frame => {
-                   frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
-               });
- 
-               console.log("Каркасы успешно обновлены:", uniqueFrames);
- 
-               // Сброс дополнительных опций
-               resetAdditionalOptions();
-           }
- 
-           // Функция обработки изменения каркаса
-           function onFrameChange() {
-               // Сброс дополнительных опций
-               resetAdditionalOptions();
-           }
- 
-           // Функция сброса выпадающих списков
-           function resetDropdown(elementId, placeholderText) {
-               const dropdown = document.getElementById(elementId);
-               dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
-           }
- 
-           // Функция сброса дополнительных опций
-           function resetAdditionalOptions() {
-               document.getElementById('bracing').checked = false;
-               document.getElementById('ground-hooks').checked = false;
-               document.getElementById('assembly').checked = false;
-               document.getElementById('drip-irrigation').checked = false;
-               document.getElementById('window-automation').checked = false;
-               document.getElementById('galvanized-tape').checked = false;
-               updateAdditionalSummary();
-           }
- 
-           // Функция обновления дополнительного резюме
-           function updateAdditionalSummary(details = "") {
-               const additionalSummary = document.getElementById("additional-summary");
-               additionalSummary.innerHTML = details;
-           }
- 
-           // Функция расчёта стоимости теплицы
-           async function calculateGreenhouseCost() {
-               const city = document.getElementById("city").value;
-               const form = document.getElementById("form").value;
-               const width = parseFloat(document.getElementById("width").value);
-               const length = parseFloat(document.getElementById("length").value);
-               const frame = document.getElementById("frame").value;
-               const polycarbonate = document.getElementById("polycarbonate").value;
-               const arcStep = parseFloat(document.getElementById("arcStep").value);
- 
-               // Проверка на заполнение всех обязательных полей
-               if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
-                   alert("Пожалуйста, заполните все обязательные поля.");
-                   return;
-               }
- 
-               // Используем уже загруженные данные currentCityData
-               if (!currentCityData || currentCityData.length === 0) {
-                   alert("Данные для текущего города не загружены. Попробуйте снова.");
-                   return;
-               }
- 
-               // Фильтрация вручную для выбранной комбинации
-               const selectedEntry = currentCityData.find(item => {
-                   return (
-                       getFormCategory(item.form_name) === form &&
-                       parseFloat(item.width) === width &&
-                       parseFloat(item.length) === length &&
-                       normalizeString(item.frame_description) === normalizeString(frame) &&
-                       normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
-                   );
-               });
- 
-               if (!selectedEntry) {
-                   alert("Теплица с заданными параметрами не найдена.");
-                   return;
-               }
- 
-               let totalPrice = 0;
-               let additionalDetails = "";
- 
-               // Расчёт стоимости базовой теплицы с учётом шага дуг
-               if (arcStep === 1) {
-                   // Шаг 1 м: используем базовую цену
-                   totalPrice = selectedEntry.price;
-               } else if (arcStep === 0.65) {
-                   // Шаг 0.65 м: рассчитываем дополнительную стоимость
-                   // Находим базовую цену для "Стандарт 4мм"
-                   const baseEntry = currentCityData.find(item => {
-                       return (
-                           getFormCategory(item.form_name) === form &&
-                           parseFloat(item.width) === width &&
-                           parseFloat(item.length) === length &&
-                           normalizeString(item.frame_description) === normalizeString(frame) &&
-                           normalizeString(item.polycarbonate_type) === "стандарт 4мм"
-                       );
-                   });
- 
-                   if (!baseEntry) {
-                       alert('Не найдена базовая цена для покрытия "Стандарт 4мм".');
-                       return;
-                   }
- 
-                   const basePrice = baseEntry.price;
-                   const additionalCost = 0.25 * basePrice;
- 
-                   // Цена выбранного типа поликарбоната
-                   const selectedPrice = selectedEntry.price;
- 
-                   totalPrice = selectedPrice + additionalCost;
- 
-                   additionalDetails += `Дополнение за шаг 0.65 м: +${Math.ceil(additionalCost / 10) * 10} руб.<br>`;
-               } else {
-                   alert("Некорректный шаг между дугами.");
-                   return;
-               }
- 
-               // Дополнительные услуги
-               const bracingChecked = document.getElementById('bracing').checked;
-               const groundHooksChecked = document.getElementById('ground-hooks').checked;
-               const assemblyChecked = document.getElementById('assembly').checked;
- 
-               // Расчёт стоимости бруса
-               let bracingCost = 0;
-               if (bracingChecked) {
-                   const bracingPrice = additionalServicesData["Брус"].price_by_length[length];
-                   if (bracingPrice) {
-                       bracingCost = bracingPrice;
-                       totalPrice += bracingCost;
-                       additionalDetails += `Брус: +${bracingCost} руб.<br>`;
-                   } else {
-                       alert(`Не найдена стоимость бруса для длины ${length} м.`);
-                       return;
-                   }
-               }
- 
-               // Расчёт стоимости штырей
-               let stakesCost = 0;
-               if (groundHooksChecked) {
-                   const quantityData = bracingChecked ? additionalServicesData["Штыри"].quantity_by_length["with_bracing"] : additionalServicesData["Штыри"].quantity_by_length["without_bracing"];
-                   const stakesQuantity = quantityData[length];
-                   if (stakesQuantity) {
-                       stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
-                       totalPrice += stakesCost;
-                       additionalDetails += `Штыри (${stakesQuantity} шт.): +${stakesCost} руб.<br>`;
-                   } else {
-                       alert(`Не найдена информация о количестве штырей для длины ${length} м.`);
-                       return;
-                   }
-               }
- 
-               // Расчёт стоимости сборки
-               let assemblyCost = 0;
-               if (assemblyChecked) {
-                   const assemblyCategory = getAssemblyCategory(form, width); // Определяем категорию
-                   console.log("Категория сборки:", assemblyCategory);
- 
-                   if (assemblyCategory) {
-                       const lengthPrices = assemblyPrices[assemblyCategory]; // Получаем цены для категории
-                       if (lengthPrices && lengthPrices[length]) {
-                           assemblyCost = lengthPrices[length]; // Получаем цену для заданной длины
-                           console.log(`Стоимость сборки для ${length} м: ${assemblyCost} руб.`); // Лог стоимости
-                           totalPrice += assemblyCost; // Добавляем к общей стоимости
-                           additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
-                       } else {
-                           console.warn(`Стоимость сборки для категории "${assemblyCategory}" и длины ${length} м не найдена.`);
-                           alert(`Стоимость сборки не найдена для выбранной длины (${length} м).`);
-                           return;
-                       }
-                   } else {
-                       console.warn("Категория сборки не определена.");
-                       alert("Не удалось определить категорию сборки. Проверьте параметры теплицы.");
-                       return;
-                   }
-               }
-               
-               // Дополнительные товары
-               const additionalProducts = [];
-               const dripIrrigationChecked = document.getElementById('drip-irrigation').checked;
-               const windowAutomationChecked = document.getElementById('window-automation').checked;
-               const galvanizedTapeChecked = document.getElementById('galvanized-tape').checked;
- 
-               if (dripIrrigationChecked) {
-                   additionalProducts.push({ name: "Капельный полив", cost: 1000 });
-                   totalPrice += 1000;
-               }
-               if (windowAutomationChecked) {
-                   additionalProducts.push({ name: "Автомат для форточки", cost: 2500 });
-                   totalPrice += 2500;
-               }
-               if (galvanizedTapeChecked) {
-                   additionalProducts.push({ name: "Оцинкованная лента", cost: 800 });
-                   totalPrice += 800;
-               }
- 
-               // Добавление стоимости дополнительных товаров в резюме
-               additionalProducts.forEach(product => {
-                   additionalDetails += `${product.name}: +${product.cost} руб.<br>`;
-               });
- 
-               // Округление вверх до ближайшего десятка
-               totalPrice = Math.ceil(totalPrice / 10) * 10;
- 
-               // Формирование итогового резюме
-               let summaryText = `Итоговая стоимость теплицы: ${totalPrice} руб.<br>`;
-               if (additionalDetails) {
-                   summaryText += `<hr>Дополнительные товары и услуги:<br>${additionalDetails}`;
-               }
- 
-               // Выводим итоговую стоимость
-               document.getElementById("summary").innerHTML = summaryText;
-           }
- 
-           // Функция расчёта доставки
-           async function calculateDelivery() {
-               const addressInput = document.getElementById("address");
-               const address = addressInput.value.trim().toLowerCase();
-               const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
- 
-               if (!address) {
-                   document.getElementById('result').innerText = "Введите адрес!";
-                   return;
-               }
- 
-               try {
-                   const res = await ymaps.geocode(address);
-                   const geoObject = res.geoObjects.get(0);
- 
-                   if (!geoObject) {
-                       document.getElementById('result').innerText = "Адрес не найден!";
-                       return;
-                   }
- 
-                   const localities = geoObject.getLocalities().map(locality => locality.toLowerCase());
-                   const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
- 
-                   const isInDeliveryRegion = deliveryRegions.some(region =>
-                       localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
-                   );
- 
-                   if (!isInDeliveryRegion) {
-                       document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
-                       return;
-                   }
- 
-                   const coords = geoObject.geometry.getCoordinates();
-                   const destinationLat = coords[0];
-                   const destinationLon = coords[1];
- 
-                   let nearestCity = null;
-                   let minDistance = Infinity;
- 
-                   citiesForMap.forEach(city => {
-                       const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
-                       if (cityDistance < minDistance) {
-                           minDistance = cityDistance;
-                           nearestCity = city;
-                       }
-                   });
- 
-                   if (!nearestCity) {
-                       document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
-                       return;
-                   }
- 
-                   mapInstance.setCenter(nearestCity.coords, 7);
- 
-                   if (currentRoute) {
-                       mapInstance.geoObjects.remove(currentRoute);
-                   }
- 
-                   try {
-                       const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
-                       currentRoute = route;
-                       mapInstance.geoObjects.add(route);
- 
-                       const distanceInKm = route.getLength() / 1000;
-                       const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
- 
-                       let cost;
-                       if (deliveryType === "withoutAssembly") {
-                           cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-                       } else {
-                           cost = Math.max(1000, 40 * distanceFromBoundary);
-                       }
- 
-                       const roundedCost = Math.ceil(cost / 50) * 50;
- 
-                       document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
-                   } catch (routeError) {
-                       document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-                   }
- 
-               } catch (geocodeError) {
-                   document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
-               }
-           }
- 
-           // Инициализация при загрузке страницы
-           window.onload = async function() {
-               const savedLogin = localStorage.getItem('savedLogin');
-               if (savedLogin) {
-                   document.getElementById("login").value = savedLogin;
-                   document.getElementById("password").focus();
-                   document.getElementById("auth-container").classList.add("hidden");
-                   document.getElementById("calculator-container").classList.remove("hidden");
-                   await initializeCalculator();
-               }
-           }
- 
-           // Функция загрузки городов при инициализации калькулятора
-           async function initializeCalculator() {
-               await loadCities();
- 
-               // **УДАЛИТЕ** следующие строки, чтобы избежать автоматического вызова расчета при изменении полей
-               /*
-               // Добавляем обработчики событий для дополнительных услуг
-               document.getElementById('bracing').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('ground-hooks').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('assembly').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('drip-irrigation').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('window-automation').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('galvanized-tape').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('arcStep').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('polycarbonate').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('frame').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('length').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('width').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('form').addEventListener('change', calculateGreenhouseCost);
-               document.getElementById('city').addEventListener('change', calculateGreenhouseCost);
-               */
- 
-               // **Вместо этого**, функция `calculateGreenhouseCost()` будет вызываться только при нажатии на кнопку
-           }
-       </script>
-   </div>
+    <!-- Авторизация -->
+    <div class="auth-container" id="auth-container">
+        <h2>Вход в систему</h2>
+        <input type="text" id="login" placeholder="Введите логин" required>
+        <input type="password" id="password" placeholder="Введите пароль" required>
+        <button onclick="authenticate()">Войти</button>
+        <p id="auth-error">Неверный логин или пароль!</p>
+    </div>
+
+    <!-- Калькулятор -->
+    <div class="calculator-container hidden" id="calculator-container">
+        <div class="container">
+            <button class="logout" onclick="logout()">Выйти</button>
+            
+            <!-- Блок доставки -->
+            <div class="block">
+                <h2>Доставка</h2>
+                <label for="address">Введите адрес доставки:</label>
+                <input type="text" id="address" placeholder="Например, Санкт-Петербург, Невский пр." required autocomplete="off">
+                
+                <label><input type="radio" name="deliveryType" value="withoutAssembly" checked> Без сборки</label>
+                <label><input type="radio" name="deliveryType" value="withAssembly"> Со сборкой</label>
+
+                <button onclick="calculateDelivery()">Рассчитать доставку</button>
+                <div id="result"></div>
+                <div id="map"></div>
+            </div>
+
+            <!-- Блок теплицы -->
+            <div class="block">
+                <h2>Стоимость теплицы</h2>
+                
+                <div class="parameters">
+                    <label for="city">Город:</label>
+                    <select id="city" onchange="onCityChange()">
+                        <option value="">Выберите город</option>
+                    </select>
+                </div>
+
+                <div class="parameters">
+                    <label for="form">Форма теплицы:</label>
+                    <select id="form" onchange="onFormChange()">
+                        <option value="">Сначала выберите город</option>
+                    </select>
+                </div>
+                
+                <div class="parameters">
+                    <label for="width">Ширина (м):</label>
+                    <select id="width" onchange="onWidthChange()">
+                        <option value="">Выберите ширину</option>
+                    </select>
+                </div>
+                
+                <div class="parameters">
+                    <label for="length">Длина (м):</label>
+                    <select id="length" onchange="onLengthChange()">
+                        <option value="">Выберите длину</option>
+                    </select>
+                </div>
+                
+                <div class="parameters">
+                    <label for="frame">Каркас:</label>
+                    <select id="frame" onchange="onFrameChange()">
+                        <option value="">Сначала выберите длину</option>
+                    </select>
+                </div>
+
+                <div class="parameters">
+                    <label for="polycarbonate">Поликарбонат:</label>
+                    <select id="polycarbonate">
+                        <option value="">Сначала выберите город</option>
+                    </select>
+                </div>
+
+                <div class="parameters">
+                    <label for="arcStep">Шаг между дугами:</label>
+                    <select id="arcStep">
+                        <option value="">Выберите шаг</option>
+                        <option value="1">1 м</option>
+                        <option value="0.65">0.65 м</option>
+                    </select>
+                </div>
+
+                <!-- Дополнительные услуги -->
+                <div class="additional-services">
+                    <div class="checkbox-group-large">
+                        <label><input type="checkbox" id="bracing"> Брус</label>
+                        <label><input type="checkbox" id="ground-hooks"> Штыри</label>
+                        <label><input type="checkbox" id="assembly"> Сборка</label>
+                    </div>
+                </div>
+
+                <div class="additional-products">
+                    <h3>Дополнительные товары:</h3>
+                    <label>
+                        Капельный полив
+                        <input type="checkbox" id="drip-irrigation">
+                    </label>
+                    <label>
+                        Автомат для форточки
+                        <input type="checkbox" id="window-automation">
+                    </label>
+                    <label>
+                        Оцинкованная лента
+                        <input type="checkbox" id="galvanized-tape">
+                    </label>
+                </div>
+
+                <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
+
+                <!-- Отображение дополнительных опций и их стоимости -->
+                <div class="additional-summary" id="additional-summary"></div>
+            </div>
+
+            <!-- Блок итогового расчета -->
+            <div class="block">
+                <h2>Итоговый расчет</h2>
+                <div class="summary" id="summary">
+                    Здесь будет выводиться итоговая сумма и детали расчета.
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Константа для контроля отладки
+            const DEBUG = false; // Выключено
+
+            // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
+            function normalizeString(str) {
+                if (!str) return ""; // Проверяем, что значение существует
+                return str.trim().toLowerCase();
+            }
+
+            // Инициализация Supabase
+            const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
+
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Объявляем currentCityData только один раз
+            let currentCityData = []; // Данные для текущего города
+
+            // Определение доступных форм теплиц и их названий
+            const availableForms = {
+                "Арочная": [
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 3М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
+                ],
+                "Каплевидная": [
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М", frame: "40х20" }
+                ],
+                "Прямостенная": [
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
+                ],
+                "Домиком": [
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М", frame: "40х20+20х20" }
+                ],
+                "Пристенная": [
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" }
+                ],
+                "Митлайдер арочная": [
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М", frame: "40х20+20х20" }
+                ],
+                "Митлайдер прямостенная": [
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М", frame: "40х20+20х20" }
+                ],
+                "Промышленная прямостенная": [
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М", frame: "40х20+40х20" }
+                ],
+                "Промышленная домиком": [
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М", frame: "40х20+40х20" }
+                ],
+                "Навес": [
+                    { name: "НАВЕС ЛЮКС 3.5М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ЛЮКС 4М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "НАВЕС ПРЕМИУМ 6М", frame: "40х20+40х20" }
+                ]
+            };
+
+            // Создание обратной карты: form_name -> category
+            const formNameToCategory = {};
+
+            Object.keys(availableForms).forEach(category => {
+                availableForms[category].forEach(form => {
+                    formNameToCategory[normalizeString(form.name)] = category;
+                });
+            });
+
+            // Обновлённая функция определения категории формы
+            function getFormCategory(formName) {
+                if (!formName || typeof formName !== "string") return "Прочие";
+
+                const normalizedFormName = normalizeString(formName);
+                const category = formNameToCategory[normalizedFormName];
+
+                if (category) {
+                    return category;
+                } else {
+                    return "Прочие";
+                }
+            }
+
+            // Пользователи
+            const users = [
+                { login: "admin", password: "Admin#2024" },
+                { login: "Manager1", password: "Mng1!Secure" },
+                { login: "Manager2", password: "Mng2#Strong" },
+                { login: "Manager3", password: "Mng3!Complex" },
+                { login: "Manager4", password: "Mng4#Robust" },
+                { login: "Manager5", password: "Mng5!Power" },
+                { login: "Manager6", password: "Mng6#Safety" },
+                { login: "Manager7", password: "Mng7!Stable" },
+                { login: "Manager8", password: "Mng8#Access" },
+                { login: "Manager9", password: "Mng9!Control" },
+                { login: "Manager10", password: "Mng10#Secure" }
+            ];
+
+            // Приоритеты форм (чем меньше число, тем выше в списке)
+            const formPriority = {
+                "Арочная": 1,
+                "Каплевидная": 2,
+                "Прямостенная": 3,
+                "Домиком": 4,
+                "Пристенная": 5,
+                "Митлайдер арочная": 6,
+                "Митлайдер прямостенная": 7,
+                "Промышленная прямостенная": 8,
+                "Промышленная домиком": 9,
+                "Навес": 10,
+                "Прочие": 11
+            };
+
+            // Регионы доставки
+            const deliveryRegions = [
+                { city: "Москва", region: "Московская область" },
+                { city: "Санкт-Петербург", region: "Ленинградская область" },
+                { city: "Белгород", region: "Белгородская область" },
+                { city: "Великий Новгород", region: "Новгородская область" },
+                { city: "Владимир", region: "Владимирская область" },
+                { city: "Вологда", region: "Вологодская область" },
+                { city: "Воронеж", region: "Воронежская область" },
+                { city: "Екатеринбург", region: "Свердловская область" },
+                { city: "Иваново", region: "Ивановская область" },
+                { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+                { city: "Казань", region: "Республика Татарстан" },
+                { city: "Калуга", region: "Калужская область" },
+                { city: "Кемерово", region: "Кемеровская область" },
+                { city: "Кострома", region: "Костромская область" },
+                { city: "Краснодар", region: "Краснодарский край" },
+                { city: "Курск", region: "Курская область" },
+                { city: "Липецк", region: "Липецкая область" },
+                { city: "Майкоп", region: "Республика Адыгея" },
+                { city: "Набережные Челны", region: "Республика Татарстан" },
+                { city: "Нижний Новгород", region: "Нижегородская область" },
+                { city: "Новосибирск", region: "Новосибирская область" },
+                { city: "Орёл", region: "Орловская область" },
+                { city: "Рязань", region: "Рязанская область" },
+                { city: "Ставрополь", region: "Ставропольский край" },
+                { city: "Тамбов", region: "Тамбовская область" },
+                { city: "Тверь", region: "Тверская область" },
+                { city: "Тула", region: "Тульская область" },
+                { city: "Ульяновск", region: "Ульяновская область" },
+                { city: "Чебоксары", region: "Чувашская Республика" },
+                { city: "Челябинск", region: "Челябинская область" },
+                { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+                { city: "Ярославль", region: "Ярославская область" }
+            ];
+
+            // Города для карты
+            const citiesForMap = [
+                { name: "Москва", coords: [55.751244, 37.618423], boundaryDistance: 20 },
+                { name: "Санкт-Петербург", coords: [59.934280, 30.335099], boundaryDistance: 20 },
+                { name: "Белгород", coords: [50.597735, 36.585823], boundaryDistance: 10 },
+                { name: "Великий Новгород", coords: [58.521400, 31.275505], boundaryDistance: 10 },
+                { name: "Владимир", coords: [56.129057, 40.407031], boundaryDistance: 12 },
+                { name: "Вологда", coords: [59.220492, 39.891568], boundaryDistance: 10 },
+                { name: "Воронеж", coords: [51.661535, 39.200287], boundaryDistance: 15 },
+                { name: "Екатеринбург", coords: [56.838926, 60.605703], boundaryDistance: 15 },
+                { name: "Иваново", coords: [57.000348, 40.973921], boundaryDistance: 12 },
+                { name: "Йошкар-Ола", coords: [56.634431, 47.899888], boundaryDistance: 12 },
+                { name: "Казань", coords: [55.796391, 49.108891], boundaryDistance: 15 },
+                { name: "Калуга", coords: [54.506043, 36.251593], boundaryDistance: 12 },
+                { name: "Кемерово", coords: [55.354968, 86.087314], boundaryDistance: 15 },
+                { name: "Кострома", coords: [57.767961, 40.926858], boundaryDistance: 10 },
+                { name: "Краснодар", coords: [45.035470, 38.975313], boundaryDistance: 12 },
+                { name: "Курск", coords: [51.730361, 36.192647], boundaryDistance: 10 },
+                { name: "Липецк", coords: [52.610150, 39.594180], boundaryDistance: 12 },
+                { name: "Майкоп", coords: [44.607782, 40.105690], boundaryDistance: 10 },
+                { name: "Набережные Челны", coords: [55.727110, 52.404913], boundaryDistance: 12 },
+                { name: "Нижний Новгород", coords: [56.296504, 43.936059], boundaryDistance: 15 },
+                { name: "Новосибирск", coords: [55.008352, 82.935733], boundaryDistance: 15 },
+                { name: "Орёл", coords: [52.967257, 36.069647], boundaryDistance: 10 },
+                { name: "Рязань", coords: [54.629704, 39.741146], boundaryDistance: 12 },
+                { name: "Ставрополь", coords: [45.044838, 41.969230], boundaryDistance: 10 },
+                { name: "Тамбов", coords: [52.721219, 41.452274], boundaryDistance: 10 },
+                { name: "Тверь", coords: [56.858539, 35.917596], boundaryDistance: 12 },
+                { name: "Тула", coords: [54.193122, 37.617348], boundaryDistance: 12 },
+                { name: "Ульяновск", coords: [54.316685, 48.403123], boundaryDistance: 12 },
+                { name: "Чебоксары", coords: [56.146223, 47.251931], boundaryDistance: 12 },
+                { name: "Челябинск", coords: [55.164442, 61.436843], boundaryDistance: 15 },
+                { name: "Черкесск", coords: [44.226863, 42.046782], boundaryDistance: 10 },
+                { name: "Ярославль", coords: [57.626559, 39.893813], boundaryDistance: 10 }
+            ];
+
+            // Дополнительные услуги данные
+            const additionalServicesData = {
+                "Брус": {
+                    price_by_length: {
+                        4: 4790,
+                        6: 6290,
+                        8: 7790,
+                        10: 9290,
+                        12: 10790,
+                        14: 12290,
+                        16: 13790
+                    }
+                },
+                "Штыри": {
+                    price_per_unit: 249,
+                    quantity_by_length: {
+                        "without_bracing": { "4": 10, "6": 14, "8": 18, "10": 22, "12": 26, "14": 30, "16": 34 },
+                        "with_bracing": { "4": 6, "6": 10, "8": 14, "10": 18, "12": 22, "14": 26, "16": 30 }
+                    }
+                },
+                "Сборка": {
+                    price_by_type_and_length: {
+                        "Арочные 2.5-3м": { "4": 4990, "6": 6490, "8": 7990, "10": 9490, "12": 11990 },
+                        "Арочные 3.5м": { "4": 5990, "6": 7990, "8": 9990, "10": 11990, "12": 13990 },
+                        "Арочные 4м": { "4": 7990, "6": 11490, "8": 14990, "10": 18490, "12": 22490 },
+                        "Промышленные": { "4": 9990, "6": 14990, "8": 19990, "10": 24990, "12": 29990, "14": 34990, "16": 39990 }
+                    }
+                }
+            };
+
+            let mapInstance;
+            let currentRoute;
+
+            ymaps.ready(() => {
+                mapInstance = new ymaps.Map("map", {
+                    center: [55.751244, 37.618423],
+                    zoom: 7
+                });
+            });
+
+            // Функция аутентификации
+            function authenticate() {
+                const loginInput = document.getElementById("login");
+                const passwordInput = document.getElementById("password");
+                const authError = document.getElementById("auth-error");
+
+                const login = loginInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                // Проверяем логин и пароль
+                const user = users.find(u => u.login === login && u.password === password);
+
+                if (user) {
+                    // Если пользователь найден, скрываем окно авторизации и показываем калькулятор
+                    authError.style.display = "none";
+                    localStorage.setItem('savedLogin', login); // Сохраняем логин
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    initializeCalculator();
+                } else {
+                    // Если пользователь не найден — показываем ошибку
+                    authError.style.display = "block";
+                }
+            }
+
+            // Функция выхода
+            function logout() {
+                localStorage.removeItem('savedLogin');
+                document.getElementById("auth-container").classList.remove("hidden");
+                document.getElementById("calculator-container").classList.add("hidden");
+            }
+
+            // Функция для загрузки городов из Supabase с учётом пагинации
+            async function loadCities() {
+                const pageSize = 1000; // Максимальное количество строк за один запрос
+                let allCities = [];
+                let page = 0;
+
+                while (true) {
+                    // Запрос данных с пагинацией
+                    let { data, error } = await supabaseClient
+                        .from('prices')
+                        .select('city_name') // Запрашиваем города
+                        .range(page * pageSize, (page + 1) * pageSize - 1); // Пагинация
+
+                    if (error) {
+                        console.error("Ошибка при загрузке городов из Supabase:", error);
+                        return;
+                    }
+
+                    // Если данных на странице меньше, чем pageSize, значит, это последняя страница
+                    if (data.length === 0) break;
+
+                    // Добавляем города в общий массив
+                    allCities = allCities.concat(data.map(item => item.city_name));
+                    page++;
+                }
+
+                // Убираем дубликаты городов
+                let uniqueCities = [...new Set(allCities)];
+
+                // Приоритетные города
+                const priorityCities = ["Москва", "Санкт-Петербург"];
+
+                // Удаляем приоритетные города из основного списка
+                uniqueCities = uniqueCities.filter(city => !priorityCities.includes(city));
+
+                // Сортируем оставшиеся города по алфавиту
+                uniqueCities.sort((a, b) => a.localeCompare(b, 'ru'));
+
+                // Объединяем приоритетные города и отсортированные города
+                const finalCities = [...priorityCities, ...uniqueCities];
+
+                // Обновляем выпадающий список
+                const cityDropdown = document.getElementById('city');
+                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
+                finalCities.forEach(city => {
+                    cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
+                });
+            }
+
+            // Функция обработки изменения города
+            async function onCityChange() {
+                const city = document.getElementById('city').value;
+
+                // Если город не выбран – сбрасываем все поля
+                if (!city) {
+                    resetDropdown('form', 'Сначала выберите город');
+                    resetDropdown('width', 'Сначала выберите форму');
+                    resetDropdown('length', 'Сначала выберите ширину');
+                    resetDropdown('frame', 'Сначала выберите длину');
+                    resetDropdown('polycarbonate', 'Сначала выберите город');
+                    return;
+                }
+
+                let { data, error } = await supabaseClient
+                    .from('prices')
+                    .select('form_name, polycarbonate_type, width, length, frame_description, price') // Добавляем поле price
+                    .eq('city_name', city)
+                    .limit(30000);
+
+                if (!data || data.length === 0) {
+                    alert("Данные для выбранного города не найдены. Попробуйте другой город.");
+                    return; // Остановить выполнение функции
+                }
+
+                if (error) {
+                    console.error('Ошибка при получении данных по городу:', error);
+                    return;
+                }
+
+                // Присваиваем данные текущему городу
+                currentCityData = data;
+
+                // 1. Обновляем выпадающий список поликарбоната
+                const polycarbonateDropdown = document.getElementById('polycarbonate');
+                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
+
+                const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
+
+                uniquePoly.forEach(poly => {
+                    const option = document.createElement('option');
+                    option.value = poly;
+                    option.textContent = poly;
+                    polycarbonateDropdown.appendChild(option);
+                });
+
+                // Фильтруем формы на основе availableForms
+                const formCategories = Object.keys(availableForms);
+                const formsAvailable = formCategories.filter(formType =>
+                    data.some(item => availableForms[formType].some(form => normalizeString(item.form_name) === normalizeString(form.name)))
+                );
+
+                // Сортируем формы по приоритету
+                formsAvailable.sort((a, b) => (formPriority[a] || 100) - (formPriority[b] || 100)); // Прочие формы получат низкий приоритет
+
+                // Обновляем выпадающий список форм теплиц
+                const formDropdown = document.getElementById('form');
+                formDropdown.innerHTML = '<option value="">Выберите форму</option>';
+                formsAvailable.forEach(form => {
+                    if (form && form !== "Прочие") { // Исключаем пустые и ненужные категории
+                        const option = document.createElement('option');
+                        option.value = form;
+                        option.textContent = form;
+                        formDropdown.appendChild(option);
+                    }
+                });
+
+                // 3. Сбрасываем размеры и каркасы
+                resetDropdown('width', 'Сначала выберите форму');
+                resetDropdown('length', 'Сначала выберите ширину');
+                resetDropdown('frame', 'Сначала выберите длину');
+
+                // Сброс дополнительных опций
+                resetAdditionalOptions();
+            }
+
+            // Функция обработки изменения формы
+            function onFormChange() {
+                const form = document.getElementById("form").value;
+
+                const widthSelect = document.getElementById("width");
+                widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
+
+                if (!form) {
+                    return;
+                }
+
+                // Фильтруем данные по выбранной форме на основе availableForms
+                const filteredData = currentCityData.filter(item => {
+                    const category = getFormCategory(item.form_name);
+                    return category === form;
+                });
+
+                // Проверка на пустые данные
+                if (filteredData.length === 0) {
+                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    return; // Останавливаем выполнение функции, если данных нет
+                }
+
+                // Получаем уникальные значения ширины
+                const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
+
+                // Заполняем выпадающий список ширины
+                uniqueWidths.forEach(width => {
+                    widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
+                });
+
+                // Сбрасываем длину и каркасы
+                resetDropdown('length', 'Сначала выберите ширину');
+                resetDropdown('frame', 'Сначала выберите длину');
+
+                // Сброс дополнительных опций
+                resetAdditionalOptions();
+            }
+
+            // Функция обработки изменения ширины
+            function onWidthChange() {
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+
+                const lengthSelect = document.getElementById("length");
+                lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
+
+                if (isNaN(width)) {
+                    return;
+                }
+
+                // Фильтруем данные по выбранной форме и ширине
+                const filteredData = currentCityData.filter(item => {
+                    const category = getFormCategory(item.form_name);
+                    return category === form && parseFloat(item.width) === width;
+                });
+
+                // Проверка на пустые данные после фильтрации
+                if (filteredData.length === 0) {
+                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    return; // Останавливаем выполнение функции
+                }
+
+                // Получаем уникальные значения длины
+                const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
+
+                // Заполняем выпадающий список длины
+                uniqueLengths.forEach(length => {
+                    lengthSelect.innerHTML += `<option value="${length}">${length} м</option>`;
+                });
+
+                // Сбрасываем каркас
+                resetDropdown('frame', 'Сначала выберите длину');
+
+                // Сброс дополнительных опций
+                resetAdditionalOptions();
+            }
+
+            // Функция обработки изменения длины
+            function onLengthChange() {
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+
+                const frameSelect = document.getElementById("frame");
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+
+                if (isNaN(length)) {
+                    return;
+                }
+
+                // Фильтруем данные по форме, ширине и длине
+                const filteredData = currentCityData.filter(item => {
+                    const category = getFormCategory(item.form_name);
+                    return category === form && parseFloat(item.width) === width && parseFloat(item.length) === length;
+                });
+
+                // Проверка на пустые данные после фильтрации
+                if (filteredData.length === 0) {
+                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+                    return; // Останавливаем выполнение функции
+                }
+
+                // Получаем уникальные значения каркаса
+                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
+
+                // Заполняем выпадающий список каркаса
+                uniqueFrames.forEach(frame => {
+                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
+                });
+
+                // Сброс дополнительных опций
+                resetAdditionalOptions();
+            }
+
+            // Функция обработки изменения каркаса
+            function onFrameChange() {
+                // Сброс дополнительных опций
+                resetAdditionalOptions();
+            }
+
+            // Функция сброса выпадающих списков
+            function resetDropdown(elementId, placeholderText) {
+                const dropdown = document.getElementById(elementId);
+                dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+            }
+
+            // Функция сброса дополнительных опций
+            function resetAdditionalOptions() {
+                document.getElementById('bracing').checked = false;
+                document.getElementById('ground-hooks').checked = false;
+                document.getElementById('assembly').checked = false;
+                document.getElementById('drip-irrigation').checked = false;
+                document.getElementById('window-automation').checked = false;
+                document.getElementById('galvanized-tape').checked = false;
+                updateAdditionalSummary();
+            }
+
+            // Функция обновления дополнительного резюме
+            function updateAdditionalSummary(details = "") {
+                const additionalSummary = document.getElementById("additional-summary");
+                additionalSummary.innerHTML = details;
+            }
+
+            // Функция расчёта стоимости теплицы
+            async function calculateGreenhouseCost() {
+                const city = document.getElementById("city").value;
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+                const frame = document.getElementById("frame").value;
+                const polycarbonate = document.getElementById("polycarbonate").value;
+                const arcStep = parseFloat(document.getElementById("arcStep").value);
+
+                // Проверка на заполнение всех обязательных полей
+                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
+                    alert("Пожалуйста, заполните все обязательные поля.");
+                    return;
+                }
+
+                // Используем уже загруженные данные currentCityData
+                if (!currentCityData || currentCityData.length === 0) {
+                    alert("Данные для текущего города не загружены. Попробуйте снова.");
+                    return;
+                }
+
+                // Фильтрация вручную для выбранной комбинации
+                const selectedEntry = currentCityData.find(item => {
+                    return (
+                        getFormCategory(item.form_name) === form &&
+                        parseFloat(item.width) === width &&
+                        parseFloat(item.length) === length &&
+                        normalizeString(item.frame_description) === normalizeString(frame) &&
+                        normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
+                    );
+                });
+
+                if (!selectedEntry) {
+                    alert("Теплица с заданными параметрами не найдена.");
+                    return;
+                }
+
+                let totalPrice = 0;
+                let additionalDetails = "";
+
+                // Расчёт стоимости базовой теплицы с учётом шага дуг
+                if (arcStep === 1) {
+                    // Шаг 1 м: используем базовую цену
+                    totalPrice = selectedEntry.price;
+                } else if (arcStep === 0.65) {
+                    // Шаг 0.65 м: рассчитываем дополнительную стоимость
+                    // Находим базовую цену для "Стандарт 4мм"
+                    const baseEntry = currentCityData.find(item => {
+                        return (
+                            getFormCategory(item.form_name) === form &&
+                            parseFloat(item.width) === width &&
+                            parseFloat(item.length) === length &&
+                            normalizeString(item.frame_description) === normalizeString(frame) &&
+                            normalizeString(item.polycarbonate_type) === "стандарт 4мм"
+                        );
+                    });
+
+                    if (!baseEntry) {
+                        alert('Не найдена базовая цена для покрытия "Стандарт 4мм".');
+                        return;
+                    }
+
+                    const basePrice = baseEntry.price;
+                    const additionalCost = 0.25 * basePrice;
+
+                    // Цена выбранного типа поликарбоната
+                    const selectedPrice = selectedEntry.price;
+
+                    totalPrice = selectedPrice + additionalCost;
+
+                    additionalDetails += `Дополнение за шаг 0.65 м: +${Math.ceil(additionalCost / 10) * 10} руб.<br>`;
+                } else {
+                    alert("Некорректный шаг между дугами.");
+                    return;
+                }
+
+                // Дополнительные услуги
+                const bracingChecked = document.getElementById('bracing').checked;
+                const groundHooksChecked = document.getElementById('ground-hooks').checked;
+                const assemblyChecked = document.getElementById('assembly').checked;
+
+                // Расчёт стоимости бруса
+                let bracingCost = 0;
+                if (bracingChecked) {
+                    const bracingPrice = additionalServicesData["Брус"].price_by_length[length];
+                    if (bracingPrice) {
+                        bracingCost = bracingPrice;
+                        totalPrice += bracingCost;
+                        additionalDetails += `Брус: +${bracingCost} руб.<br>`;
+                    } else {
+                        alert(`Не найдена стоимость бруса для длины ${length} м.`);
+                        return;
+                    }
+                }
+
+                // Расчёт стоимости штырей
+                let stakesCost = 0;
+                if (groundHooksChecked) {
+                    const quantityData = bracingChecked ? additionalServicesData["Штыри"].quantity_by_length["with_bracing"] : additionalServicesData["Штыри"].quantity_by_length["without_bracing"];
+                    const stakesQuantity = quantityData[length];
+                    if (stakesQuantity) {
+                        stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
+                        totalPrice += stakesCost;
+                        additionalDetails += `Штыри (${stakesQuantity} шт.): +${stakesCost} руб.<br>`;
+                    } else {
+                        alert(`Не найдена информация о количестве штырей для длины ${length} м.`);
+                        return;
+                    }
+                }
+
+                // Расчёт стоимости сборки
+                let assemblyCost = 0;
+                if (assemblyChecked) {
+                    const assemblyCategory = getAssemblyCategory(form, width);
+                    if (assemblyCategory && additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length]) {
+                        assemblyCost = additionalServicesData["Сборка"].price_by_type_and_length[assemblyCategory][length];
+                        totalPrice += assemblyCost;
+                        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+                    } else {
+                        alert(`Не найдена стоимость сборки для типа "${assemblyCategory}" и длины ${length} м.`);
+                        return;
+                    }
+                }
+
+                // Дополнительные товары
+                const additionalProducts = [];
+                const dripIrrigationChecked = document.getElementById('drip-irrigation').checked;
+                const windowAutomationChecked = document.getElementById('window-automation').checked;
+                const galvanizedTapeChecked = document.getElementById('galvanized-tape').checked;
+
+                if (dripIrrigationChecked) {
+                    additionalProducts.push({ name: "Капельный полив", cost: 1000 });
+                    totalPrice += 1000;
+                }
+                if (windowAutomationChecked) {
+                    additionalProducts.push({ name: "Автомат для форточки", cost: 2500 });
+                    totalPrice += 2500;
+                }
+                if (galvanizedTapeChecked) {
+                    additionalProducts.push({ name: "Оцинкованная лента", cost: 800 });
+                    totalPrice += 800;
+                }
+
+                // Добавление стоимости дополнительных товаров в резюме
+                additionalProducts.forEach(product => {
+                    additionalDetails += `${product.name}: +${product.cost} руб.<br>`;
+                });
+
+                // Округление вверх до ближайшего десятка
+                totalPrice = Math.ceil(totalPrice / 10) * 10;
+
+                // Формирование итогового резюме
+                let summaryText = `Итоговая стоимость теплицы: ${totalPrice} руб.<br>`;
+                if (additionalDetails) {
+                    summaryText += `<hr>Дополнительные товары и услуги:<br>${additionalDetails}`;
+                }
+
+                // Выводим итоговую стоимость
+                document.getElementById("summary").innerHTML = summaryText;
+            }
+
+            // Функция получения категории сборки на основе формы и ширины
+            function getAssemblyCategory(form, width) {
+                const formCategory = getFormCategory(form);
+                if (formCategory === "Промышленная прямостенная" || formCategory === "Промышленная домиком") {
+                    return "Промышленные";
+                }
+
+                if ((formCategory === "Арочная" || formCategory === "Каплевидная") && (width === 2.5 || width === 3)) {
+                    return "Арочные 2.5-3м";
+                }
+
+                if ((formCategory === "Арочная" || formCategory === "Каплевидная" || formCategory === "Прямостенная" || formCategory === "Домиком") && width === 3.5) {
+                    return "Арочные 3.5м";
+                }
+
+                if ((formCategory === "Арочная" || formCategory === "Прямостенная" || formCategory === "Домиком" || formCategory === "Митлайдер арочная" || formCategory === "Митлайдер прямостенная" || formCategory === "Навес") && (width === 4 || width === 5 || width === 6)) {
+                    return "Арочные 4м";
+                }
+
+                return null; // Если не подходит ни одна категория
+            }
+
+            // Функция расчёта доставки
+            async function calculateDelivery() {
+                const addressInput = document.getElementById("address");
+                const address = addressInput.value.trim().toLowerCase();
+                const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+
+                if (!address) {
+                    document.getElementById('result').innerText = "Введите адрес!";
+                    return;
+                }
+
+                try {
+                    const res = await ymaps.geocode(address);
+                    const geoObject = res.geoObjects.get(0);
+
+                    if (!geoObject) {
+                        document.getElementById('result').innerText = "Адрес не найден!";
+                        return;
+                    }
+
+                    const localities = geoObject.getLocalities().map(locality => locality.toLowerCase());
+                    const administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
+
+                    const isInDeliveryRegion = deliveryRegions.some(region => 
+                        localities.includes(region.city.toLowerCase()) || administrativeAreas.includes(region.region.toLowerCase())
+                    );
+
+                    if (!isInDeliveryRegion) {
+                        document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
+                        return;
+                    }
+
+                    const coords = geoObject.geometry.getCoordinates();
+                    const destinationLat = coords[0];
+                    const destinationLon = coords[1];
+
+                    let nearestCity = null;
+                    let minDistance = Infinity;
+
+                    citiesForMap.forEach(city => {
+                        const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000;
+                        if (cityDistance < minDistance) {
+                            minDistance = cityDistance;
+                            nearestCity = city;
+                        }
+                    });
+
+                    if (!nearestCity) {
+                        document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                        return;
+                    }
+
+                    mapInstance.setCenter(nearestCity.coords, 7);
+
+                    if (currentRoute) {
+                        mapInstance.geoObjects.remove(currentRoute);
+                    }
+
+                    try {
+                        const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
+                        currentRoute = route;
+                        mapInstance.geoObjects.add(route);
+
+                        const distanceInKm = route.getLength() / 1000;
+                        const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+
+                        let cost;
+                        if (deliveryType === "withoutAssembly") {
+                            cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                        } else {
+                            cost = Math.max(1000, 40 * distanceFromBoundary);
+                        }
+
+                        const roundedCost = Math.ceil(cost / 50) * 50;
+
+                        document.getElementById('result').innerText = `Стоимость доставки: ${roundedCost} рублей (${nearestCity.name})`;
+                    } catch (routeError) {
+                        document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                    }
+
+                } catch (geocodeError) {
+                    document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
+                }
+            }
+
+            // Инициализация при загрузке страницы
+            window.onload = async function() {
+                const savedLogin = localStorage.getItem('savedLogin');
+                if (savedLogin) {
+                    document.getElementById("login").value = savedLogin;
+                    document.getElementById("password").focus();
+                    document.getElementById("auth-container").classList.add("hidden");
+                    document.getElementById("calculator-container").classList.remove("hidden");
+                    await initializeCalculator();
+                }
+            }
+
+            // Функция загрузки городов при инициализации калькулятора
+            async function initializeCalculator() {
+                await loadCities();
+
+                // **УДАЛИТЕ** следующие строки, чтобы избежать автоматического вызова расчета при изменении полей
+                /*
+                // Добавляем обработчики событий для дополнительных услуг
+                document.getElementById('bracing').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('ground-hooks').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('assembly').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('drip-irrigation').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('window-automation').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('galvanized-tape').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('arcStep').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('polycarbonate').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('frame').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('length').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('width').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('form').addEventListener('change', calculateGreenhouseCost);
+                document.getElementById('city').addEventListener('change', calculateGreenhouseCost);
+                */
+
+                // **Вместо этого**, функция `calculateGreenhouseCost()` будет вызываться только при нажатии на кнопку
+            }
+        </script>
+    </div>
 </body>
 </html>
