@@ -418,6 +418,66 @@ const assemblyPrices = {
     "Навес_4м_5м_6м": { 4: 7990, 6: 11490, 8: 14990, 10: 18490, 12: 22490 }
 };
 
+// Функция получения категории сборки на основе формы и ширины
+function getAssemblyCategory(form, width) {
+    console.log("Определение категории сборки...");
+    console.log("Форма:", form);
+    console.log("Ширина:", width);
+
+    // Определение категории на основе формы и ширины
+    if (form === "Арочная" && (width === 2.5 || width === 3)) {
+        return "Арочная_2.5м_3м";
+    }
+    if (form === "Арочная" && width === 3.5) {
+        return "Арочная_3.5м";
+    }
+    if (form === "Арочная" && width === 4) {
+        return "Арочная_4м";
+    }
+    if (form === "Каплевидная" && (width === 2.5 || width === 3)) {
+        return "Каплевидная_2.5м_3м";
+    }
+    if (form === "Каплевидная" && width === 3.5) {
+        return "Каплевидная_3.5м";
+    }
+    if (form === "Прямостенная" && (width === 2.5 || width === 3 || width === 3.5)) {
+        return "Прямостенная_2.5м_3м_3.5м";
+    }
+    if (form === "Прямостенная" && width === 4) {
+        return "Прямостенная_4м";
+    }
+    if (form === "Домиком" && (width === 2.5 || width === 3 || width === 3.5)) {
+        return "Домиком_2.5м_3м_3.5м";
+    }
+    if (form === "Домиком" && width === 4) {
+        return "Домиком_4м";
+    }
+    if (form === "Пристенная" && (width === 2.5 || width === 3)) {
+        return "Пристенная_2.5м_3м";
+    }
+    if (form === "Митлайдер арочная" && (width === 3 || width === 3.5)) {
+        return "Митлайдер арочная_3м_3.5м";
+    }
+    if (form === "Митлайдер прямостенная" && (width === 3 || width === 3.5)) {
+        return "Митлайдер прямостенная_3м_3.5м";
+    }
+    if (form === "Промышленная прямостенная" && (width === 5 || width === 6)) {
+        return "Промышленная прямостенная_5м_6м";
+    }
+    if (form === "Промышленная домиком" && (width === 7 || width === 8)) {
+        return "Промышленная домиком_7м_8м";
+    }
+    if (form === "Навес" && (width === 3 || width === 3.5)) {
+        return "Навес_3м_3.5м";
+    }
+    if (form === "Навес" && (width === 4 || width === 5 || width === 6)) {
+        return "Навес_4м_5м_6м";
+    }
+
+    console.log("Категория сборки не определена. Возвращаем null.");
+    return null; // Если категория не определена
+}
+
             // Создание обратной карты: form_name -> category
             const formNameToCategory = {};
 
@@ -1008,18 +1068,28 @@ const assemblyPrices = {
                // Расчёт стоимости сборки
 let assemblyCost = 0;
 if (assemblyChecked) {
-    const assemblyCategory = getAssemblyCategory(form, width);
+    const assemblyCategory = getAssemblyCategory(form, width); // Определяем категорию
     console.log("Категория сборки:", assemblyCategory);
 
-    assemblyCost = calculateAssemblyCost(assemblyCategory, width, length);
-    if (assemblyCost > 0) {
-        totalPrice += assemblyCost; // Добавляем стоимость сборки к общей сумме
-        additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+    if (assemblyCategory) {
+        const lengthPrices = assemblyPrices[assemblyCategory]; // Получаем цены для категории
+        if (lengthPrices && lengthPrices[length]) {
+            assemblyCost = lengthPrices[length]; // Получаем цену для заданной длины
+            console.log(`Стоимость сборки для ${length} м: ${assemblyCost} руб.`); // Лог стоимости
+            totalPrice += assemblyCost; // Добавляем к общей стоимости
+            additionalDetails += `Сборка (${assemblyCategory}, ${length} м): +${assemblyCost} руб.<br>`;
+        } else {
+            console.warn(`Стоимость сборки для категории "${assemblyCategory}" и длины ${length} м не найдена.`);
+            alert(`Стоимость сборки не найдена для выбранной длины (${length} м).`);
+            return;
+        }
     } else {
-        alert(`Не найдена стоимость сборки для категории "${assemblyCategory}" и длины ${length} м.`);
+        console.warn("Категория сборки не определена.");
+        alert("Не удалось определить категорию сборки. Проверьте параметры теплицы.");
         return;
     }
 }
+                
                 // Дополнительные товары
                 const additionalProducts = [];
                 const dripIrrigationChecked = document.getElementById('drip-irrigation').checked;
