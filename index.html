@@ -429,17 +429,27 @@ const assemblyPrices = {
 
             // Обновлённая функция определения категории формы
             function getFormCategory(formName) {
-                if (!formName || typeof formName !== "string") return "Прочие";
+    if (!formName || typeof formName !== "string") {
+        console.log("getFormCategory: Некорректное имя формы или отсутствует.");
+        return "Прочие";
+    }
 
-                const normalizedFormName = normalizeString(formName);
-                const category = formNameToCategory[normalizedFormName];
+    console.log(`getFormCategory: Обрабатываем форму "${formName}".`);
 
-                if (category) {
-                    return category;
-                } else {
-                    return "Прочие";
-                }
-            }
+    // Нормализуем строку
+    const normalizedFormName = normalizeString(formName);
+    console.log(`getFormCategory: Нормализованное имя формы: "${normalizedFormName}".`);
+
+    // Ищем категорию
+    const category = formNameToCategory[normalizedFormName];
+    if (category) {
+        console.log(`getFormCategory: Найдена категория "${category}" для формы "${normalizedFormName}".`);
+        return category;
+    } else {
+        console.log(`getFormCategory: Категория для формы "${normalizedFormName}" не найдена. Возвращаем "Прочие".`);
+        return "Прочие";
+    }
+}
 
             // Пользователи
             const users = [
