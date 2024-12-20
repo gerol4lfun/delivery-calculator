@@ -398,6 +398,17 @@
                 ]
             };
 
+            // Создание обратной карты: form_name -> category
+const formNameToCategory = {};
+
+Object.keys(availableForms).forEach(category => {
+    availableForms[category].forEach(form => {
+        const normalizedName = normalizeString(form.name);
+        formNameToCategory[normalizedName] = category;
+        console.log(`Добавлено в formNameToCategory: "${normalizedName}" -> "${category}"`);
+    });
+});
+            
 // Цены на сборку теплиц по форме, ширине и длине
 const assemblyPrices = {
     "Арочная_2.5м_3м": { 4: 4990, 6: 6490, 8: 7990, 10: 9490, 12: 11990 },
@@ -510,6 +521,12 @@ function getAssemblyCategory(form, width) {
         return "Прочие";
     }
 }
+            console.log(getFormCategory("ТЕПЛИЦА БОЯРСКАЯ 2.5М")); // Ожидаемый результат: "Арочная"
+console.log(getFormCategory("ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М")); // Ожидаемый результат: "Каплевидная"
+console.log(getFormCategory("ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М")); // Ожидаемый результат: "Митлайдер арочная"
+console.log(getFormCategory("ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М")); // Ожидаемый результат: "Промышленная прямостенная"
+console.log(getFormCategory("НЕСУЩЕСТВУЮЩАЯ ТЕПЛИЦА")); // Ожидаемый результат: "Прочие"
+
 
             // Пользователи
             const users = [
@@ -850,80 +867,89 @@ function getAssemblyCategory(form, width) {
             }
 
             // Функция обработки изменения ширины
-            function onWidthChange() {
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
+function onWidthChange() {
+    const form = document.getElementById("form").value;
+    const width = parseFloat(document.getElementById("width").value);
 
-                const lengthSelect = document.getElementById("length");
-                lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
+    // Определяем категорию формы
+    const formCategory = getFormCategory(form);
+    console.log("Категория формы:", formCategory); // Лог для проверки
 
-                if (isNaN(width)) {
-                    return;
-                }
+    const lengthSelect = document.getElementById("length");
+    lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
 
-                // Фильтруем данные по выбранной форме и ширине
-                const filteredData = currentCityData.filter(item => {
-                    const category = getFormCategory(item.form_name);
-                    return category === form && parseFloat(item.width) === width;
-                });
+    if (isNaN(width)) {
+        return;
+    }
 
-                // Проверка на пустые данные после фильтрации
-                if (filteredData.length === 0) {
-                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                    return; // Останавливаем выполнение функции
-                }
+    // Фильтруем данные по выбранной форме и ширине
+    const filteredData = currentCityData.filter(item => {
+        const category = getFormCategory(item.form_name);
+        return category === formCategory && parseFloat(item.width) === width;
+    });
 
-                // Получаем уникальные значения длины
-                const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
+    // Проверка на пустые данные после фильтрации
+    if (filteredData.length === 0) {
+        alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+        return; // Останавливаем выполнение функции
+    }
 
-                // Заполняем выпадающий список длины
-                uniqueLengths.forEach(length => {
-                    lengthSelect.innerHTML += `<option value="${length}">${length} м</option>`;
-                });
+    // Получаем уникальные значения длины
+    const uniqueLengths = [...new Set(filteredData.map(item => item.length))].sort((a, b) => a - b);
 
-                // Сбрасываем каркас
-                resetDropdown('frame', 'Сначала выберите длину');
+    // Заполняем выпадающий список длины
+    uniqueLengths.forEach(length => {
+        lengthSelect.innerHTML += `<option value="${length}">${length} м</option>`;
+    });
 
-                // Сброс дополнительных опций
-                resetAdditionalOptions();
-            }
+    // Сбрасываем каркас
+    resetDropdown('frame', 'Сначала выберите длину');
+
+    // Сброс дополнительных опций
+    resetAdditionalOptions();
+}
 
             // Функция обработки изменения длины
-            function onLengthChange() {
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
+function onLengthChange() {
+    const form = document.getElementById("form").value;
+    const width = parseFloat(document.getElementById("width").value);
+    const length = parseFloat(document.getElementById("length").value);
 
-                const frameSelect = document.getElementById("frame");
-                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+    const frameSelect = document.getElementById("frame");
+    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
-                if (isNaN(length)) {
-                    return;
-                }
+    if (isNaN(width) || isNaN(length)) {
+        console.warn("Ширина или длина теплицы не выбраны.");
+        return;
+    }
 
-                // Фильтруем данные по форме, ширине и длине
-                const filteredData = currentCityData.filter(item => {
-                    const category = getFormCategory(item.form_name);
-                    return category === form && parseFloat(item.width) === width && parseFloat(item.length) === length;
-                });
+    // Фильтруем данные по форме, ширине и длине
+    const filteredData = currentCityData.filter(item => {
+        const category = getFormCategory(item.form_name); // Определяем категорию формы из данных
+        return category === getFormCategory(form) &&
+            parseFloat(item.width) === width &&
+            parseFloat(item.length) === length;
+    });
 
-                // Проверка на пустые данные после фильтрации
-                if (filteredData.length === 0) {
-                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                    return; // Останавливаем выполнение функции
-                }
+    // Проверка на пустые данные после фильтрации
+    if (filteredData.length === 0) {
+        alert("Каркас для выбранных параметров теплицы не найден. Попробуйте изменить параметры.");
+        return; // Останавливаем выполнение функции
+    }
 
-                // Получаем уникальные значения каркаса
-                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
+    // Получаем уникальные значения каркаса
+    const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
 
-                // Заполняем выпадающий список каркаса
-                uniqueFrames.forEach(frame => {
-                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
-                });
+    // Заполняем выпадающий список каркасов
+    uniqueFrames.forEach(frame => {
+        frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
+    });
 
-                // Сброс дополнительных опций
-                resetAdditionalOptions();
-            }
+    console.log("Каркасы успешно обновлены:", uniqueFrames);
+
+    // Сброс дополнительных опций
+    resetAdditionalOptions();
+}
 
             // Функция обработки изменения каркаса
             function onFrameChange() {
