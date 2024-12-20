@@ -9,111 +9,173 @@
     <!-- Supabase JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
-        /* Ваши стили */
+        /* Основные стили */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
             margin: 0;
             padding: 0;
+            background: #f4f4f9;
+            color: #333;
         }
-
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: auto;
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
             padding: 20px;
-        }
-
-        .auth-container, .calculator-container {
-            background-color: #fff;
-            padding: 20px;
-            margin-top: 50px;
+            background: #fff;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
         }
-
+        .calculator-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+        input[type="text"], input[type="password"], select, button {
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
         .hidden {
             display: none;
         }
-
-        .logout {
-            float: right;
-            background-color: #ff4d4d;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .logout:hover {
-            background-color: #e60000;
-        }
-
-        .block {
-            margin-bottom: 30px;
-        }
-
         label {
+            font-size: 14px;
             display: block;
-            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
-
-        input[type="text"], input[type="password"], select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            margin-top: 15px;
-            padding: 10px 15px;
-            background-color: #4CAF50;
+        .auth-container h2, .block h2 {
+            margin-bottom: 20px;
+            font-size: 18px;
             color: #fff;
-            border: none;
-            border-radius: 5px;
+            background-color: #6c757d; /* Нейтральный серый фон */
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .auth-container p {
+            color: red;
+            display: none;
+            margin: 10px 0;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .block {
+            flex: 1 1 45%;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            box-sizing: border-box;
+            min-width: 300px;
+        }
+        .block:last-child {
+            border-right: none;
+        }
+        .logout {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
+            width: auto;
         }
-
-        button:hover {
-            background-color: #45a049;
+        .logout:hover {
+            background-color: #e0e0e0;
+            color: #000;
         }
-
-        #map {
-            width: 100%;
-            height: 400px;
-            margin-top: 20px;
+        .parameters {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
         }
-
-        .summary {
-            background-color: #e6f7ff;
-            padding: 15px;
-            border-radius: 5px;
+        .parameters label {
+            width: 40%;
+            margin-right: 10px;
+            text-align: left;
+            padding-right: 10px;
+            box-sizing: border-box;
         }
-
+        .parameters select {
+            width: 60%;
+            text-align: center; /* Центрирование текста внутри select */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-position: right 10px center;
+            background-repeat: no-repeat;
+            background-size: 10px;
+        }
+        /* Стили для центрирования текста в опциях select */
+        select option {
+            text-align: center;
+        }
         .additional-services, .additional-products {
             margin-top: 20px;
         }
-
+        .checkbox-group-large {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
         .checkbox-group-large label {
+            width: 48%;
+            text-align: left;
+            font-weight: normal;
+        }
+        .additional-products h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+        .additional-products label {
             display: block;
             margin-bottom: 5px;
+            font-weight: normal;
         }
-
-        .additional-summary {
-            margin-top: 10px;
-            background-color: #fffbe6;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ffe58f;
+        #result, #summary {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007BFF;
+            text-align: center;
         }
-
-        #auth-error {
-            color: red;
-            display: none;
-            margin-top: 10px;
+        #map {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .summary {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -204,9 +266,14 @@
                 <!-- Дополнительные услуги -->
                 <div class="additional-services">
                     <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="bracing"> Брус</label>
-                        <label><input type="checkbox" id="ground-hooks"> Штыри</label>
-                        <label><input type="checkbox" id="assembly"> Сборка</label>
+                        <label><input type="checkbox" id="bracing"> Брус (+2000 руб.)</label>
+                        <label><input type="checkbox" id="assembly"> Сборка (+5000 руб.)</label>
+                        <label><input type="checkbox" id="ground-hooks"> Штыри (+1500 руб.)</label>
+                    </div>
+                    <p>Монтаж на фундамент клиента</p>
+                    <div class="checkbox-group-large">
+                        <label><input type="checkbox" id="on-wood"> На брус</label>
+                        <label><input type="checkbox" id="on-concrete"> На бетон</label>
                     </div>
                 </div>
 
@@ -227,9 +294,6 @@
                 </div>
 
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
-
-                <!-- Отображение дополнительных опций и их стоимости -->
-                <div class="additional-summary" id="additional-summary"></div>
             </div>
 
             <!-- Блок итогового расчета -->
@@ -243,7 +307,7 @@
 
         <script>
             // Константа для контроля отладки
-            const DEBUG = true; // Включено для отладки
+            const DEBUG = false; // Выключено
 
             // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
             function normalizeString(str) {
@@ -253,7 +317,7 @@
 
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -342,16 +406,30 @@
             // Функция определения категории на основе имени формы
             function getFormCategory(formName) {
                 if (!formName || typeof formName !== "string") return "Прочие";
+
                 const normalizedFormName = normalizeString(formName);
                 const category = formNameToCategory[normalizedFormName];
-                if (category) return category;
-                return "Прочие";
+
+                if (category) {
+                    return category;
+                } else {
+                    return "Прочие";
+                }
             }
 
             // Пользователи
             const users = [
                 { login: "admin", password: "Admin#2024" },
-                // Другие пользователи
+                { login: "Manager1", password: "Mng1!Secure" },
+                { login: "Manager2", password: "Mng2#Strong" },
+                { login: "Manager3", password: "Mng3!Complex" },
+                { login: "Manager4", password: "Mng4#Robust" },
+                { login: "Manager5", password: "Mng5!Power" },
+                { login: "Manager6", password: "Mng6#Safety" },
+                { login: "Manager7", password: "Mng7!Stable" },
+                { login: "Manager8", password: "Mng8#Access" },
+                { login: "Manager9", password: "Mng9!Control" },
+                { login: "Manager10", password: "Mng10#Secure" }
             ];
 
             // Приоритеты форм (чем меньше число, тем выше в списке)
@@ -373,7 +451,36 @@
             const deliveryRegions = [
                 { city: "Москва", region: "Московская область" },
                 { city: "Санкт-Петербург", region: "Ленинградская область" },
-                // Другие регионы...
+                { city: "Белгород", region: "Белгородская область" },
+                { city: "Великий Новгород", region: "Новгородская область" },
+                { city: "Владимир", region: "Владимирская область" },
+                { city: "Вологда", region: "Вологодская область" },
+                { city: "Воронеж", region: "Воронежская область" },
+                { city: "Екатеринбург", region: "Свердловская область" },
+                { city: "Иваново", region: "Ивановская область" },
+                { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+                { city: "Казань", region: "Республика Татарстан" },
+                { city: "Калуга", region: "Калужская область" },
+                { city: "Кемерово", region: "Кемеровская область" },
+                { city: "Кострома", region: "Костромская область" },
+                { city: "Краснодар", region: "Краснодарский край" },
+                { city: "Курск", region: "Курская область" },
+                { city: "Липецк", region: "Липецкая область" },
+                { city: "Майкоп", region: "Республика Адыгея" },
+                { city: "Набережные Челны", region: "Республика Татарстан" },
+                { city: "Нижний Новгород", region: "Нижегородская область" },
+                { city: "Новосибирск", region: "Новосибирская область" },
+                { city: "Орёл", region: "Орловская область" },
+                { city: "Рязань", region: "Рязанская область" },
+                { city: "Ставрополь", region: "Ставропольский край" },
+                { city: "Тамбов", region: "Тамбовская область" },
+                { city: "Тверь", region: "Тверская область" },
+                { city: "Тула", region: "Тульская область" },
+                { city: "Ульяновск", region: "Ульяновская область" },
+                { city: "Чебоксары", region: "Чувашская Республика" },
+                { city: "Челябинск", region: "Челябинская область" },
+                { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+                { city: "Ярославль", region: "Ярославская область" }
             ];
 
             // Города для карты
@@ -431,10 +538,8 @@
                         "without_bracing": { "4": 10, "6": 14, "8": 18, "10": 22, "12": 26, "14": 30, "16": 34 },
                         "with_bracing": { "4": 6, "6": 10, "8": 14, "10": 18, "12": 22, "14": 26, "16": 30 }
                     }
-                },
-                "Сборка": {
-                    // Удалено, так как используется отдельный объект assemblyPrices
                 }
+                // Сборка теперь обрабатывается через assemblyPrices
             };
 
             // Структура данных для сборки теплиц (изменено)
@@ -852,15 +957,13 @@
                 document.getElementById('drip-irrigation').checked = false;
                 document.getElementById('window-automation').checked = false;
                 document.getElementById('galvanized-tape').checked = false;
-                updateAdditionalSummary();
+                updateSummary();
                 if (DEBUG) console.log("Дополнительные опции сброшены.");
             }
 
-            // Функция обновления дополнительного резюме
-            function updateAdditionalSummary(details = "") {
-                const additionalSummary = document.getElementById("additional-summary");
-                additionalSummary.innerHTML = details;
-                if (DEBUG) console.log("Дополнительное резюме обновлено.");
+            // Функция обновления резюме
+            function updateSummary() {
+                // Здесь можно добавить логику для отображения выбранных опций в резюме, если требуется
             }
 
             // Функция получения категории сборки на основе формы и ширины (изменено)
@@ -1195,9 +1298,30 @@
             async function initializeCalculator() {
                 await loadCities();
 
-                // Удалены обработчики событий для предотвращения автоматического вызова расчета
-
                 if (DEBUG) console.log("Инициализация калькулятора завершена.");
+            }
+
+            // Функция расчёта стоимости сборки (изменено)
+            function calculateAssemblyCost(form, width, length) {
+                console.log(`[CALCULATE_COST] Расчёт стоимости сборки для формы: ${form}, ширины: ${width} м, длины: ${length} м`);
+                if (!form || !assemblyPrices[form] || !assemblyPrices[form][width] || !assemblyPrices[form][width][length]) {
+                    console.log(`[CALCULATE_COST] Стоимость сборки не найдена для формы "${form}", ширины "${width} м" и длины "${length} м".`);
+                    return 0;
+                }
+
+                const price = assemblyPrices[form][width][length];
+                console.log(`[CALCULATE_COST] Найдена стоимость сборки: ${price} руб.`);
+                return price;
+            }
+
+            // Функция получения категории сборки на основе формы и ширины (изменено)
+            function getAssemblyCategory(form, width) {
+                console.log("[ASSEMBLY_CATEGORY] Определение категории сборки...");
+                console.log("[ASSEMBLY_CATEGORY] Форма:", form);
+                console.log("[ASSEMBLY_CATEGORY] Ширина:", width);
+
+                // Возвращаем строку ширины с "М", например, "2.5М", "3М"
+                return `${width}М`;
             }
         </script>
     </div>
