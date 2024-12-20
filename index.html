@@ -177,6 +177,24 @@
             text-align: center;
             font-weight: bold;
         }
+
+        .additional-products .product-item {
+    display: flex; /* Используем Flexbox для выравнивания */
+    align-items: center; /* Выравниваем текст и галочку по центру по вертикали */
+    margin-bottom: 10px; /* Добавляем отступ между строками */
+}
+
+.additional-products .product-item input[type="checkbox"] {
+    margin-right: 10px; /* Отступ между галочкой и текстом */
+    transform: scale(1.2); /* Немного увеличиваем размер галочек */
+}
+
+.additional-products .product-item label {
+    margin: 0; /* Убираем лишние отступы у текста */
+    flex: 1; /* Текст занимает оставшееся пространство */
+    text-align: left; /* Выравниваем текст по левому краю */
+}
+
     </style>
 </head>
 <body>
