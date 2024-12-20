@@ -1067,6 +1067,52 @@ const assemblyPrices = {
 
                 return null; // Если не подходит ни одна категория
             }
+            
+         /**
+          * Функция расчёта стоимости сборки
+          * @param {string} form - Форма теплицы (например, "Арочная").
+          * @param {number} width - Ширина теплицы (в метрах, например, 2.5).
+          * @param {number} length - Длина теплицы (в метрах, например, 6).
+          * @returns {number} Стоимость сборки (или 0, если параметры некорректны).
+          */
+         function calculateAssemblyCost(form, width, length) {
+             // Преобразуем ширину в строку с "м" для соответствия формату в assemblyPrices
+             const widthString = width + "м";
+
+             // Определяем ключ для формы и ширины
+             const assemblyKey = `${form}_${widthString}`;
+
+             // Проверяем, есть ли соответствие в assemblyPrices
+             if (assemblyPrices[assemblyKey] && assemblyPrices[assemblyKey][length]) {
+                 return assemblyPrices[assemblyKey][length]; // Возвращаем стоимость сборки
+             }
+
+             // Если соответствие не найдено, возвращаем 0
+             return 0;
+         }
+            
+         /**
+          * Функция расчёта стоимости сборки
+          * @param {string} form - Форма теплицы (например, "Арочная").
+          * @param {number} width - Ширина теплицы (в метрах, например, 2.5).
+          * @param {number} length - Длина теплицы (в метрах, например, 6).
+          * @returns {number} Стоимость сборки (или 0, если параметры некорректны).
+          */
+         function calculateAssemblyCost(form, width, length) {
+             // Преобразуем ширину в строку с "м" для соответствия формату в assemblyPrices
+             const widthString = width + "м";
+
+             // Определяем ключ для формы и ширины
+             const assemblyKey = `${form}_${widthString}`;
+
+             // Проверяем, есть ли соответствие в assemblyPrices
+             if (assemblyPrices[assemblyKey] && assemblyPrices[assemblyKey][length]) {
+                 return assemblyPrices[assemblyKey][length]; // Возвращаем стоимость сборки
+             }
+
+             // Если соответствие не найдено, возвращаем 0
+             return 0;
+         }
 
             // Функция расчёта доставки
             async function calculateDelivery() {
