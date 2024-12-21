@@ -177,24 +177,6 @@
             text-align: center;
             font-weight: bold;
         }
-
-        .additional-products .product-item {
-    display: flex; /* Используем Flexbox для расположения галочек и текста */
-    align-items: center; /* Выравниваем галочки и текст по вертикали */
-    margin-bottom: 10px; /* Отступ между строками */
-}
-
-.additional-products .product-item input[type="checkbox"] {
-    margin-right: 10px; /* Отступ между галочкой и текстом */
-    transform: scale(1.2); /* Увеличиваем размер галочек */
-}
-
-.additional-products .product-item label {
-    margin: 0; /* Убираем лишние отступы у текста */
-    flex: 1; /* Текст занимает оставшееся пространство */
-    text-align: left; /* Текст выравнивается по левому краю */
-}
-
     </style>
 </head>
 <body>
@@ -284,52 +266,32 @@
                 <!-- Дополнительные услуги -->
                 <div class="additional-services">
                     <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="bracing"> Брус </label>
-                        <label><input type="checkbox" id="assembly"> Сборка </label>
-                        <label><input type="checkbox" id="ground-hooks"> Штыри </label>
+                        <label><input type="checkbox" id="bracing"> Брус (+2000 руб.)</label>
+                        <label><input type="checkbox" id="assembly"> Сборка (+5000 руб.)</label>
+                        <label><input type="checkbox" id="ground-hooks"> Штыри (+1500 руб.)</label>
                     </div>
                     <p>Монтаж на фундамент клиента</p>
                     <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="on-wood"> На брус +1.500 рублей</label>
-                        <label><input type="checkbox" id="on-concrete"> На бетон +2.000 рублей</label>
+                        <label><input type="checkbox" id="on-wood"> На брус</label>
+                        <label><input type="checkbox" id="on-concrete"> На бетон</label>
                     </div>
                 </div>
 
                 <div class="additional-products">
-    <h3>Дополнительные товары:</h3>
-    <div class="product-item">
-        <label for="drip-irrigation-mech">Капельный полив механический - 1.690 рублей</label>
-        <input type="checkbox" id="drip-irrigation-mech" data-price="1690">
-    </div>
-    <div class="product-item">
-        <label for="drip-irrigation-auto">Капельный полив автоматический - 4.490 рублей</label>
-        <input type="checkbox" id="drip-irrigation-auto" data-price="4490">
-    </div>
-    <div class="product-item">
-        <label for="window-automation">Автомат для форточки - 2.590 рублей</label>
-        <input type="checkbox" id="window-automation" data-price="2590">
-    </div>
-    <div class="product-item">
-        <label for="galvanized-tape-30m">Оцинкованная лента 30 м - 1.990 рублей</label>
-        <input type="checkbox" id="galvanized-tape-30m" data-price="1990">
-    </div>
-    <div class="product-item">
-        <label for="vapor-permeable-tape-25m">Паропропускная лента 25 м - 1.590 рублей</label>
-        <input type="checkbox" id="vapor-permeable-tape-25m" data-price="1590">
-    </div>
-    <div class="product-item">
-        <label for="additional-window">Дополнительная форточка - 1.490 рублей</label>
-        <input type="checkbox" id="additional-window" data-price="1490">
-    </div>
-    <div class="product-item">
-        <label for="additional-partition">Дополнительная перегородка - 5.490 рублей</label>
-        <input type="checkbox" id="additional-partition" data-price="5490">
-    </div>
-    <div class="product-item">
-        <label for="additional-partition-door">Дополнительная перегородка с дверью - 6.990 рублей</label>
-        <input type="checkbox" id="additional-partition-door" data-price="6990">
-    </div>
-</div>
+                    <h3>Дополнительные товары:</h3>
+                    <label>
+                        Капельный полив
+                        <input type="checkbox" id="drip-irrigation">
+                    </label>
+                    <label>
+                        Автомат для форточки
+                        <input type="checkbox" id="window-automation">
+                    </label>
+                    <label>
+                        Оцинкованная лента
+                        <input type="checkbox" id="galvanized-tape">
+                    </label>
+                </div>
 
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
             </div>
