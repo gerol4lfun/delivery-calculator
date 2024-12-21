@@ -7,212 +7,211 @@
     <!-- Яндекс.Карты -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
     <!-- Supabase JavaScript SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@аsupabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
         /* Основные стили */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f4f4f9;
-    color: #333;
-}
-.auth-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    text-align: center;
-}
-.calculator-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    position: relative;
-}
-input[type="text"], input[type="password"], select, button {
-    padding: 8px;
-    margin: 5px 0;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
-}
-button {
-    background: #007BFF;
-    color: #fff;
-    cursor: pointer;
-    border: none;
-    width: 100%;
-}
-button:hover {
-    background: #0056b3;
-}
-.hidden {
-    display: none;
-}
-label {
-    font-size: 14px;
-    display: block;
-    margin-bottom: 5px;
-}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+        }
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .calculator-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+        input[type="text"], input[type="password"], select, button {
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        label {
+            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
+        }
 
-.auth-container h2, .block h2 {
-    margin-bottom: 20px;
-    font-size: 18px;
-    color: #fff;
-    background-color: #6c757d; /* Нейтральный серый фон */
-    padding: 10px;
-    border-radius: 4px;
-    text-align: center;
-}
-.auth-container p {
-    color: red;
-    display: none;
-    margin: 10px 0;
-}
-.container {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-.block {
-    flex: 1 1 45%;
-    padding: 20px;
-    border-right: 1px solid #ddd;
-    box-sizing: border-box;
-    min-width: 300px;
-}
-.block:last-child {
-    border-right: none;
-}
-.logout {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #f5f5f5;
-    color: #555;
-    border: 1px solid #ddd;
-    font-size: 12px;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    width: auto;
-}
-.logout:hover {
-    background-color: #e0e0e0;
-    color: #000;
-}
-.parameters {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-.parameters label {
-    width: 40%;
-    margin-right: 10px;
-    text-align: left;
-    padding-right: 10px;
-    box-sizing: border-box;
-}
-.parameters select {
-    width: 60%;
-    text-align: center; /* Центрирование текста внутри select */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-position: right 10px center;
-    background-repeat: no-repeat;
-    background-size: 10px;
-}
-/* Стили для центрирования текста в опциях select */
-select option {
-    text-align: center;
-}
-.additional-services, .additional-products {
-    margin-top: 20px;
-}
-.checkbox-group-large {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-.checkbox-group-large label {
-    width: 48%;
-    text-align: left;
-    font-weight: normal;
-    cursor: pointer;
-}
-.additional-products h3 {
-    margin-bottom: 10px;
-    font-size: 16px;
-    color: #333;
-}
-.additional-products .product-item {
-    margin-bottom: 10px;
-}
-.product-label {
-    display: flex;
-    justify-content: space-between; /* Распределение пространства между элементами */
-    align-items: center;
-    margin-bottom: 5px; /* Небольшой отступ снизу */
-    cursor: pointer;
-}
-.product-label input[type="checkbox"] {
-    margin-right: 10px;
-    width: 16px;
-    height: 16px;
-}
-.product-label .product-name {
-    flex-grow: 1; /* Название занимает всё доступное пространство слева */
-    text-align: left; /* Выравнивание названия по левому краю */
-    margin-left: 0; /* Убираем отступ между чекбоксом и названием */
-}
-.product-label .price {
-    font-weight: bold; /* Только цена жирная */
-    color: #000; /* Сделать цену черной */
-    white-space: nowrap; /* Предотвращает перенос цен на новую строку */
-}
-#result, #summary {
-    margin-top: 20px;
-    font-size: 16px;
-    color: #007BFF;
-    text-align: center;
-}
-#map {
-    width: 100%;
-    height: 300px;
-    margin-top: 20px;
-    border-radius: 8px;
-}
-.summary {
-    margin-top: 20px;
-    font-size: 16px;
-    text-align: center;
-    font-weight: bold;
-}
-/* Дополнительные стили */
+        .auth-container h2, .block h2 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #6c757d; /* Нейтральный серый фон */
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .auth-container p {
+            color: red;
+            display: none;
+            margin: 10px 0;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .block {
+            flex: 1 1 45%;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            box-sizing: border-box;
+            min-width: 300px;
+        }
+        .block:last-child {
+            border-right: none;
+        }
+        .logout {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+        }
+        .logout:hover {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+        .parameters {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .parameters label {
+            width: 40%;
+            margin-right: 10px;
+            text-align: left;
+            padding-right: 10px;
+            box-sizing: border-box;
+        }
+        .parameters select {
+            width: 60%;
+            text-align: center; /* Центрирование текста внутри select */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-position: right 10px center;
+            background-repeat: no-repeat;
+            background-size: 10px;
+        }
+        /* Стили для центрирования текста в опциях select */
+        select option {
+            text-align: center;
+        }
+        .additional-services, .additional-products {
+            margin-top: 20px;
+        }
+        .checkbox-group-large {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .checkbox-group-large label {
+            width: 48%;
+            text-align: left;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .additional-products h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+        .additional-products .product-item {
+            margin-bottom: 10px;
+        }
+        .product-label {
+            display: flex;
+            justify-content: space-between; /* Распределение пространства между элементами */
+            align-items: center;
+            margin-bottom: 5px; /* Небольшой отступ снизу */
+            cursor: pointer;
+        }
+        .product-label input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+        }
+        .product-label .product-name {
+            flex-grow: 1; /* Название занимает всё доступное пространство слева */
+            text-align: left; /* Выравнивание названия по левому краю */
+            margin-left: 0; /* Убираем отступ между чекбоксом и названием */
+        }
+        .product-label .price {
+            font-weight: bold; /* Только цена жирная */
+            color: #000; /* Сделать цену черной */
+            white-space: nowrap; /* Предотвращает перенос цен на новую строку */
+        }
+        #result, #summary {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007BFF;
+            text-align: center;
+        }
+        #map {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .summary {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+        /* Дополнительные стили */
 
-/* Убедимся, что чекбоксы в additional-services имеют такой же размер, как и в additional-products */
-.additional-services input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin-right: 10px; /* Добавляем отступ справа для согласованности */
-}
+        /* Убедимся, что чекбоксы в additional-services имеют такой же размер, как и в additional-products */
+        .additional-services input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px; /* Добавляем отступ справа для согласованности */
+        }
 
-/* Удаление тире между названием и ценой с помощью псевдоэлемента */
-.product-label .product-name::after {
-    content: "";
-    margin-right: 0px; /* Убираем отступ, если был добавлен ранее */
-}
-
+        /* Удаление тире между названием и ценой с помощью псевдоэлемента */
+        .product-label .product-name::after {
+            content: "";
+            margin-right: 0px; /* Убираем отступ, если был добавлен ранее */
+        }
     </style>
 </head>
 <body>
@@ -308,78 +307,79 @@ select option {
                     </div>
                     <p><strong>Монтаж на фундамент клиента</strong></p>
                     <div class="checkbox-group-large">
-                        <label><input type="checkbox" id="on-wood"> На брус +1.500 рублей</label>
-                        <label><input type="checkbox" id="on-concrete"> На бетон +2.000 рублей</label>
+                        <label><input type="checkbox" id="on-wood" data-price="1500"> На брус +1.500 рублей</label>
+                        <label><input type="checkbox" id="on-concrete" data-price="2000"> На бетон +2.000 рублей</label>
                     </div>
                 </div>
 
+                <!-- Дополнительные товары -->
                 <div class="additional-products">
-    <h3>Дополнительные товары:</h3>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="drip-irrigation-mech" data-price="1690">
-            <span class="product-name">Капельный полив механический</span>
-            <span class="price">1.690 рублей</span>
-        </label>
-    </div>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="drip-irrigation-auto" data-price="4490">
-            <span class="product-name">Капельный полив автоматический</span>
-            <span class="price">4.490 рублей</span>
-        </label>
-    </div>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="window-automation" data-price="2590">
-            <span class="product-name">Автомат для форточки</span>
-            <span class="price">2.590 рублей</span>
-        </label>
-    </div>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="galvanized-tape-30m" data-price="1990">
-            <span class="product-name">Оцинкованная лента 30 м</span>
-            <span class="price">1.990 рублей</span>
-        </label>
-    </div>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="vapor-permeable-tape-25m" data-price="1590">
-            <span class="product-name">Паропропускная лента 25 м</span>
-            <span class="price">1.590 рублей</span>
-        </label>
-    </div>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="additional-window" data-price="1490">
-            <span class="product-name">Дополнительная форточка</span>
-            <span class="price">1.490 рублей</span>
-        </label>
-    </div>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="additional-partition" data-price="5490">
-            <span class="product-name">Дополнительная перегородка</span>
-            <span class="price">5.490 рублей</span>
-        </label>
-    </div>
-    
-    <div class="product-item">
-        <label class="product-label">
-            <input type="checkbox" id="additional-partition-door" data-price="6990">
-            <span class="product-name">Дополнительная перегородка с дверью</span>
-            <span class="price">6.990 рублей</span>
-        </label>
-    </div>
-</div>
+                    <h3>Дополнительные товары:</h3>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="drip-irrigation-mech" data-price="1690">
+                            <span class="product-name">Капельный полив механический</span>
+                            <span class="price">1.690 рублей</span>
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="drip-irrigation-auto" data-price="4490">
+                            <span class="product-name">Капельный полив автоматический</span>
+                            <span class="price">4.490 рублей</span>
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="window-automation" data-price="2590">
+                            <span class="product-name">Автомат для форточки</span>
+                            <span class="price">2.590 рублей</span>
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="galvanized-tape-30m" data-price="1990">
+                            <span class="product-name">Оцинкованная лента 30 м</span>
+                            <span class="price">1.990 рублей</span>
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="vapor-permeable-tape-25m" data-price="1590">
+                            <span class="product-name">Паропропускная лента 25 м</span>
+                            <span class="price">1.590 рублей</span>
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="additional-window" data-price="1490">
+                            <span class="product-name">Дополнительная форточка</span>
+                            <span class="price">1.490 рублей</span>
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="additional-partition" data-price="5490">
+                            <span class="product-name">Дополнительная перегородка</span>
+                            <span class="price">5.490 рублей</span>
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="additional-partition-door" data-price="6990">
+                            <span class="product-name">Дополнительная перегородка с дверью</span>
+                            <span class="price">6.990 рублей</span>
+                        </label>
+                    </div>
+                </div>
 
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
             </div>
@@ -1004,7 +1004,7 @@ select option {
                 // Проверка на пустые данные
                 if (filteredData.length === 0) {
                     alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                    if (DEBUG) console.log(`Нет теплиц с формой ${form}, шириной ${width} м и длиной ${length} м`);
+                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Нет теплиц с формой ${form}, шириной ${width} м и длиной ${length} м`);
                     return;
                 }
 
@@ -1058,11 +1058,6 @@ select option {
 
                 updateSummary();
                 if (DEBUG) console.log("Дополнительные опции сброшены.");
-            }
-
-            // Функция обновления резюме
-            function updateSummary() {
-                // Здесь можно добавить логику для отображения выбранных опций в резюме, если требуется
             }
 
             // Функция получения категории сборки на основе формы и ширины (изменено)
@@ -1136,13 +1131,16 @@ select option {
                 }
 
                 let totalPrice = 0;
+                let basePrice = 0;
                 let additionalDetails = "";
 
                 // Расчёт стоимости базовой теплицы с учётом шага дуг
                 if (arcStep === 1) {
                     // Шаг 1 м: используем базовую цену
-                    totalPrice = selectedEntry.price;
-                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Цена теплицы без добавок: ${totalPrice} руб.`);
+                    basePrice = selectedEntry.price;
+                    totalPrice += basePrice;
+                    additionalDetails += `Базовая стоимость теплицы: ${basePrice} руб.<br>`;
+                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Цена теплицы без добавок: ${basePrice} руб.`);
                 } else if (arcStep === 0.65) {
                     // Шаг 0.65 м: рассчитываем дополнительную стоимость
                     // Находим базовую цену для "Стандарт 4мм"
@@ -1162,14 +1160,14 @@ select option {
                         return;
                     }
 
-                    const basePrice = baseEntry.price;
-                    const additionalCost = 0.25 * basePrice;
+                    const basePriceStandard = baseEntry.price;
+                    const additionalCost = 0.25 * basePriceStandard;
 
                     // Цена выбранного типа поликарбоната
-                    const selectedPrice = selectedEntry.price;
+                    basePrice = selectedEntry.price;
+                    totalPrice += basePrice + additionalCost;
 
-                    totalPrice = selectedPrice + additionalCost;
-
+                    additionalDetails += `Базовая стоимость теплицы: ${basePrice} руб.<br>`;
                     additionalDetails += `Дополнение за шаг 0.65 м: +${Math.ceil(additionalCost / 10) * 10} руб.<br>`;
                     if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Дополнительная стоимость за шаг 0.65 м: ${additionalCost} руб.`);
                 } else {
@@ -1182,8 +1180,10 @@ select option {
                 const bracingChecked = document.getElementById('bracing').checked;
                 const groundHooksChecked = document.getElementById('ground-hooks').checked;
                 const assemblyChecked = document.getElementById('assembly').checked;
+                const onWoodChecked = document.getElementById('on-wood').checked;
+                const onConcreteChecked = document.getElementById('on-concrete').checked;
 
-                if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Дополнительные услуги - Брус: ${bracingChecked}, Штыри: ${groundHooksChecked}, Сборка: ${assemblyChecked}`);
+                if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Дополнительные услуги - Брус: ${bracingChecked}, Штыри: ${groundHooksChecked}, Сборка: ${assemblyChecked}, На брус: ${onWoodChecked}, На бетон: ${onConcreteChecked}`);
 
                 // Расчёт стоимости бруса
                 let bracingCost = 0;
@@ -1240,12 +1240,43 @@ select option {
                     }
                 }
 
+                // Расчёт стоимости монтажа на фундамент клиента
+                let foundationCost = 0;
+                if (onWoodChecked || onConcreteChecked) {
+                    if (onWoodChecked) {
+                        const woodPrice = parseFloat(document.getElementById('on-wood').getAttribute('data-price'));
+                        if (woodPrice) {
+                            foundationCost += woodPrice;
+                            additionalDetails += `Монтаж на брус: +${woodPrice} руб.<br>`;
+                            if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость монтажа на брус: ${woodPrice} руб.`);
+                        } else {
+                            alert(`Не найдена стоимость монтажа на брус.`);
+                            if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Не найдена стоимость монтажа на брус.`);
+                            return;
+                        }
+                    }
+                    if (onConcreteChecked) {
+                        const concretePrice = parseFloat(document.getElementById('on-concrete').getAttribute('data-price'));
+                        if (concretePrice) {
+                            foundationCost += concretePrice;
+                            additionalDetails += `Монтаж на бетон: +${concretePrice} руб.<br>`;
+                            if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость монтажа на бетон: ${concretePrice} руб.`);
+                        } else {
+                            alert(`Не найдена стоимость монтажа на бетон.`);
+                            if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Не найдена стоимость монтажа на бетон.`);
+                            return;
+                        }
+                    }
+                    totalPrice += foundationCost;
+                }
+
                 // Дополнительные товары
                 const additionalProducts = [];
                 const productCheckboxes = document.querySelectorAll('.additional-products input[type="checkbox"]');
                 productCheckboxes.forEach(checkbox => {
                     if (checkbox.checked) {
-                        const productName = checkbox.parentElement.textContent.split(' - ')[0].trim();
+                        const productNameElement = checkbox.parentElement.querySelector('.product-name');
+                        const productName = productNameElement ? productNameElement.textContent : checkbox.parentElement.textContent.split(' +')[0].trim();
                         const productPrice = parseFloat(checkbox.getAttribute('data-price'));
                         additionalProducts.push({ name: productName, cost: productPrice });
                         totalPrice += productPrice;
@@ -1266,9 +1297,9 @@ select option {
                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Общая стоимость после округления: ${totalPrice} руб.`);
 
                 // Формирование итогового резюме
-                let summaryText = `Итоговая стоимость теплицы: ${totalPrice} руб.<br>`;
+                let summaryText = `Итоговая стоимость теплицы: <strong>${totalPrice} руб.</strong><br>`;
                 if (additionalDetails) {
-                    summaryText += `<hr>Дополнительные товары и услуги:<br>${additionalDetails}`;
+                    summaryText += `<hr>Детали расчета:<br>${additionalDetails}`;
                 }
 
                 // Выводим итоговую стоимость
