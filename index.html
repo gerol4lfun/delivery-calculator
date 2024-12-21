@@ -7,7 +7,7 @@
     <!-- Яндекс.Карты -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
     <!-- Supabase JavaScript SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@аsupabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
         /* Основные стили */
         body {
@@ -403,108 +403,6 @@
                 return str.trim().toLowerCase();
             }
 
-            // Инициализация Supabase
-            const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
-
-            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-            // Объявляем currentCityData только один раз
-            let currentCityData = []; // Данные для текущего города
-
-            // Определение доступных форм теплиц и их названий
-            const availableForms = {
-                "Арочная": [
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М", frame: "20х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ 3М", frame: "20х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", frame: "20х20+20х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", frame: "20х20+20х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
-                ],
-                "Каплевидная": [
-                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М", frame: "40х20" }
-                ],
-                "Прямостенная": [
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
-                ],
-                "Домиком": [
-                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М", frame: "40х20+20х20" }
-                ],
-                "Пристенная": [
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" }
-                ],
-                "Митлайдер арочная": [
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", frame: "40х20" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М", frame: "40х20+20х20" }
-                ],
-                "Митлайдер прямостенная": [
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", frame: "40х20+20х20" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М", frame: "40х20+20х20" }
-                ],
-                "Промышленная прямостенная": [
-                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", frame: "40х20+40х20" },
-                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М", frame: "40х20+40х20" }
-                ],
-                "Промышленная домиком": [
-                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", frame: "40х20+40х20" },
-                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М", frame: "40х20+40х20" }
-                ],
-                "Навес": [
-                    { name: "НАВЕС ЛЮКС 3.5М", frame: "40х20+20х20" },
-                    { name: "НАВЕС ЛЮКС 4М", frame: "40х20+20х20" },
-                    { name: "НАВЕС ПРЕМИУМ 5М", frame: "40х20+40х20" },
-                    { name: "НАВЕС ПРЕМИУМ 6М", frame: "40х20+40х20" }
-                ]
-            };
-
-            // Создание обратной карты: form_name -> category
-            const formNameToCategory = {};
-
-            Object.keys(availableForms).forEach(category => {
-                availableForms[category].forEach(form => {
-                    formNameToCategory[normalizeString(form.name)] = category;
-                });
-            });
-
-            // Функция определения категории на основе имени формы
-            function getFormCategory(formName) {
-                if (!formName || typeof formName !== "string") return "Прочие";
-
-                const normalizedFormName = normalizeString(formName);
-                const category = formNameToCategory[normalizedFormName];
-
-                if (category) {
-                    return category;
-                } else {
-                    return "Прочие";
-                }
-            }
-
             // Пользователи
             const users = [
                 { login: "admin", password: "Admin#2024" },
@@ -684,6 +582,111 @@
                 }
             };
 
+            // Определение доступных форм теплиц и их названий
+            const availableForms = {
+                "Арочная": [
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 3М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
+                ],
+                "Каплевидная": [
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М", frame: "40х20" }
+                ],
+                "Прямостенная": [
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
+                ],
+                "Домиком": [
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М", frame: "40х20+20х20" }
+                ],
+                "Пристенная": [
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" }
+                ],
+                "Митлайдер арочная": [
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М", frame: "40х20+20х20" }
+                ],
+                "Митлайдер прямостенная": [
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М", frame: "40х20+20х20" }
+                ],
+                "Промышленная прямостенная": [
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М", frame: "40х20+40х20" }
+                ],
+                "Промышленная домиком": [
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М", frame: "40х20+40х20" }
+                ],
+                "Навес": [
+                    { name: "НАВЕС ЛЮКС 3.5М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ЛЮКС 4М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "НАВЕС ПРЕМИУМ 6М", frame: "40х20+40х20" }
+                ]
+            };
+
+            // Создание обратной карты: form_name -> category
+            const formNameToCategory = {};
+
+            Object.keys(availableForms).forEach(category => {
+                availableForms[category].forEach(form => {
+                    formNameToCategory[normalizeString(form.name)] = category;
+                });
+            });
+
+            // Функция определения категории на основе имени формы
+            function getFormCategory(formName) {
+                if (!formName || typeof formName !== "string") return "Прочие";
+
+                const normalizedFormName = normalizeString(formName);
+                const category = formNameToCategory[normalizedFormName];
+
+                if (category) {
+                    return category;
+                } else {
+                    return "Прочие";
+                }
+            }
+
+            // Определение доступных форм теплиц и их названий уже выполнено выше
+
+            // Определение доступных форм теплиц и их названий уже выполнено выше
+
+            let currentCityData = []; // Данные для текущего города
+
+            // Инициализация Supabase
+            const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
+
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
             let mapInstance;
             let currentRoute;
 
@@ -731,6 +734,16 @@
                 localStorage.removeItem('savedLogin');
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("calculator-container").classList.add("hidden");
+                // Сброс калькулятора при выходе
+                resetDropdown('form', 'Сначала выберите город');
+                resetDropdown('width', 'Сначала выберите форму');
+                resetDropdown('length', 'Сначала выберите ширину');
+                resetDropdown('frame', 'Сначала выберите длину');
+                resetDropdown('polycarbonate', 'Сначала выберите город');
+                resetAdditionalOptions();
+                document.getElementById("summary").innerHTML = "Здесь будет выводиться итоговая сумма и детали расчета.";
+                document.getElementById("result").innerText = "";
+                mapInstance.geoObjects.removeAll();
             }
 
             // Функция для загрузки городов из Supabase с учётом пагинации
@@ -1083,6 +1096,11 @@
                 const price = assemblyPrices[form][width][length];
                 if (DEBUG) console.log(`[CALCULATE_COST] Найдена стоимость сборки: ${price} руб.`);
                 return price;
+            }
+
+            // Функция обновления резюме
+            function updateSummary() {
+                // Здесь можно добавить логику для отображения выбранных опций в резюме, если требуется
             }
 
             // Функция расчёта стоимости теплицы
