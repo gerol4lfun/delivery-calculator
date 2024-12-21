@@ -186,6 +186,10 @@
             text-align: center;
             font-weight: bold;
         }
+        /* Дополнительные стили */
+        .price {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -279,7 +283,7 @@
                         <label><input type="checkbox" id="assembly"> Сборка</label>
                         <label><input type="checkbox" id="ground-hooks"> Штыри</label>
                     </div>
-                    <p>Монтаж на фундамент клиента</p>
+                    <p><strong>Монтаж на фундамент клиента</strong></p>
                     <div class="checkbox-group-large">
                         <label><input type="checkbox" id="on-wood"> На брус +1.500 рублей</label>
                         <label><input type="checkbox" id="on-concrete"> На бетон +2.000 рублей</label>
@@ -293,56 +297,56 @@
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="drip-irrigation-mech" data-price="1690">
-                            Капельный полив механический - 1.690 рублей
+                            Капельный полив механический - <strong>1.690 рублей</strong>
                         </label>
                     </div>
                     
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="drip-irrigation-auto" data-price="4490">
-                            Капельный полив автоматический - 4.490 рублей
+                            Капельный полив автоматический - <strong>4.490 рублей</strong>
                         </label>
                     </div>
                     
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="window-automation" data-price="2590">
-                            Автомат для форточки - 2.590 рублей
+                            Автомат для форточки - <strong>2.590 рублей</strong>
                         </label>
                     </div>
                     
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="galvanized-tape-30m" data-price="1990">
-                            Оцинкованная лента 30 м - 1.990 рублей
+                            Оцинкованная лента 30 м - <strong>1.990 рублей</strong>
                         </label>
                     </div>
                     
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="vapor-permeable-tape-25m" data-price="1590">
-                            Паропропускная лента 25 м - 1.590 рублей
+                            Паропропускная лента 25 м - <strong>1.590 рублей</strong>
                         </label>
                     </div>
                     
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="additional-window" data-price="1490">
-                            Дополнительная форточка - 1.490 рублей
+                            Дополнительная форточка - <strong>1.490 рублей</strong>
                         </label>
                     </div>
                     
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="additional-partition" data-price="5490">
-                            Дополнительная перегородка - 5.490 рублей
+                            Дополнительная перегородка - <strong>5.490 рублей</strong>
                         </label>
                     </div>
                     
                     <div class="product-item">
                         <label class="product-label">
                             <input type="checkbox" id="additional-partition-door" data-price="6990">
-                            Дополнительная перегородка с дверью - 6.990 рублей
+                            Дополнительная перегородка с дверью - <strong>6.990 рублей</strong>
                         </label>
                     </div>
                 </div>
@@ -888,7 +892,7 @@
 
                 if (DEBUG) console.log("Выпадающий список ширины обновлен.");
 
-                // Сбрасываем длину и каркасы
+                // Сброс длины и каркасов
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
 
@@ -1211,7 +1215,7 @@
                 const productCheckboxes = document.querySelectorAll('.additional-products input[type="checkbox"]');
                 productCheckboxes.forEach(checkbox => {
                     if (checkbox.checked) {
-                        const productName = checkbox.previousElementSibling.textContent.split(' - ')[0];
+                        const productName = checkbox.parentElement.textContent.split(' - ')[0].trim();
                         const productPrice = parseFloat(checkbox.getAttribute('data-price'));
                         additionalProducts.push({ name: productName, cost: productPrice });
                         totalPrice += productPrice;
