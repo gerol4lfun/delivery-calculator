@@ -148,16 +148,25 @@
             width: 48%;
             text-align: left;
             font-weight: normal;
+            cursor: pointer;
         }
         .additional-products h3 {
             margin-bottom: 10px;
             font-size: 16px;
             color: #333;
         }
-        .additional-products label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: normal;
+        .additional-products .product-item {
+            margin-bottom: 10px;
+        }
+        .product-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .product-label input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
         }
         #result, #summary {
             margin-top: 20px;
@@ -277,49 +286,66 @@
                     </div>
                 </div>
 
+                <!-- Дополнительные товары -->
                 <div class="additional-products">
-    <h3>Дополнительные товары:</h3>
-    
-    <div class="product-item">
-        <label for="drip-irrigation-mech">Капельный полив механический - 1.690 рублей</label>
-        <input type="checkbox" id="drip-irrigation-mech" data-price="1690">
-    </div>
-    
-    <div class="product-item">
-        <label for="drip-irrigation-auto">Капельный полив автоматический - 4.490 рублей</label>
-        <input type="checkbox" id="drip-irrigation-auto" data-price="4490">
-    </div>
-    
-    <div class="product-item">
-        <label for="window-automation">Автомат для форточки - 2.590 рублей</label>
-        <input type="checkbox" id="window-automation" data-price="2590">
-    </div>
-    
-    <div class="product-item">
-        <label for="galvanized-tape-30m">Оцинкованная лента 30 м - 1.990 рублей</label>
-        <input type="checkbox" id="galvanized-tape-30m" data-price="1990">
-    </div>
-    
-    <div class="product-item">
-        <label for="vapor-permeable-tape-25m">Паропропускная лента 25 м - 1.590 рублей</label>
-        <input type="checkbox" id="vapor-permeable-tape-25m" data-price="1590">
-    </div>
-    
-    <div class="product-item">
-        <label for="additional-window">Дополнительная форточка - 1.490 рублей</label>
-        <input type="checkbox" id="additional-window" data-price="1490">
-    </div>
-    
-    <div class="product-item">
-        <label for="additional-partition">Дополнительная перегородка - 5.490 рублей</label>
-        <input type="checkbox" id="additional-partition" data-price="5490">
-    </div>
-    
-    <div class="product-item">
-        <label for="additional-partition-door">Дополнительная перегородка с дверью - 6.990 рублей</label>
-        <input type="checkbox" id="additional-partition-door" data-price="6990">
-    </div>
-</div>
+                    <h3>Дополнительные товары:</h3>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="drip-irrigation-mech" data-price="1690">
+                            Капельный полив механический - 1.690 рублей
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="drip-irrigation-auto" data-price="4490">
+                            Капельный полив автоматический - 4.490 рублей
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="window-automation" data-price="2590">
+                            Автомат для форточки - 2.590 рублей
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="galvanized-tape-30m" data-price="1990">
+                            Оцинкованная лента 30 м - 1.990 рублей
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="vapor-permeable-tape-25m" data-price="1590">
+                            Паропропускная лента 25 м - 1.590 рублей
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="additional-window" data-price="1490">
+                            Дополнительная форточка - 1.490 рублей
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="additional-partition" data-price="5490">
+                            Дополнительная перегородка - 5.490 рублей
+                        </label>
+                    </div>
+                    
+                    <div class="product-item">
+                        <label class="product-label">
+                            <input type="checkbox" id="additional-partition-door" data-price="6990">
+                            Дополнительная перегородка с дверью - 6.990 рублей
+                        </label>
+                    </div>
+                </div>
 
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
             </div>
@@ -743,6 +769,7 @@
                     resetDropdown('length', 'Сначала выберите ширину');
                     resetDropdown('frame', 'Сначала выберите длину');
                     resetDropdown('polycarbonate', 'Сначала выберите город');
+                    resetAdditionalOptions();
                     return;
                 }
 
@@ -973,18 +1000,28 @@
             // Функция сброса выпадающих списков
             function resetDropdown(elementId, placeholderText) {
                 const dropdown = document.getElementById(elementId);
-                dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
-                if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
+                if (dropdown) {
+                    dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+                    if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
+                }
             }
 
             // Функция сброса дополнительных опций
             function resetAdditionalOptions() {
-                document.getElementById('bracing').checked = false;
-                document.getElementById('ground-hooks').checked = false;
-                document.getElementById('assembly').checked = false;
-                document.getElementById('drip-irrigation').checked = false;
-                document.getElementById('window-automation').checked = false;
-                document.getElementById('galvanized-tape').checked = false;
+                const additionalProducts = document.querySelectorAll('.additional-products input[type="checkbox"]');
+                additionalProducts.forEach(checkbox => {
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                });
+
+                const additionalServices = document.querySelectorAll('.additional-services input[type="checkbox"]');
+                additionalServices.forEach(checkbox => {
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                });
+
                 updateSummary();
                 if (DEBUG) console.log("Дополнительные опции сброшены.");
             }
@@ -996,9 +1033,11 @@
 
             // Функция получения категории сборки на основе формы и ширины (изменено)
             function getAssemblyCategory(form, width) {
-                console.log("[ASSEMBLY_CATEGORY] Определение категории сборки...");
-                console.log("[ASSEMBLY_CATEGORY] Форма:", form);
-                console.log("[ASSEMBLY_CATEGORY] Ширина:", width);
+                if (DEBUG) {
+                    console.log("[ASSEMBLY_CATEGORY] Определение категории сборки...");
+                    console.log("[ASSEMBLY_CATEGORY] Форма:", form);
+                    console.log("[ASSEMBLY_CATEGORY] Ширина:", width);
+                }
 
                 // Возвращаем строку ширины с "М", например, "2.5М", "3М"
                 return `${width}М`;
@@ -1006,14 +1045,14 @@
 
             // Функция расчёта стоимости сборки (изменено)
             function calculateAssemblyCost(form, width, length) {
-                console.log(`[CALCULATE_COST] Расчёт стоимости сборки для формы: ${form}, ширины: ${width} м, длины: ${length} м`);
+                if (DEBUG) console.log(`[CALCULATE_COST] Расчёт стоимости сборки для формы: ${form}, ширины: ${width} м, длины: ${length} м`);
                 if (!form || !assemblyPrices[form] || !assemblyPrices[form][width] || !assemblyPrices[form][width][length]) {
-                    console.log(`[CALCULATE_COST] Стоимость сборки не найдена для формы "${form}", ширины "${width} м" и длины "${length} м".`);
+                    if (DEBUG) console.log(`[CALCULATE_COST] Стоимость сборки не найдена для формы "${form}", ширины "${width} м" и длины "${length} м".`);
                     return 0;
                 }
 
                 const price = assemblyPrices[form][width][length];
-                console.log(`[CALCULATE_COST] Найдена стоимость сборки: ${price} руб.`);
+                if (DEBUG) console.log(`[CALCULATE_COST] Найдена стоимость сборки: ${price} руб.`);
                 return price;
             }
 
@@ -1169,25 +1208,16 @@
 
                 // Дополнительные товары
                 const additionalProducts = [];
-                const dripIrrigationChecked = document.getElementById('drip-irrigation').checked;
-                const windowAutomationChecked = document.getElementById('window-automation').checked;
-                const galvanizedTapeChecked = document.getElementById('galvanized-tape').checked;
-
-                if (dripIrrigationChecked) {
-                    additionalProducts.push({ name: "Капельный полив", cost: 1000 });
-                    totalPrice += 1000;
-                    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Добавлен товар: Капельный полив - 1000 руб.");
-                }
-                if (windowAutomationChecked) {
-                    additionalProducts.push({ name: "Автомат для форточки", cost: 2500 });
-                    totalPrice += 2500;
-                    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Добавлен товар: Автомат для форточки - 2500 руб.");
-                }
-                if (galvanizedTapeChecked) {
-                    additionalProducts.push({ name: "Оцинкованная лента", cost: 800 });
-                    totalPrice += 800;
-                    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Добавлен товар: Оцинкованная лента - 800 руб.");
-                }
+                const productCheckboxes = document.querySelectorAll('.additional-products input[type="checkbox"]');
+                productCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const productName = checkbox.previousElementSibling.textContent.split(' - ')[0];
+                        const productPrice = parseFloat(checkbox.getAttribute('data-price'));
+                        additionalProducts.push({ name: productName, cost: productPrice });
+                        totalPrice += productPrice;
+                        if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Добавлен товар: ${productName} - ${productPrice} руб.`);
+                    }
+                });
 
                 // Добавление стоимости дополнительных товаров в резюме
                 additionalProducts.forEach(product => {
@@ -1325,31 +1355,21 @@
             // Функция загрузки городов при инициализации калькулятора
             async function initializeCalculator() {
                 await loadCities();
-
+                addAdditionalProductsEventListeners();
                 if (DEBUG) console.log("Инициализация калькулятора завершена.");
             }
 
-            // Функция расчёта стоимости сборки (изменено)
-            function calculateAssemblyCost(form, width, length) {
-                console.log(`[CALCULATE_COST] Расчёт стоимости сборки для формы: ${form}, ширины: ${width} м, длины: ${length} м`);
-                if (!form || !assemblyPrices[form] || !assemblyPrices[form][width] || !assemblyPrices[form][width][length]) {
-                    console.log(`[CALCULATE_COST] Стоимость сборки не найдена для формы "${form}", ширины "${width} м" и длины "${length} м".`);
-                    return 0;
-                }
+            // Функция добавления обработчиков событий для дополнительных опций
+            function addAdditionalProductsEventListeners() {
+                const additionalProducts = document.querySelectorAll('.additional-products input[type="checkbox"]');
+                additionalProducts.forEach(checkbox => {
+                    checkbox.addEventListener('change', calculateGreenhouseCost);
+                });
 
-                const price = assemblyPrices[form][width][length];
-                console.log(`[CALCULATE_COST] Найдена стоимость сборки: ${price} руб.`);
-                return price;
-            }
-
-            // Функция получения категории сборки на основе формы и ширины (изменено)
-            function getAssemblyCategory(form, width) {
-                console.log("[ASSEMBLY_CATEGORY] Определение категории сборки...");
-                console.log("[ASSEMBLY_CATEGORY] Форма:", form);
-                console.log("[ASSEMBLY_CATEGORY] Ширина:", width);
-
-                // Возвращаем строку ширины с "М", например, "2.5М", "3М"
-                return `${width}М`;
+                const additionalServices = document.querySelectorAll('.additional-services input[type="checkbox"]');
+                additionalServices.forEach(checkbox => {
+                    checkbox.addEventListener('change', calculateGreenhouseCost);
+                });
             }
         </script>
     </div>
