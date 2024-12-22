@@ -83,7 +83,7 @@
             flex-wrap: wrap;
         }
         .block {
-            flex: 1 1 45%;
+            flex: 1 1 30%; /* Изменено на 30% для размещения трёх блоков в ряд */
             padding: 20px;
             border-right: 1px solid #ddd;
             box-sizing: border-box;
@@ -180,7 +180,7 @@
             color: #000; /* Сделать цену черной */
             white-space: nowrap; /* Предотвращает перенос цен на новую строку */
         }
-        #result, #summary, #commercial-offer {
+        #summary, #commercial-offer {
             margin-top: 20px;
             font-size: 16px;
             color: #007BFF;
@@ -213,6 +213,24 @@
         .product-label .product-name::after {
             content: "";
             margin-right: 0px; /* Убираем отступ, если был добавлен ранее */
+        }
+
+        /* Обеспечим, что коммерческое предложение не выйдет за пределы блока */
+        .block textarea {
+            height: 400px; /* Увеличим высоту для лучшего отображения */
+            resize: vertical; /* Разрешаем только вертикальное изменение размера */
+        }
+
+        /* Для адаптивности на малых экранах */
+        @media (max-width: 1200px) {
+            .block {
+                flex: 1 1 45%; /* Два блока в ряд */
+            }
+        }
+        @media (max-width: 800px) {
+            .block {
+                flex: 1 1 100%; /* Один блок в ряд */
+            }
         }
     </style>
 </head>
@@ -384,14 +402,6 @@
                 </div>
 
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
-            </div>
-
-            <!-- Блок итогового расчета -->
-            <div class="block">
-                <h2>Итоговый расчет</h2>
-                <div class="summary" id="summary">
-                    Здесь будет выводиться итоговая сумма и детали расчета.
-                </div>
             </div>
 
             <!-- Блок коммерческого предложения -->
@@ -760,7 +770,6 @@
                 resetDropdown('polycarbonate', 'Сначала выберите город');
                 resetDropdown('arcStep', 'Выберите шаг');
                 resetAdditionalOptions();
-                document.getElementById("summary").innerHTML = "Здесь будет выводиться итоговая сумма и детали расчета.";
                 document.getElementById("commercial-offer").value = "Здесь будет ваше коммерческое предложение.";
                 document.getElementById("result").innerText = "";
                 if (mapInstance && currentRoute) {
@@ -1390,7 +1399,7 @@
                 if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость отображена.");
 
                 // Генерация коммерческого предложения с необходимыми параметрами
-                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText);
+                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, form, basePriceText, assemblyText, foundationText, additionalProductsText);
             }
 
             // Функция расчёта доставки
@@ -1537,12 +1546,13 @@
              * @param {number} deliveryPrice - Стоимость доставки
              * @param {number} finalTotalPrice - Итоговая стоимость с доставкой
              * @param {object} selectedEntry - Выбранная запись из currentCityData
+             * @param {string} form - Выбранная форма теплицы
              * @param {string} basePriceText - Текстовая часть стоимости базовой теплицы
              * @param {string} assemblyText - Текстовая часть стоимости сборки
              * @param {string} foundationText - Текстовая часть стоимости основания
              * @param {string} additionalProductsText - Текстовая часть дополнительных товаров
              */
-            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText) {
+            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, form, basePriceText, assemblyText, foundationText, additionalProductsText) {
                 if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
 
                 // Извлечение дополнительных характеристик
@@ -1560,8 +1570,11 @@
                 // Если в названии уже есть слово "ТЕПЛИЦА", не добавляем его повторно
                 const cleanName = baseName.startsWith("ТЕПЛИЦА") ? baseName : `ТЕПЛИЦА ${baseName}`;
 
-                // Формируем модель теплицы без добавления формы, так как она уже включена в form_name
-                const modelName = cleanName;
+                // Получаем форму
+                const formValue = form.toUpperCase();
+
+                // Формируем модель теплицы с добавлением формы
+                const modelName = `${cleanName} ${formValue}`;
 
                 // Получаем значения параметров для коммерческого предложения
                 const frameValue = document.getElementById("frame").value;
