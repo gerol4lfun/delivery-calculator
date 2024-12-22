@@ -908,53 +908,50 @@
             }
 
             // Функция обработки изменения формы
-            function onFormChange() {
-                const form = document.getElementById("form").value;
+function onFormChange() {
+    const form = document.getElementById("form").value;
 
-                if (DEBUG) console.log(`Выбрана форма теплицы: ${form}`);
+    if (DEBUG) console.log(`Выбрана форма теплицы: ${form}`);
 
-                const widthSelect = document.getElementById("width");
-                widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
+    const widthSelect = document.getElementById("width");
+    widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
 
-                if (!form) {
-                    return;
-                }
+    if (!form) {
+        return;
+    }
 
-                // Фильтруем данные по выбранной форме на основе availableForms
-                const filteredData = currentCityData.filter(item => {
-                    const category = getFormCategory(item.form_name);
-                    return category === form;
-                });
+    // Фильтруем данные по выбранной форме на основе availableForms
+    const filteredData = currentCityData.filter(item => {
+        const category = getFormCategory(item.form_name);
+        return category === form;
+    });
 
-                if (DEBUG) console.log(`Данные после фильтрации по форме (${form}):`, filteredData);
+    if (DEBUG) console.log(`Данные после фильтрации по форме (${form}):`, filteredData);
 
-                // Проверка на пустые данные
-                if (filteredData.length === 0) {
-                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                    if (DEBUG) console.log(`Нет теплиц с формой ${form}`);
-                    return;
-                }
+    // Проверка на пустые данные
+    if (filteredData.length === 0) {
+        alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+        if (DEBUG) console.log(`Нет теплиц с формой ${form}`);
+        return;
+    }
 
-                // Получаем уникальные значения ширины
-                const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
+    // Получаем уникальные значения ширины
+    const uniqueWidths = [...new Set(filteredData.map(item => item.width))].sort((a, b) => a - b);
 
-                if (DEBUG) console.log("Уникальные ширины:", uniqueWidths);
+    if (DEBUG) console.log("Уникальные ширины:", uniqueWidths);
 
-                // Заполняем выпадающий список ширины
-                uniqueWidths.forEach(width => {
-                    widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
-                });
+    // Заполняем выпадающий список ширины
+    uniqueWidths.forEach(width => {
+        widthSelect.innerHTML += `<option value="${width}">${width} м</option>`;
+    });
 
-                if (DEBUG) console.log("Выпадающий список ширины обновлен.");
+    if (DEBUG) console.log("Выпадающий список ширины обновлен.");
 
-                // Сброс длины и каркасов
-                resetDropdown('length', 'Сначала выберите ширину');
-                resetDropdown('frame', 'Сначала выберите длину');
-                // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
-
-                // Сброс дополнительных опций
-                resetAdditionalOptions();
-            }
+    // Сброс длины и каркасов
+    resetDropdown('length', 'Сначала выберите ширину');
+    resetDropdown('frame', 'Сначала выберите длину');
+    resetAdditionalOptions();
+}
 
             // Функция обработки изменения ширины
             function onWidthChange() {
