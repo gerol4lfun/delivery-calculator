@@ -1486,60 +1486,66 @@
             }
 
             // Функция формирования коммерческого предложения
-            function generateCommercialOffer() {
-                if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
+function generateCommercialOffer() {
+    if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
 
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
-                const frame = document.getElementById("frame").value;
-                const polycarbonate = document.getElementById("polycarbonate").value;
-                const arcStep = parseFloat(document.getElementById("arcStep").value);
+    const form = document.getElementById("form").value;
+    const width = parseFloat(document.getElementById("width").value);
+    const length = parseFloat(document.getElementById("length").value);
+    const frame = document.getElementById("frame").value;
+    const polycarbonate = document.getElementById("polycarbonate").value;
+    const arcStep = parseFloat(document.getElementById("arcStep").value);
 
-                // Проверка, что arcStep выбран
-                if (isNaN(arcStep)) {
-                    if (DEBUG) console.log("[GENERATE_OFFICE] Шаг дуги не выбран.");
-                    document.getElementById("commercial-offer").value = "Пожалуйста, выберите шаг дуги.";
-                    return;
-                }
+    // Проверка, что arcStep выбран
+    if (isNaN(arcStep)) {
+        if (DEBUG) console.log("[GENERATE_OFFICE] Шаг дуги не выбран.");
+        document.getElementById("commercial-offer").value = "Пожалуйста, выберите шаг дуги.";
+        return;
+    }
 
-                // Дополнительные характеристики из currentCityData
-                const selectedEntry = currentCityData.find(item => {
-                    return (
-                        getFormCategory(item.form_name) === form &&
-                        parseFloat(item.width) === width &&
-                        parseFloat(item.length) === length &&
-                        normalizeString(item.frame_description) === normalizeString(frame) &&
-                        normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
-                    );
-                });
+    // Дополнительные характеристики из currentCityData
+    const selectedEntry = currentCityData.find(item => {
+        return (
+            getFormCategory(item.form_name) === form &&
+            parseFloat(item.width) === width &&
+            parseFloat(item.length) === length &&
+            normalizeString(item.frame_description) === normalizeString(frame) &&
+            normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
+        );
+    });
 
-                if (!selectedEntry) {
-                    if (DEBUG) console.log("[GENERATE_OFFICE] Теплица с заданными параметрами не найдена.");
-                    document.getElementById("commercial-offer").value = "Теплица с заданными параметрами не найдена.";
-                    return;
-                }
+    if (!selectedEntry) {
+        if (DEBUG) console.log("[GENERATE_OFFICE] Теплица с заданными параметрами не найдена.");
+        document.getElementById("commercial-offer").value = "Теплица с заданными параметрами не найдена.";
+        return;
+    }
 
-                // Извлечение дополнительных характеристик
-                const snowLoad = selectedEntry.snow_load || "Не указано";
-                const height = selectedEntry.height || "Не указано";
-                const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
-                const equipment = selectedEntry.equipment || "Не указано";
+    // Извлечение дополнительных характеристик
+    const snowLoad = selectedEntry.snow_load || "Не указано";
+    const height = selectedEntry.height || "Не указано";
+    const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
+    const equipment = selectedEntry.equipment || "Не указано";
 
-                // Извлечение стоимости и дополнительных услуг
-                const totalPriceMatch = document.getElementById("summary").innerText.match(/Итоговая стоимость теплицы: <strong>(\d+) руб.<\/strong>/);
-                const totalPriceValue = totalPriceMatch ? totalPriceMatch[1] : "Не рассчитано";
+    // Извлечение стоимости и дополнительных услуг
+    const totalPriceMatch = document.getElementById("summary").innerText.match(/Итоговая стоимость теплицы: <strong>(\d+) руб.<\/strong>/);
+    const totalPriceValue = totalPriceMatch ? totalPriceMatch[1] : "Не рассчитано";
 
-                // Дополнительные услуги и товары
-                const assemblyCost = document.querySelector("#assembly").checked ? "4.990 рублей" : "0 рублей";
-                const bracingCost = document.querySelector("#bracing").checked ? "4.790 рублей" : "0 рублей";
-                const groundHooksCost = document.querySelector("#ground-hooks").checked ? "2.490 рублей" : "0 рублей";
-                const deliveryCostMatch = document.getElementById("result").innerText.match(/Стоимость доставки: (\d+) рублей/);
-                const deliveryCostValue = deliveryCostMatch ? deliveryCostMatch[1] : "Не рассчитано";
+    // Дополнительные услуги и товары
+    const assemblyCost = document.querySelector("#assembly").checked ? "4.990 рублей" : "0 рублей";
+    const bracingCost = document.querySelector("#bracing").checked ? "4.790 рублей" : "0 рублей";
+    const groundHooksCost = document.querySelector("#ground-hooks").checked ? "2.490 рублей" : "0 рублей";
+    const deliveryCostMatch = document.getElementById("result").innerText.match(/Стоимость доставки: (\d+) рублей/);
+    const deliveryCostValue = deliveryCostMatch ? deliveryCostMatch[1] : "Не рассчитано";
 
-                // Формирование текста КП
-                const commercialOffer = `
-ТЕПЛИЦА ${form.toUpperCase()} ${getModelName(form, width, length)}
+    // Получаем название теплицы из базы данных или используем форму
+    const selectedName = selectedEntry.form_name || form;
+
+    // Формируем модель теплицы
+    const modelName = `ТЕПЛИЦА ${selectedName.toUpperCase()} ${form.toUpperCase()} ${width}М`;
+
+    // Формирование текста КП
+    const commercialOffer = `
+${modelName}
 
 Каркас: ${frame}
 Ширина: ${width} м
@@ -1560,11 +1566,11 @@
 Доставка - ${deliveryCostValue} рублей
 
 Итоговая стоимость - ${totalPriceValue} рублей
-                `.trim();
+    `.trim();
 
-                document.getElementById("commercial-offer").value = commercialOffer;
-                if (DEBUG) console.log("[GENERATE_OFFICE] Коммерческое предложение сформировано:", commercialOffer);
-            }
+    document.getElementById("commercial-offer").value = commercialOffer;
+    if (DEBUG) console.log("[GENERATE_OFFICE] Коммерческое предложение сформировано:", commercialOffer);
+}
 
             // Функция копирования КП
             function copyCommercialOffer() {
