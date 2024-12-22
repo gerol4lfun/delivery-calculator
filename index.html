@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор доставки и стоимости теплиц</title>
     <!-- Яндекс.Карты -->
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=410a6099-56c9-4669-81c8-f21896edfab0&lang=ru_RU" type="text/javascript"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=YOUR_YANDEX_API_KEY&lang=ru_RU" type="text/javascript"></script>
     <!-- Supabase JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/umd/supabase.min.js"></script>
     <style>
@@ -529,13 +529,13 @@
             const additionalServicesData = {
                 "Брус": {
                     price_by_length: {
-                        4: 4790,
-                        6: 6290,
-                        8: 7790,
-                        10: 9290,
-                        12: 10790,
-                        14: 12290,
-                        16: 13790
+                        4: 6290,
+                        6: 7790,
+                        8: 9290,
+                        10: 10790,
+                        12: 12290,
+                        14: 13790,
+                        16: 15290
                     }
                 },
                 "Штыри": {
@@ -700,7 +700,7 @@
 
             // Инициализация Supabase
             const SUPABASE_URL = 'https://dyoibmfdohpvjltfaygr.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
+            const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Замените на ваш ключ
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             if (DEBUG) console.log("Supabase клиент инициализирован.");
@@ -838,8 +838,8 @@
                     resetDropdown('width', 'Сначала выберите форму');
                     resetDropdown('length', 'Сначала выберите ширину');
                     resetDropdown('frame', 'Сначала выберите длину');
-                    resetDropdown('polycarbonate', 'Сначала выберите город');
                     resetDropdown('arcStep', 'Выберите шаг');
+                    resetDropdown('polycarbonate', 'Выберите поликарбонат');
                     resetAdditionalOptions();
                     return;
                 }
@@ -961,6 +961,9 @@
                 // Сброс длины и каркасов
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
+                resetDropdown('arcStep', 'Выберите шаг');
+
+                // Сброс дополнительных опций
                 resetAdditionalOptions();
             }
 
@@ -1184,12 +1187,14 @@
                 }
 
                 let basePrice = 0; // Стоимость теплицы
-                let assemblyOrFoundationCost = 0; // Стоимость сборки или монтажа на фундамент
+                let assemblyCost = 0; // Стоимость сборки
+                let foundationCost = 0; // Стоимость основания (брус)
                 let additionalProductsCost = 0; // Стоимость дополнительных товаров
                 let finalTotalPrice = 0; // Итоговая стоимость
 
                 let basePriceText = "";
-                let assemblyOrFoundationText = "";
+                let assemblyText = "";
+                let foundationText = "";
                 let additionalProductsText = "";
                 let deliveryText = "";
 
@@ -1224,8 +1229,8 @@
                     // Цена выбранного типа поликарбоната
                     basePrice = selectedEntry.price;
                     basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
-                    assemblyOrFoundationCost += additionalCost;
-                    assemblyOrFoundationText += `\nДополнение за шаг 0.65 м: +${formatPrice(Math.ceil(additionalCost / 10) * 10)} рублей`;
+                    assemblyCost += additionalCost;
+                    assemblyText += `\nДополнение за шаг 0.65 м: +${formatPrice(Math.ceil(additionalCost / 10) * 10)} рублей`;
                     if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Дополнительная стоимость за шаг 0.65 м: ${additionalCost} руб.`);
                 } else {
                     alert("Некорректный шаг между дугами.");
@@ -1246,8 +1251,8 @@
                 if (bracingChecked) {
                     const bracingPrice = additionalServicesData["Брус"].price_by_length[length];
                     if (bracingPrice) {
-                        assemblyOrFoundationCost += bracingPrice;
-                        assemblyOrFoundationText += `\nОснование из бруса - ${formatPrice(bracingPrice)} рублей`;
+                        foundationCost += bracingPrice;
+                        foundationText += `\nОснование из бруса - ${formatPrice(bracingPrice)} рублей`;
                         if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость бруса: ${bracingPrice} руб.`);
                     } else {
                         alert(`Не найдена стоимость бруса для длины ${length} м.`);
@@ -1262,8 +1267,8 @@
                     const stakesQuantity = quantityData[length];
                     if (stakesQuantity) {
                         const stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
-                        assemblyOrFoundationCost += stakesCost;
-                        assemblyOrFoundationText += `\nГрунтозацепы ${stakesQuantity} шт - ${formatPrice(stakesCost)} рублей`;
+                        foundationCost += stakesCost;
+                        foundationText += `\nГрунтозацепы ${stakesQuantity} шт - ${formatPrice(stakesCost)} рублей`;
                         if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость штырей: ${stakesCost} руб. (${stakesQuantity} шт.)`);
                     } else {
                         alert(`Не найдена информация о количестве штырей для длины ${length} м.`);
@@ -1276,11 +1281,11 @@
                 if (assemblyChecked) {
                     const assemblyCategory = getAssemblyCategory(form, width); // Получаем категорию сборки
                     if (assemblyCategory) {
-                        const assemblyCost = calculateAssemblyCost(form, assemblyCategory, length);
-                        if (assemblyCost > 0) {
-                            assemblyOrFoundationCost += assemblyCost;
-                            assemblyOrFoundationText += `\nСборка и установка - ${formatPrice(assemblyCost)} рублей`;
-                            if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость сборки: ${assemblyCost} руб.`);
+                        const assemblyCostCalculated = calculateAssemblyCost(form, assemblyCategory, length);
+                        if (assemblyCostCalculated > 0) {
+                            assemblyCost += assemblyCostCalculated;
+                            assemblyText += `\nСборка и установка - ${formatPrice(assemblyCostCalculated)} рублей`;
+                            if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость сборки: ${assemblyCostCalculated} руб.`);
                         } else {
                             alert(`Не найдена стоимость сборки для формы "${form}", ширины "${width}М" и длины "${length} м".`);
                             if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость сборки не найдена для формы "${form}", ширины "${width}М" и длины "${length} м".`);
@@ -1297,8 +1302,8 @@
                         if (onWoodChecked) {
                             const woodPrice = parseFloat(document.getElementById('on-wood').getAttribute('data-price'));
                             if (woodPrice) {
-                                assemblyOrFoundationCost += woodPrice;
-                                assemblyOrFoundationText += `\nМонтаж на брус клиента - ${formatPrice(woodPrice)} рублей`;
+                                foundationCost += woodPrice;
+                                foundationText += `\nМонтаж на брус клиента - ${formatPrice(woodPrice)} рублей`;
                                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость монтажа на брус: ${woodPrice} руб.`);
                             } else {
                                 alert(`Не найдена стоимость монтажа на брус.`);
@@ -1309,8 +1314,8 @@
                         if (onConcreteChecked) {
                             const concretePrice = parseFloat(document.getElementById('on-concrete').getAttribute('data-price'));
                             if (concretePrice) {
-                                assemblyOrFoundationCost += concretePrice;
-                                assemblyOrFoundationText += `\nМонтаж на бетон клиента - ${formatPrice(concretePrice)} рублей`;
+                                foundationCost += concretePrice;
+                                foundationText += `\nМонтаж на бетон клиента - ${formatPrice(concretePrice)} рублей`;
                                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость монтажа на бетон: ${concretePrice} руб.`);
                             } else {
                                 alert(`Не найдена стоимость монтажа на бетон.`);
@@ -1343,7 +1348,7 @@
                 }
 
                 // Итоговая стоимость (без доставки)
-                finalTotalPrice = basePrice + assemblyOrFoundationCost + additionalProductsCost;
+                finalTotalPrice = basePrice + assemblyCost + foundationCost + additionalProductsCost;
 
                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Итоговая стоимость (без доставки): ${finalTotalPrice} руб.`);
 
@@ -1353,34 +1358,40 @@
                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Общая стоимость после округления: ${finalTotalPrice} руб.`);
 
                 // Получаем стоимость доставки из блока доставки
-                const deliveryMatch = document.getElementById('result').innerText.match(/Стоимость доставки: (\d+) рублей/);
-                deliveryCost = deliveryMatch ? parseInt(deliveryMatch[1], 10) : 0;
+                // Предполагаем, что пользователь уже рассчитал доставку и deliveryCost обновлена
+                // Если доставка не была рассчитана, deliveryCost останется 0
+                const deliveryPrice = deliveryCost;
 
-                if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость доставки: ${deliveryCost} руб.`);
+                if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость доставки: ${deliveryPrice} руб.`);
 
                 // Итоговая стоимость с доставкой
-                finalTotalPrice += deliveryCost;
+                finalTotalPrice += deliveryPrice;
 
                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Итоговая стоимость с доставкой: ${finalTotalPrice} руб.`);
 
                 // Формирование итогового резюме
                 let summaryText = `Итоговая стоимость теплицы: ${formatPrice(finalTotalPrice)} рублей\n`;
-                summaryText += `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей\n`;
-                if (assemblyOrFoundationText) {
-                    summaryText += `${assemblyOrFoundationText}\n`;
+                summaryText += `${basePriceText}\n`;
+                if (assemblyText) {
+                    summaryText += `${assemblyText}\n`;
+                }
+                if (foundationText) {
+                    summaryText += `${foundationText}\n`;
                 }
                 if (additionalProductsText) {
-                    summaryText += `${additionalProductsText}\n`;
+                    summaryText += `\nДополнительные товары:\n${additionalProductsText}\n`;
                 }
-                summaryText += `Доставка - ${formatPrice(deliveryCost)} рублей\n`;
-                summaryText += `Итоговая стоимость - ${formatPrice(finalTotalPrice)} рублей`;
+                if (deliveryPrice > 0) {
+                    summaryText += `Доставка - ${formatPrice(deliveryPrice)} рублей\n`;
+                }
+                summaryText += `\nИтоговая стоимость - ${formatPrice(finalTotalPrice)} рублей`;
 
                 // Выводим итоговую стоимость
                 document.getElementById("summary").innerText = summaryText;
                 if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость отображена.");
 
                 // Генерация коммерческого предложения с необходимыми параметрами
-                generateCommercialOffer(basePrice, assemblyOrFoundationCost, additionalProducts, additionalProductsCost, deliveryCost, finalTotalPrice, selectedEntry);
+                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry);
             }
 
             // Функция расчёта доставки
@@ -1520,31 +1531,21 @@
             /**
              * Функция формирования коммерческого предложения
              * @param {number} basePrice - Стоимость теплицы
-             * @param {number} assemblyOrFoundationCost - Стоимость сборки или монтажа
+             * @param {number} assemblyCost - Стоимость сборки
+             * @param {number} foundationCost - Стоимость основания (брус)
              * @param {array} additionalProducts - Массив дополнительных продуктов
              * @param {number} additionalProductsCost - Стоимость дополнительных товаров
-             * @param {number} deliveryCost - Стоимость доставки
+             * @param {number} deliveryPrice - Стоимость доставки
              * @param {number} finalTotalPrice - Итоговая стоимость с доставкой
              * @param {object} selectedEntry - Выбранная запись из currentCityData
              */
-            function generateCommercialOffer(basePrice, assemblyOrFoundationCost, additionalProducts, additionalProductsCost, deliveryCost, finalTotalPrice, selectedEntry) {
+            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry) {
                 if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
 
                 // Извлечение дополнительных характеристик
-                const snowLoadRaw = selectedEntry.snow_load ? selectedEntry.snow_load : "";
-                const snowLoadMatch = snowLoadRaw.match(/(\d+(\.\d+)?)/);
-                const snowLoadValue = snowLoadMatch ? parseFloat(snowLoadMatch[1]) : 0;
-                const snowLoad = !isNaN(snowLoadValue) ? `${snowLoadValue} кг/м²` : "Не указано";
-
-                const heightRaw = selectedEntry.height ? selectedEntry.height : "";
-                const heightMatch = heightRaw.match(/(\d+(\.\d+)?)/);
-                const heightValue = heightMatch ? parseFloat(heightMatch[1]) : 0;
-                const height = !isNaN(heightValue) ? `${heightValue} м` : "Не указано";
-
-                const horizontalTiesRaw = selectedEntry.horizontal_ties ? selectedEntry.horizontal_ties : "";
-                const horizontalTiesValue = parseInt(horizontalTiesRaw.replace(/[^0-9]/g, ''), 10);
-                const horizontalTies = !isNaN(horizontalTiesValue) ? `${horizontalTiesValue} шт` : "Не указано";
-
+                const snowLoad = selectedEntry.snow_load ? selectedEntry.snow_load : "Не указано";
+                const height = selectedEntry.height ? selectedEntry.height : "Не указано";
+                const horizontalTies = selectedEntry.horizontal_ties ? selectedEntry.horizontal_ties : "Не указано";
                 const equipment = selectedEntry.equipment || "Не указано";
 
                 // Логирование для отладки
@@ -1577,26 +1578,16 @@
                     `Снеговая нагрузка: ${snowLoad}\n` +
                     `Горизонтальные стяжки: ${horizontalTies}\n` +
                     `Комплектация: ${equipment}\n\n` +
-                    `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей\n`;
+                    `${basePriceText}\n`;
 
-                // Добавление сборки или монтажа на фундамент клиента
-                if (assemblyOrFoundationCost > 0) {
-                    if (document.getElementById('assembly').checked) {
-                        commercialOffer += `Сборка и установка - ${formatPrice(assemblyOrFoundationCost)} рублей\n`;
-                    } else {
-                        // Проверяем, какой вариант монтажа выбран
-                        const onWoodChecked = document.getElementById('on-wood').checked;
-                        const onConcreteChecked = document.getElementById('on-concrete').checked;
+                // Добавление сборки
+                if (assemblyCost > 0) {
+                    commercialOffer += `Сборка и установка - ${formatPrice(assemblyCost)} рублей\n`;
+                }
 
-                        if (onWoodChecked) {
-                            const woodPrice = parseInt(document.getElementById('on-wood').getAttribute('data-price'), 10);
-                            commercialOffer += `Монтаж на брус клиента - ${formatPrice(woodPrice)} рублей\n`;
-                        }
-                        if (onConcreteChecked) {
-                            const concretePrice = parseInt(document.getElementById('on-concrete').getAttribute('data-price'), 10);
-                            commercialOffer += `Монтаж на бетон клиента - ${formatPrice(concretePrice)} рублей\n`;
-                        }
-                    }
+                // Добавление основания из бруса
+                if (foundationCost > 0) {
+                    commercialOffer += `Основание из бруса - ${formatPrice(foundationCost)} рублей\n`;
                 }
 
                 // Добавление дополнительных товаров
@@ -1607,8 +1598,8 @@
                 }
 
                 // Добавление стоимости доставки
-                if (deliveryCost > 0) {
-                    commercialOffer += `\nДоставка - ${formatPrice(deliveryCost)} рублей\n`;
+                if (deliveryPrice > 0) {
+                    commercialOffer += `\nДоставка - ${formatPrice(deliveryPrice)} рублей\n`;
                 }
 
                 // Итоговая стоимость
