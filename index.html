@@ -1511,22 +1511,34 @@ function generateCommercialOffer() {
         );
     });
 
-    if (!selectedEntry) {
-        if (DEBUG) console.log("[GENERATE_OFFICE] Теплица с заданными параметрами не найдена.");
-        document.getElementById("commercial-offer").value = "Теплица с заданными параметрами не найдена.";
-        return;
-    }
+    // Проверка наличия теплицы
+if (!selectedEntry) {
+    if (DEBUG) console.log("[GENERATE_OFFICE] Теплица с заданными параметрами не найдена.");
+    document.getElementById("commercial-offer").value = "Теплица с заданными параметрами не найдена.";
+    return;
+}
+// Извлечение дополнительных характеристик
 
-    // Извлечение дополнительных характеристик
-const snowLoad = selectedEntry.snow_load || "Не указано";
+// Исправляем снеговую нагрузку — убираем повторяющиеся единицы измерения
+const snowLoad = selectedEntry.snow_load
+    ? `${parseFloat(selectedEntry.snow_load.replace(/[^0-9.]/g, ''))} кг/м²`
+    : "Не указано";
 
 // Исправляем высоту — убираем все лишние символы и добавляем одну "м"
 const height = selectedEntry.height
     ? `${parseFloat(selectedEntry.height.replace(/[^0-9.]/g, ''))} м`
     : "Не указано";
 
-const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
+// Исправляем горизонтальные стяжки — убираем повтор "шт"
+const horizontalTies = selectedEntry.horizontal_ties
+    ? `${parseInt(selectedEntry.horizontal_ties.replace(/[^0-9]/g, ''))} шт`
+    : "Не указано";
+
+// Комплектация оставляем без изменений
 const equipment = selectedEntry.equipment || "Не указано";
+
+// Для отладки выводим данные в консоль
+if (DEBUG) console.log({ snowLoad, height, horizontalTies, equipment });
 
     // Извлечение стоимости и дополнительных услуг
     const totalPriceMatch = document.getElementById("summary").innerText.match(/Итоговая стоимость теплицы: <strong>(\d+) руб.<\/strong>/);
