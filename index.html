@@ -35,7 +35,7 @@
             border-radius: 8px;
             position: relative;
         }
-        input[type="text"], input[type="password"], select, button {
+        input[type="text"], input[type="password"], select, button, textarea {
             padding: 8px;
             margin: 5px 0;
             font-size: 14px;
@@ -180,7 +180,7 @@
             color: #000; /* Сделать цену черной */
             white-space: nowrap; /* Предотвращает перенос цен на новую строку */
         }
-        #result, #summary {
+        #result, #summary, #commercial-offer {
             margin-top: 20px;
             font-size: 16px;
             color: #007BFF;
@@ -391,11 +391,20 @@
                     Здесь будет выводиться итоговая сумма и детали расчета.
                 </div>
             </div>
+
+            <!-- Блок коммерческого предложения -->
+            <div class="block">
+                <h2>Коммерческое предложение</h2>
+                <textarea id="commercial-offer" rows="20" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" readonly>
+                    Здесь будет ваше коммерческое предложение.
+                </textarea>
+                <button onclick="copyCommercialOffer()">Скопировать КП</button>
+            </div>
         </div>
 
         <script>
             // Константа для контроля отладки
-            const DEBUG = false; // Выключено
+            const DEBUG = true; // Включено для отладки
 
             // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
             function normalizeString(str) {
@@ -675,10 +684,6 @@
                 }
             }
 
-            // Определение доступных форм теплиц и их названий уже выполнено выше
-
-            // Определение доступных форм теплиц и их названий уже выполнено выше
-
             let currentCityData = []; // Данные для текущего города
 
             // Инициализация Supabase
@@ -686,6 +691,7 @@
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5b2libWZkb2hwdmpsdGZheWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5ODAxMzcsImV4cCI6MjA0OTU1NjEzN30.ZHj1JJsmSN45-0cv83uJDpaqtv3R6_U7CZmbkK-H24s'; // Ваш Anon Public Key
 
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            if (DEBUG) console.log("Supabase клиент инициализирован.");
 
             let mapInstance;
             let currentRoute;
@@ -740,10 +746,13 @@
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
                 resetDropdown('polycarbonate', 'Сначала выберите город');
+                resetDropdown('arcStep', 'Выберите шаг');
                 resetAdditionalOptions();
                 document.getElementById("summary").innerHTML = "Здесь будет выводиться итоговая сумма и детали расчета.";
+                document.getElementById("commercial-offer").value = "Здесь будет ваше коммерческое предложение.";
                 document.getElementById("result").innerText = "";
                 mapInstance.geoObjects.removeAll();
+                if (DEBUG) console.log("Калькулятор сброшен.");
             }
 
             // Функция для загрузки городов из Supabase с учётом пагинации
@@ -816,13 +825,14 @@
                     resetDropdown('length', 'Сначала выберите ширину');
                     resetDropdown('frame', 'Сначала выберите длину');
                     resetDropdown('polycarbonate', 'Сначала выберите город');
+                    resetDropdown('arcStep', 'Выберите шаг');
                     resetAdditionalOptions();
                     return;
                 }
 
                 let { data, error } = await supabaseClient
                     .from('prices')
-                    .select('form_name, polycarbonate_type, width, length, frame_description, price') // Добавляем поле price
+                    .select('form_name, polycarbonate_type, width, length, frame_description, price, snow_load, height, horizontal_ties, equipment') // Добавлены новые поля
                     .eq('city_name', city)
                     .limit(30000);
 
@@ -890,6 +900,7 @@
                 resetDropdown('width', 'Сначала выберите форму');
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
+                resetDropdown('arcStep', 'Выберите шаг');
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -938,6 +949,7 @@
                 // Сброс длины и каркасов
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
+                resetDropdown('arcStep', 'Выберите шаг');
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -984,8 +996,9 @@
 
                 if (DEBUG) console.log("Выпадающий список длины обновлен.");
 
-                // Сброс каркаса
+                // Сброс каркаса и шага дуг
                 resetDropdown('frame', 'Сначала выберите длину');
+                resetDropdown('arcStep', 'Выберите шаг');
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -1033,6 +1046,9 @@
 
                 if (DEBUG) console.log("Выпадающий список каркаса обновлен.");
 
+                // Сброс шага дуг
+                resetDropdown('arcStep', 'Выберите шаг');
+
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
             }
@@ -1040,6 +1056,8 @@
             // Функция обработки изменения каркаса
             function onFrameChange() {
                 if (DEBUG) console.log("Каркас изменен.");
+                // Сброс шага дуг
+                resetDropdown('arcStep', 'Выберите шаг');
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
             }
@@ -1098,7 +1116,7 @@
                 return price;
             }
 
-            // Функция обновления резюме
+            // Функция обновления резюме (можно дополнить при необходимости)
             function updateSummary() {
                 // Здесь можно добавить логику для отображения выбранных опций в резюме, если требуется
             }
@@ -1323,6 +1341,9 @@
                 // Выводим итоговую стоимость
                 document.getElementById("summary").innerHTML = summaryText;
                 if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость отображена.");
+
+                // Генерация коммерческого предложения
+                generateCommercialOffer();
             }
 
             // Функция расчёта доставки
@@ -1453,6 +1474,102 @@
                 additionalServices.forEach(checkbox => {
                     checkbox.addEventListener('change', calculateGreenhouseCost);
                 });
+
+                if (DEBUG) console.log("Обработчики событий для дополнительных опций добавлены.");
+            }
+
+            // Функция формирования коммерческого предложения
+            function generateCommercialOffer() {
+                if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
+
+                const form = document.getElementById("form").value;
+                const width = parseFloat(document.getElementById("width").value);
+                const length = parseFloat(document.getElementById("length").value);
+                const frame = document.getElementById("frame").value;
+                const polycarbonate = document.getElementById("polycarbonate").value;
+                const arcStep = parseFloat(document.getElementById("arcStep").value);
+
+                // Дополнительные характеристики из currentCityData
+                const selectedEntry = currentCityData.find(item => {
+                    return (
+                        getFormCategory(item.form_name) === form &&
+                        parseFloat(item.width) === width &&
+                        parseFloat(item.length) === length &&
+                        normalizeString(item.frame_description) === normalizeString(frame) &&
+                        normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
+                    );
+                });
+
+                if (!selectedEntry) {
+                    if (DEBUG) console.log("[GENERATE_OFFICE] Теплица с заданными параметрами не найдена.");
+                    document.getElementById("commercial-offer").value = "Теплица с заданными параметрами не найдена.";
+                    return;
+                }
+
+                // Извлечение дополнительных характеристик
+                const snowLoad = selectedEntry.snow_load || "Не указано";
+                const height = selectedEntry.height || "Не указано";
+                const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
+                const equipment = selectedEntry.equipment || "Не указано";
+
+                // Извлечение стоимости и дополнительных услуг
+                const totalPriceMatch = document.getElementById("summary").innerText.match(/Итоговая стоимость теплицы: <strong>(\d+) руб.<\/strong>/);
+                const totalPriceValue = totalPriceMatch ? totalPriceMatch[1] : "Не рассчитано";
+
+                // Дополнительные услуги и товары
+                const assemblyCost = document.querySelector("#assembly").checked ? "4.990 рублей" : "0 рублей";
+                const bracingCost = document.querySelector("#bracing").checked ? "4.790 рублей" : "0 рублей";
+                const groundHooksCost = document.querySelector("#ground-hooks").checked ? "2.490 рублей" : "0 рублей";
+                const deliveryCostMatch = document.getElementById("result").innerText.match(/Стоимость доставки: (\d+) рублей/);
+                const deliveryCostValue = deliveryCostMatch ? deliveryCostMatch[1] : "Не рассчитано";
+
+                // Формирование текста КП
+                const commercialOffer = `
+ТЕПЛИЦА ${form.toUpperCase()} ${getModelName(form, width, length)}
+
+Каркас: ${frame}
+Ширина: ${width} м
+Длина: ${length} м
+Высота: ${height} м
+Шаг дуги: ${arcStep} м
+Поликарбонат с УФ защитой: ${polycarbonate}
+Снеговая нагрузка: ${snowLoad} кг/м²
+Горизонтальные стяжки: ${horizontalTies} шт
+Комплектация: ${equipment}
+
+Стоимость с учетом скидки - ${totalPriceValue} рублей
+
+Сборка и установка - ${assemblyCost}
+Основание из бруса - ${bracingCost}
+Грунтозацепы - ${groundHooksCost}
+
+Доставка - ${deliveryCostValue} рублей
+
+Итоговая стоимость - ${totalPriceValue} рублей
+                `.trim();
+
+                document.getElementById("commercial-offer").value = commercialOffer;
+                if (DEBUG) console.log("[GENERATE_OFFICE] Коммерческое предложение сформировано:", commercialOffer);
+            }
+
+            // Функция копирования КП
+            function copyCommercialOffer() {
+                const offerText = document.getElementById("commercial-offer");
+                offerText.select();
+                offerText.setSelectionRange(0, 99999); // Для мобильных устройств
+
+                document.execCommand("copy");
+
+                alert("Коммерческое предложение скопировано!");
+                if (DEBUG) console.log("Коммерческое предложение скопировано.");
+            }
+
+            // Функция получения названия модели на основе формы, ширины и длины
+            function getModelName(form, width, length) {
+                // Здесь можно реализовать логику для получения точного названия модели
+                // Например, использовать текущую запись selectedEntry или другую логику
+                // Для простоты вернем просто ширину и длину
+                return `${width}М ${length}М`;
             }
         </script>
     </div>
