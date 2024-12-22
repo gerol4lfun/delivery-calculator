@@ -850,7 +850,10 @@
                     .eq('city_name', city)
                     .limit(30000);
 
-                if (DEBUG) console.log(`Получены данные для города ${city}:`, data);
+                if (error) {
+                    console.error('Ошибка при получении данных по городу:', error);
+                    return;
+                }
 
                 if (!data || data.length === 0) {
                     alert("Данные для выбранного города не найдены. Попробуйте другой город.");
@@ -858,10 +861,7 @@
                     return; // Остановить выполнение функции
                 }
 
-                if (error) {
-                    console.error('Ошибка при получении данных по городу:', error);
-                    return;
-                }
+                if (DEBUG) console.log(`Получены данные для города ${city}:`, data);
 
                 // Присваиваем данные текущему городу
                 currentCityData = data;
@@ -915,6 +915,8 @@
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
                 resetDropdown('arcStep', 'Выберите шаг');
+
+                // Сброс дополнительных опций
                 resetAdditionalOptions();
             }
 
@@ -1104,9 +1106,6 @@
                         checkbox.checked = false;
                     }
                 });
-
-                // Удалите вызов updateSummary()
-                // updateSummary();
 
                 if (DEBUG) console.log("Дополнительные опции сброшены.");
             }
@@ -1391,7 +1390,7 @@
                 if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость отображена.");
 
                 // Генерация коммерческого предложения с необходимыми параметрами
-                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry);
+                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText);
             }
 
             // Функция расчёта доставки
@@ -1538,8 +1537,12 @@
              * @param {number} deliveryPrice - Стоимость доставки
              * @param {number} finalTotalPrice - Итоговая стоимость с доставкой
              * @param {object} selectedEntry - Выбранная запись из currentCityData
+             * @param {string} basePriceText - Текстовая часть стоимости базовой теплицы
+             * @param {string} assemblyText - Текстовая часть стоимости сборки
+             * @param {string} foundationText - Текстовая часть стоимости основания
+             * @param {string} additionalProductsText - Текстовая часть дополнительных товаров
              */
-            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry) {
+            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText) {
                 if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
 
                 // Извлечение дополнительных характеристик
@@ -1581,20 +1584,18 @@
                     `${basePriceText}\n`;
 
                 // Добавление сборки
-                if (assemblyCost > 0) {
-                    commercialOffer += `Сборка и установка - ${formatPrice(assemblyCost)} рублей\n`;
+                if (assemblyText) {
+                    commercialOffer += `${assemblyText}\n`;
                 }
 
                 // Добавление основания из бруса
-                if (foundationCost > 0) {
-                    commercialOffer += `Основание из бруса - ${formatPrice(foundationCost)} рублей\n`;
+                if (foundationText) {
+                    commercialOffer += `${foundationText}\n`;
                 }
 
                 // Добавление дополнительных товаров
-                if (additionalProductsCost > 0) {
-                    commercialOffer += `\nДополнительные товары:\n`;
-                    const additionalProductsList = additionalProducts.map(product => `${product.name} - ${formatPrice(product.cost)} рублей`).join('\n');
-                    commercialOffer += `${additionalProductsList}\n`;
+                if (additionalProductsText) {
+                    commercialOffer += `\nДополнительные товары:\n${additionalProductsText}\n`;
                 }
 
                 // Добавление стоимости доставки
