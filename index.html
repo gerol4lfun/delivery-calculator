@@ -1518,11 +1518,15 @@ function generateCommercialOffer() {
     }
 
     // Извлечение дополнительных характеристик
-    const snowLoad = selectedEntry.snow_load || "Не указано";
-    // Исправляем высоту — удаляем лишнюю букву "м", если она есть
-const height = selectedEntry.height ? `${parseFloat(selectedEntry.height)} м` : "Не указано";
-    const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
-    const equipment = selectedEntry.equipment || "Не указано";
+const snowLoad = selectedEntry.snow_load || "Не указано";
+
+// Исправляем высоту — убираем лишнюю букву "м", если она уже есть
+const height = selectedEntry.height
+    ? `${parseFloat(selectedEntry.height.replace(/[^\d.]/g, ''))} м`
+    : "Не указано";
+
+const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
+const equipment = selectedEntry.equipment || "Не указано";
 
     // Извлечение стоимости и дополнительных услуг
     const totalPriceMatch = document.getElementById("summary").innerText.match(/Итоговая стоимость теплицы: <strong>(\d+) руб.<\/strong>/);
