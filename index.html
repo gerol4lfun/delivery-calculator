@@ -1535,10 +1535,13 @@ function generateCommercialOffer() {
     const deliveryCostValue = deliveryCostMatch ? deliveryCostMatch[1] : "Не рассчитано";
 
     // Получаем название теплицы из базы данных или используем форму
-    const selectedName = selectedEntry.form_name || form;
+const baseName = selectedEntry.form_name.toUpperCase();
 
-    // Формируем модель теплицы
-const modelName = `ТЕПЛИЦА ${selectedEntry.form_name.toUpperCase()} ${form.toUpperCase()} ${width}М`;
+// Если в названии уже есть слово "ТЕПЛИЦА", не добавляем его повторно
+const cleanName = baseName.startsWith("ТЕПЛИЦА") ? baseName : `ТЕПЛИЦА ${baseName}`;
+
+// Формируем модель теплицы
+const modelName = `${cleanName} ${form.toUpperCase()} ${width}М`;
 
     // Формирование текста КП
     const commercialOffer = `
