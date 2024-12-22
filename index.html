@@ -185,6 +185,7 @@
             font-size: 16px;
             color: #007BFF;
             text-align: center;
+            white-space: pre-wrap; /* Чтобы переносы строк \n работали */
         }
         #map {
             width: 100%;
@@ -197,6 +198,7 @@
             font-size: 16px;
             text-align: center;
             font-weight: bold;
+            white-space: pre-wrap; /* Чтобы переносы строк \n работали */
         }
         /* Дополнительные стили */
 
@@ -278,7 +280,7 @@
                 <div class="parameters">
                     <label for="frame">Каркас:</label>
                     <select id="frame" onchange="onFrameChange()">
-                        <option value="">Сначала выберите длину</option>
+                        <option value="">Выберите каркас</option>
                     </select>
                 </div>
 
@@ -1223,7 +1225,7 @@
                     basePrice = selectedEntry.price;
                     basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
                     assemblyOrFoundationCost += additionalCost;
-                    assemblyOrFoundationText += `Дополнение за шаг 0.65 м: +${formatPrice(Math.ceil(additionalCost / 10) * 10)} рублей`;
+                    assemblyOrFoundationText += `\nДополнение за шаг 0.65 м: +${formatPrice(Math.ceil(additionalCost / 10) * 10)} рублей`;
                     if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Дополнительная стоимость за шаг 0.65 м: ${additionalCost} руб.`);
                 } else {
                     alert("Некорректный шаг между дугами.");
@@ -1378,7 +1380,7 @@
                 if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость отображена.");
 
                 // Генерация коммерческого предложения с необходимыми параметрами
-                generateCommercialOffer(basePrice, assemblyOrFoundationCost, additionalProductsCost, deliveryCost, finalTotalPrice, selectedEntry);
+                generateCommercialOffer(basePrice, assemblyOrFoundationCost, additionalProducts, additionalProductsCost, deliveryCost, finalTotalPrice, selectedEntry);
             }
 
             // Функция расчёта доставки
@@ -1519,21 +1521,24 @@
              * Функция формирования коммерческого предложения
              * @param {number} basePrice - Стоимость теплицы
              * @param {number} assemblyOrFoundationCost - Стоимость сборки или монтажа
+             * @param {array} additionalProducts - Массив дополнительных продуктов
              * @param {number} additionalProductsCost - Стоимость дополнительных товаров
              * @param {number} deliveryCost - Стоимость доставки
              * @param {number} finalTotalPrice - Итоговая стоимость с доставкой
              * @param {object} selectedEntry - Выбранная запись из currentCityData
              */
-            function generateCommercialOffer(basePrice, assemblyOrFoundationCost, additionalProductsCost, deliveryCost, finalTotalPrice, selectedEntry) {
+            function generateCommercialOffer(basePrice, assemblyOrFoundationCost, additionalProducts, additionalProductsCost, deliveryCost, finalTotalPrice, selectedEntry) {
                 if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
 
                 // Извлечение дополнительных характеристик
                 const snowLoadRaw = selectedEntry.snow_load ? selectedEntry.snow_load : "";
-                const snowLoadValue = parseFloat(snowLoadRaw.replace(/[^0-9.]/g, ''));
+                const snowLoadMatch = snowLoadRaw.match(/(\d+(\.\d+)?)/);
+                const snowLoadValue = snowLoadMatch ? parseFloat(snowLoadMatch[1]) : 0;
                 const snowLoad = !isNaN(snowLoadValue) ? `${snowLoadValue} кг/м²` : "Не указано";
 
                 const heightRaw = selectedEntry.height ? selectedEntry.height : "";
-                const heightValue = parseFloat(heightRaw.replace(/[^0-9.]/g, ''));
+                const heightMatch = heightRaw.match(/(\d+(\.\d+)?)/);
+                const heightValue = heightMatch ? parseFloat(heightMatch[1]) : 0;
                 const height = !isNaN(heightValue) ? `${heightValue} м` : "Не указано";
 
                 const horizontalTiesRaw = selectedEntry.horizontal_ties ? selectedEntry.horizontal_ties : "";
