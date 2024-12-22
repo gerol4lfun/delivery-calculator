@@ -1520,9 +1520,9 @@ function generateCommercialOffer() {
     // Извлечение дополнительных характеристик
 const snowLoad = selectedEntry.snow_load || "Не указано";
 
-// Исправляем высоту — убираем лишнюю букву "м", если она уже есть
+// Исправляем высоту — убираем ВСЕ буквы "м" и пробелы, затем добавляем одну "м"
 const height = selectedEntry.height
-    ? `${parseFloat(selectedEntry.height.replace(/[^\d.]/g, ''))} м`
+    ? `${parseFloat(selectedEntry.height.replace(/[^0-9.]/g, ''))} м`
     : "Не указано";
 
 const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
