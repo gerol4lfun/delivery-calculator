@@ -746,7 +746,7 @@
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
                 resetDropdown('polycarbonate', 'Сначала выберите город');
-                resetDropdown('arcStep', 'Выберите шаг');
+                // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
                 resetAdditionalOptions();
                 document.getElementById("summary").innerHTML = "Здесь будет выводиться итоговая сумма и детали расчета.";
                 document.getElementById("commercial-offer").value = "Здесь будет ваше коммерческое предложение.";
@@ -825,7 +825,7 @@
                     resetDropdown('length', 'Сначала выберите ширину');
                     resetDropdown('frame', 'Сначала выберите длину');
                     resetDropdown('polycarbonate', 'Сначала выберите город');
-                    resetDropdown('arcStep', 'Выберите шаг');
+                    // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
                     resetAdditionalOptions();
                     return;
                 }
@@ -900,7 +900,8 @@
                 resetDropdown('width', 'Сначала выберите форму');
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
-                resetDropdown('arcStep', 'Выберите шаг');
+                resetDropdown('arcStep', 'Выберите шаг'); // Можно оставить, если нужно сбросить выбор
+                // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -949,7 +950,7 @@
                 // Сброс длины и каркасов
                 resetDropdown('length', 'Сначала выберите ширину');
                 resetDropdown('frame', 'Сначала выберите длину');
-                resetDropdown('arcStep', 'Выберите шаг');
+                // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -998,7 +999,7 @@
 
                 // Сброс каркаса и шага дуг
                 resetDropdown('frame', 'Сначала выберите длину');
-                resetDropdown('arcStep', 'Выберите шаг');
+                // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -1047,7 +1048,7 @@
                 if (DEBUG) console.log("Выпадающий список каркаса обновлен.");
 
                 // Сброс шага дуг
-                resetDropdown('arcStep', 'Выберите шаг');
+                // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
@@ -1056,8 +1057,8 @@
             // Функция обработки изменения каркаса
             function onFrameChange() {
                 if (DEBUG) console.log("Каркас изменен.");
-                // Сброс шага дуг
-                resetDropdown('arcStep', 'Выберите шаг');
+                // Сброс шага дуг, если это необходимо
+                // resetDropdown('arcStep', 'Выберите шаг'); // Удаляем сброс arcStep
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
             }
@@ -1066,8 +1067,14 @@
             function resetDropdown(elementId, placeholderText) {
                 const dropdown = document.getElementById(elementId);
                 if (dropdown) {
-                    dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
-                    if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
+                    if (elementId === 'arcStep') {
+                        // Не сбрасываем arcStep, просто устанавливаем на дефолтное значение
+                        dropdown.value = "";
+                        if (DEBUG) console.log(`Выпадающий список ${elementId} установлен на дефолтное значение "${placeholderText}".`);
+                    } else {
+                        dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+                        if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
+                    }
                 }
             }
 
@@ -1489,6 +1496,13 @@
                 const polycarbonate = document.getElementById("polycarbonate").value;
                 const arcStep = parseFloat(document.getElementById("arcStep").value);
 
+                // Проверка, что arcStep выбран
+                if (isNaN(arcStep)) {
+                    if (DEBUG) console.log("[GENERATE_OFFICE] Шаг дуги не выбран.");
+                    document.getElementById("commercial-offer").value = "Пожалуйста, выберите шаг дуги.";
+                    return;
+                }
+
                 // Дополнительные характеристики из currentCityData
                 const selectedEntry = currentCityData.find(item => {
                     return (
@@ -1568,7 +1582,7 @@
             function getModelName(form, width, length) {
                 // Здесь можно реализовать логику для получения точного названия модели
                 // Например, использовать текущую запись selectedEntry или другую логику
-                // Для простоты вернем просто ширину и длину
+                // Для примера вернем просто ширину и длину
                 return `${width}М ${length}М`;
             }
         </script>
