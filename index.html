@@ -1519,7 +1519,8 @@ function generateCommercialOffer() {
 
     // Извлечение дополнительных характеристик
     const snowLoad = selectedEntry.snow_load || "Не указано";
-    const height = selectedEntry.height || "Не указано";
+    // Исправляем высоту — удаляем лишнюю букву "м", если она есть
+const height = selectedEntry.height ? `${parseFloat(selectedEntry.height)} м` : "Не указано";
     const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
     const equipment = selectedEntry.equipment || "Не указано";
 
