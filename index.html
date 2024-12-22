@@ -1538,7 +1538,7 @@ function generateCommercialOffer() {
     const selectedName = selectedEntry.form_name || form;
 
     // Формируем модель теплицы
-    const modelName = `ТЕПЛИЦА ${selectedName.toUpperCase()} ${form.toUpperCase()} ${width}М`;
+const modelName = `ТЕПЛИЦА ${selectedEntry.form_name.toUpperCase()} ${form.toUpperCase()} ${width}М`;
 
     // Формирование текста КП
     const commercialOffer = `
