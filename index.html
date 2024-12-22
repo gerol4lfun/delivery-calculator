@@ -1540,8 +1540,8 @@ const baseName = selectedEntry.form_name.toUpperCase();
 // Если в названии уже есть слово "ТЕПЛИЦА", не добавляем его повторно
 const cleanName = baseName.startsWith("ТЕПЛИЦА") ? baseName : `ТЕПЛИЦА ${baseName}`;
 
-// Формируем модель теплицы (название + форма + ширина)
-const modelName = `${cleanName} ${form.toUpperCase()} ${width}М`;
+// Формируем модель теплицы (только название и форма, ширину больше не добавляем)
+const modelName = `${cleanName} ${form.toUpperCase()}`;
 
     // Формирование текста КП
     const commercialOffer = `
