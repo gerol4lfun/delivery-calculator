@@ -1534,13 +1534,13 @@ function generateCommercialOffer() {
     const deliveryCostMatch = document.getElementById("result").innerText.match(/Стоимость доставки: (\d+) рублей/);
     const deliveryCostValue = deliveryCostMatch ? deliveryCostMatch[1] : "Не рассчитано";
 
-    // Получаем название теплицы из базы данных или используем форму
+    // Получаем название теплицы из базы данных
 const baseName = selectedEntry.form_name.toUpperCase();
 
 // Если в названии уже есть слово "ТЕПЛИЦА", не добавляем его повторно
 const cleanName = baseName.startsWith("ТЕПЛИЦА") ? baseName : `ТЕПЛИЦА ${baseName}`;
 
-// Формируем модель теплицы
+// Формируем модель теплицы (название + форма + ширина)
 const modelName = `${cleanName} ${form.toUpperCase()} ${width}М`;
 
     // Формирование текста КП
