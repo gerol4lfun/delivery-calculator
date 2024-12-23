@@ -83,11 +83,14 @@
             flex-wrap: wrap;
         }
         .block {
-            flex: 1 1 30%;
+            flex: 1 1 45%;
             padding: 20px;
+            border-right: 1px solid #ddd;
             box-sizing: border-box;
             min-width: 300px;
-            margin: 10px;
+        }
+        .block:last-child {
+            border-right: none;
         }
         .logout {
             position: absolute;
@@ -151,7 +154,6 @@
             margin-bottom: 10px;
             font-size: 16px;
             color: #333;
-            text-align: center;
         }
         .additional-products .product-item {
             margin-bottom: 10px;
@@ -178,13 +180,12 @@
             color: #000; /* Сделать цену черной */
             white-space: nowrap; /* Предотвращает перенос цен на новую строку */
         }
-        #commercial-offer, #result {
+        #result, #summary, #commercial-offer {
             margin-top: 20px;
             font-size: 16px;
             color: #007BFF;
             text-align: center;
             white-space: pre-wrap; /* Чтобы переносы строк \n работали */
-            font-family: Arial, sans-serif; /* Совпадает с остальными элементами */
         }
         #map {
             width: 100%;
@@ -192,7 +193,13 @@
             margin-top: 20px;
             border-radius: 8px;
         }
-
+        .summary {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+            white-space: pre-wrap; /* Чтобы переносы строк \n работали */
+        }
         /* Дополнительные стили */
 
         /* Убедимся, что чекбоксы в additional-services имеют такой же размер, как и в additional-products */
@@ -206,29 +213,6 @@
         .product-label .product-name::after {
             content: "";
             margin-right: 0px; /* Убираем отступ, если был добавлен ранее */
-        }
-
-        /* Организация радио кнопок доставки в одну строку */
-        .delivery-options {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        /* Центрирование текста и выравнивание шрифта для коммерческого предложения */
-        #commercial-offer {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: none; /* Запрещаем изменение размера */
-        }
-
-        /* Обеспечиваем корректное размещение кнопки расчета */
-        .calculate-button {
-            margin-top: 20px;
         }
     </style>
 </head>
@@ -253,10 +237,8 @@
                 <label for="address">Введите адрес доставки:</label>
                 <input type="text" id="address" placeholder="Например, Санкт-Петербург, Невский пр." required autocomplete="off">
                 
-                <div class="delivery-options">
-                    <label><input type="radio" name="deliveryType" value="withoutAssembly" checked> Без сборки</label>
-                    <label><input type="radio" name="deliveryType" value="withAssembly"> Со сборкой</label>
-                </div>
+                <label><input type="radio" name="deliveryType" value="withoutAssembly" checked> Без сборки</label>
+                <label><input type="radio" name="deliveryType" value="withAssembly"> Со сборкой</label>
 
                 <button onclick="calculateDelivery()">Рассчитать доставку</button>
                 <div id="result"></div>
@@ -296,19 +278,6 @@
                 </div>
                 
                 <div class="parameters">
-                    <label for="height">Высота (м):</label>
-                    <select id="height" onchange="onHeightChange()">
-                        <option value="">Выберите высоту</option>
-                        <option value="2.0">2.0 м</option>
-                        <option value="2.1">2.1 м</option>
-                        <option value="2.2">2.2 м</option>
-                        <option value="2.3">2.3 м</option>
-                        <option value="2.4">2.4 м</option>
-                        <option value="2.5">2.5 м</option>
-                    </select>
-                </div>
-                
-                <div class="parameters">
                     <label for="frame">Каркас:</label>
                     <select id="frame" onchange="onFrameChange()">
                         <option value="">Выберите каркас</option>
@@ -317,17 +286,15 @@
 
                 <div class="parameters">
                     <label for="polycarbonate">Поликарбонат:</label>
-                    <select id="polycarbonate" onchange="onPolycarbonateChange()">
-                        <option value="">Выберите поликарбонат</option>
-                        <option value="Стандарт 4мм">Стандарт 4мм</option>
-                        <option value="Люкс 4мм">Люкс 4мм</option>
-                        <option value="Премиум 6мм">Премиум 6мм</option>
+                    <select id="polycarbonate">
+                        <option value="">Сначала выберите город</option>
                     </select>
                 </div>
 
                 <div class="parameters">
                     <label for="arcStep">Шаг между дугами:</label>
-                    <select id="arcStep" onchange="onArcStepChange()">
+                    <select id="arcStep">
+                        <option value="">Выберите шаг</option>
                         <option value="1">1 м</option>
                         <option value="0.65">0.65 м</option>
                     </select>
@@ -416,17 +383,22 @@
                     </div>
                 </div>
 
-                <!-- Кнопка расчета -->
-                <div class="calculate-button">
-                    <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
+                <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
+            </div>
+
+            <!-- Блок итогового расчета -->
+            <div class="block">
+                <h2>Итоговый расчет</h2>
+                <div class="summary" id="summary">
+                    Здесь будет выводиться итоговая сумма и детали расчета.
                 </div>
             </div>
 
             <!-- Блок коммерческого предложения -->
             <div class="block">
                 <h2>Коммерческое предложение</h2>
-                <textarea id="commercial-offer" rows="20" readonly>
-Здесь будет ваше коммерческое предложение.
+                <textarea id="commercial-offer" rows="20" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" readonly>
+                    Здесь будет ваше коммерческое предложение.
                 </textarea>
                 <button onclick="copyCommercialOffer()">Скопировать КП</button>
             </div>
@@ -633,70 +605,70 @@
             // Определение доступных форм теплиц и их названий
             const availableForms = {
                 "Арочная": [
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М АРОЧНАЯ", frame: "оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ 3М АРОЧНАЯ", frame: "оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М АРОЧНАЯ", frame: "оцинкованная труба 20х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М АРОЧНАЯ", frame: "оцинкованная труба 20х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" }
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 2.5М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ 3М", frame: "20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 2.5М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ДЕЛЮКС 3М", frame: "20х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА БОЯРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
                 ],
                 "Каплевидная": [
-                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М КАПЛЕВИДНАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М КАПЛЕВИДНАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М КАПЛЕВИДНАЯ", frame: "оцинкованная труба 40х20 мм" }
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА СТРЕЛЕЦКАЯ ЛЮКС 3.5М", frame: "40х20" }
                 ],
                 "Прямостенная": [
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" }
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
                 ],
                 "Домиком": [
-                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" }
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М", frame: "40х20+20х20" }
                 ],
                 "Пристенная": [
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М ПРИСТЕННАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М ПРИСТЕННАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М ПРИСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М ПРИСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" }
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА ПРИСТЕННАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" }
                 ],
                 "Митлайдер арочная": [
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М МИТЛАЙДЕР АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М МИТЛАЙДЕР АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М МИТЛАЙДЕР АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М МИТЛАЙДЕР АРОЧНАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" }
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЛЮКС 3.5М", frame: "40х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ПРЕМИУМ 3.5М", frame: "40х20+20х20" }
                 ],
                 "Митлайдер прямостенная": [
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М МИТЛАЙДЕР ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М МИТЛАЙДЕР ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" }
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3М", frame: "40х20+20х20" },
+                    { name: "ТЕПЛИЦА МИТЛАЙДЕР ЭЛИТ 3.5М", frame: "40х20+20х20" }
                 ],
                 "Промышленная прямостенная": [
-                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М ПРОМЫШЛЕННАЯ ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М ПРОМЫШЛЕННАЯ ПРЯМОСТЕННАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 40х20 мм" }
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА ПРЕМЬЕР ПРЕМИУМ 6М", frame: "40х20+40х20" }
                 ],
                 "Промышленная домиком": [
-                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М ПРОМЫШЛЕННАЯ ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 40х20 мм" },
-                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М ПРОМЫШЛЕННАЯ ДОМИКОВАЯ", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 40х20 мм" }
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 7М", frame: "40х20+40х20" },
+                    { name: "ТЕПЛИЦА МОНАРХ ПРЕМИУМ 8М", frame: "40х20+40х20" }
                 ],
                 "Навес": [
-                    { name: "НАВЕС ЛЮКС 3.5М НАВЕС", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "НАВЕС ЛЮКС 4М НАВЕС", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 20х20 мм" },
-                    { name: "НАВЕС ПРЕМИУМ 5М НАВЕС", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 40х20 мм" },
-                    { name: "НАВЕС ПРЕМИУМ 6М НАВЕС", frame: "оцинкованная труба 40х20 мм+оцинкованная труба 40х20 мм" }
+                    { name: "НАВЕС ЛЮКС 3.5М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ЛЮКС 4М", frame: "40х20+20х20" },
+                    { name: "НАВЕС ПРЕМИУМ 5М", frame: "40х20+40х20" },
+                    { name: "НАВЕС ПРЕМИУМ 6М", frame: "40х20+40х20" }
                 ]
             };
 
@@ -784,12 +756,11 @@
                 resetDropdown('form', 'Сначала выберите город');
                 resetDropdown('width', 'Сначала выберите форму');
                 resetDropdown('length', 'Сначала выберите ширину');
-                resetDropdown('height', 'Сначала выберите высоту');
                 resetDropdown('frame', 'Сначала выберите длину');
-                resetDropdown('polycarbonate', 'Выберите поликарбонат');
+                resetDropdown('polycarbonate', 'Сначала выберите город');
                 resetDropdown('arcStep', 'Выберите шаг');
                 resetAdditionalOptions();
-                // Сброс коммерческого предложения и результатов
+                document.getElementById("summary").innerHTML = "Здесь будет выводиться итоговая сумма и детали расчета.";
                 document.getElementById("commercial-offer").value = "Здесь будет ваше коммерческое предложение.";
                 document.getElementById("result").innerText = "";
                 if (mapInstance && currentRoute) {
@@ -866,10 +837,9 @@
                     resetDropdown('form', 'Сначала выберите город');
                     resetDropdown('width', 'Сначала выберите форму');
                     resetDropdown('length', 'Сначала выберите ширину');
-                    resetDropdown('height', 'Сначала выберите высоту');
                     resetDropdown('frame', 'Сначала выберите длину');
-                    resetDropdown('polycarbonate', 'Выберите поликарбонат');
                     resetDropdown('arcStep', 'Выберите шаг');
+                    resetDropdown('polycarbonate', 'Выберите поликарбонат');
                     resetAdditionalOptions();
                     return;
                 }
@@ -940,10 +910,9 @@
 
                 if (DEBUG) console.log("Выпадающий список форм теплиц обновлен.");
 
-                // 4. Сбрасываем размеры, высоту, каркасы и шаг дуг
+                // 4. Сбрасываем размеры и каркасы
                 resetDropdown('width', 'Сначала выберите форму');
                 resetDropdown('length', 'Сначала выберите ширину');
-                resetDropdown('height', 'Сначала выберите высоту');
                 resetDropdown('frame', 'Сначала выберите длину');
                 resetDropdown('arcStep', 'Выберите шаг');
 
@@ -991,9 +960,8 @@
 
                 if (DEBUG) console.log("Выпадающий список ширины обновлен.");
 
-                // Сброс длины, высоты и каркасов
+                // Сброс длины и каркасов
                 resetDropdown('length', 'Сначала выберите ширину');
-                resetDropdown('height', 'Сначала выберите высоту');
                 resetDropdown('frame', 'Сначала выберите длину');
                 resetDropdown('arcStep', 'Выберите шаг');
 
@@ -1042,8 +1010,7 @@
 
                 if (DEBUG) console.log("Выпадающий список длины обновлен.");
 
-                // Сброс высоты и каркасов
-                resetDropdown('height', 'Сначала выберите высоту');
+                // Сброс каркаса и шага дуг
                 resetDropdown('frame', 'Сначала выберите длину');
                 resetDropdown('arcStep', 'Выберите шаг');
 
@@ -1059,8 +1026,8 @@
 
                 if (DEBUG) console.log(`Выбрана длина: ${length} м для формы: ${form} и ширины: ${width} м`);
 
-                const heightSelect = document.getElementById("height");
-                heightSelect.innerHTML = '<option value="">Выберите высоту</option>';
+                const frameSelect = document.getElementById("frame");
+                frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
                 if (isNaN(length)) {
                     return;
@@ -1081,49 +1048,32 @@
                     return;
                 }
 
-                // Получаем уникальные значения высоты
-                const uniqueHeights = [...new Set(filteredData.map(item => item.height))].sort((a, b) => a - b);
+                // Получаем уникальные значения каркаса
+                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
 
-                if (DEBUG) console.log("Уникальные высоты:", uniqueHeights);
+                if (DEBUG) console.log("Уникальные каркасы:", uniqueFrames);
 
-                // Заполняем выпадающий список высоты
-                uniqueHeights.forEach(height => {
-                    heightSelect.innerHTML += `<option value="${height}">${formatPrice(height)} м</option>`;
+                // Заполняем выпадающий список каркаса
+                uniqueFrames.forEach(frame => {
+                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
                 });
 
-                if (DEBUG) console.log("Выпадающий список высоты обновлен.");
+                if (DEBUG) console.log("Выпадающий список каркаса обновлен.");
 
-                // Сброс каркаса и шага дуг
-                resetDropdown('frame', 'Сначала выберите длину');
+                // Сброс шага дуг
                 resetDropdown('arcStep', 'Выберите шаг');
 
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
             }
 
-            // Функция обработки изменения высоты
-            function onHeightChange() {
-                if (DEBUG) console.log("Высота изменена.");
+            // Функция обработки изменения каркаса
+            function onFrameChange() {
+                if (DEBUG) console.log("Каркас изменен.");
                 // Сброс шага дуг
                 resetDropdown('arcStep', 'Выберите шаг');
                 // Сброс дополнительных опций
                 resetAdditionalOptions();
-            }
-
-            // Функция обработки изменения поликарбоната
-            function onPolycarbonateChange() {
-                if (DEBUG) console.log("Поликарбонат изменен.");
-                // Сброс шага дуг
-                resetDropdown('arcStep', 'Выберите шаг');
-                // Сброс дополнительных опций
-                resetAdditionalOptions();
-            }
-
-            // Функция обработки изменения шага дуг
-            function onArcStepChange() {
-                if (DEBUG) console.log("Шаг дуг изменен.");
-                // Автоматически пересчитываем снеговую нагрузку и обновляем КП
-                calculateGreenhouseCost();
             }
 
             // Функция сброса выпадающих списков
@@ -1132,8 +1082,8 @@
                 if (dropdown) {
                     if (elementId === 'arcStep') {
                         // Устанавливаем на дефолтное значение без сброса опций
-                        dropdown.value = "1"; // Устанавливаем на 1 м по умолчанию
-                        if (DEBUG) console.log(`Выпадающий список ${elementId} установлен на дефолтное значение "${dropdown.value} м".`);
+                        dropdown.value = "";
+                        if (DEBUG) console.log(`Выпадающий список ${elementId} установлен на дефолтное значение "${placeholderText}".`);
                     } else {
                         dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
                         if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
@@ -1191,7 +1141,6 @@
                 const form = document.getElementById("form").value;
                 const width = parseFloat(document.getElementById("width").value);
                 const length = parseFloat(document.getElementById("length").value);
-                const height = parseFloat(document.getElementById("height").value);
                 const frame = document.getElementById("frame").value;
                 const polycarbonate = document.getElementById("polycarbonate").value;
                 const arcStep = parseFloat(document.getElementById("arcStep").value);
@@ -1199,7 +1148,7 @@
                 if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Начало расчёта стоимости теплицы.");
 
                 // Проверка на заполнение всех обязательных полей
-                if (!city || !form || isNaN(width) || isNaN(length) || isNaN(height) || !frame || !polycarbonate || isNaN(arcStep)) {
+                if (!city || !form || isNaN(width) || isNaN(length) || !frame || !polycarbonate || isNaN(arcStep)) {
                     alert("Пожалуйста, заполните все обязательные поля.");
                     if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Не все обязательные поля заполнены.");
                     return;
@@ -1218,7 +1167,6 @@
                         getFormCategory(item.form_name) === form &&
                         parseFloat(item.width) === width &&
                         parseFloat(item.length) === length &&
-                        parseFloat(item.height) === height &&
                         normalizeString(item.frame_description) === normalizeString(frame) &&
                         normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
                     );
@@ -1237,7 +1185,7 @@
                     console.log("[CALCULATE_GREENHOUSE] Значение snow_load из базы данных:", selectedEntry.snow_load);
                 }
 
-                let basePrice = selectedEntry.price; // Стоимость теплицы
+                let basePrice = 0; // Стоимость теплицы
                 let assemblyCost = 0; // Стоимость сборки
                 let foundationCost = 0; // Стоимость основания (брус)
                 let additionalProductsCost = 0; // Стоимость дополнительных товаров
@@ -1249,35 +1197,45 @@
                 let additionalProductsText = "";
                 let deliveryText = "";
 
-                // Расчёт снеговой нагрузки
-                let adjustedSnowLoad = selectedEntry.snow_load;
+                // Расчёт стоимости базовой теплицы с учётом шага дуг
+                if (arcStep === 1) {
+                    // Шаг 1 м: используем базовую цену
+                    basePrice = selectedEntry.price;
+                    basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
+                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Цена теплицы без добавок: ${basePrice} руб.`);
+                } else if (arcStep === 0.65) {
+                    // Шаг 0.65 м: рассчитываем дополнительную стоимость
+                    // Находим базовую цену для "Стандарт 4мм"
+                    const baseEntry = currentCityData.find(item => {
+                        return (
+                            getFormCategory(item.form_name) === form &&
+                            parseFloat(item.width) === width &&
+                            parseFloat(item.length) === length &&
+                            normalizeString(item.frame_description) === normalizeString(frame) &&
+                            normalizeString(item.polycarbonate_type) === "стандарт 4мм"
+                        );
+                    });
 
-                // Увеличение нагрузки на основе типа поликарбоната
-                let polycarbonateMultiplier = 1;
-                if (polycarbonate === "Люкс 4мм") {
-                    polycarbonateMultiplier += 0.10; // +10%
-                } else if (polycarbonate === "Премиум 6мм") {
-                    polycarbonateMultiplier += 0.20; // +20%
+                    if (!baseEntry) {
+                        alert('Не найдена базовая цена для покрытия "Стандарт 4мм".');
+                        if (DEBUG) console.log('[CALCULATE_GREENHOUSE] Не найдена baseEntry для "стандарт 4мм".');
+                        return;
+                    }
+
+                    const basePriceStandard = baseEntry.price;
+                    const additionalCost = 0.25 * basePriceStandard;
+
+                    // Цена выбранного типа поликарбоната
+                    basePrice = selectedEntry.price;
+                    basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
+                    assemblyCost += additionalCost;
+                    assemblyText += `\nДополнение за шаг 0.65 м: +${formatPrice(Math.ceil(additionalCost / 10) * 10)} рублей`;
+                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Дополнительная стоимость за шаг 0.65 м: ${additionalCost} руб.`);
+                } else {
+                    alert("Некорректный шаг между дугами.");
+                    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Некорректный arcStep:", arcStep);
+                    return;
                 }
-                adjustedSnowLoad *= polycarbonateMultiplier;
-
-                // Увеличение нагрузки на основе шага дуг
-                let arcStepMultiplier = 1;
-                if (arcStep === 0.65) {
-                    arcStepMultiplier += 0.20; // +20%
-                }
-                adjustedSnowLoad *= arcStepMultiplier;
-
-                if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Снеговая нагрузка после корректировок: ${adjustedSnowLoad} кг/м²`);
-
-                // Включение стоимости изменения шага дуг в базовую стоимость
-                if (arcStep === 0.65) {
-                    const stepCost = basePrice * 0.20; // Добавляем 20% к базовой цене
-                    basePrice += stepCost;
-                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Добавлена стоимость за шаг дуг 0.65 м: ${stepCost} руб.`);
-                }
-
-                basePriceText = `Стоимость теплицы: ${formatPrice(basePrice)} рублей`;
 
                 // Дополнительные услуги
                 const bracingChecked = document.getElementById('bracing').checked;
@@ -1293,7 +1251,7 @@
                     const bracingPrice = additionalServicesData["Брус"].price_by_length[length];
                     if (bracingPrice) {
                         foundationCost += bracingPrice;
-                        foundationText += `Основание из бруса - ${formatPrice(bracingPrice)} рублей\n`;
+                        foundationText += `\nОснование из бруса - ${formatPrice(bracingPrice)} рублей`;
                         if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость бруса: ${bracingPrice} руб.`);
                     } else {
                         alert(`Не найдена стоимость бруса для длины ${length} м.`);
@@ -1309,7 +1267,7 @@
                     if (stakesQuantity) {
                         const stakesCost = stakesQuantity * additionalServicesData["Штыри"].price_per_unit;
                         foundationCost += stakesCost;
-                        foundationText += `Грунтозацепы ${stakesQuantity} шт - ${formatPrice(stakesCost)} рублей\n`;
+                        foundationText += `\nГрунтозацепы ${stakesQuantity} шт - ${formatPrice(stakesCost)} рублей`;
                         if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость штырей: ${stakesCost} руб. (${stakesQuantity} шт.)`);
                     } else {
                         alert(`Не найдена информация о количестве штырей для длины ${length} м.`);
@@ -1325,7 +1283,7 @@
                         const assemblyCostCalculated = calculateAssemblyCost(form, assemblyCategory, length);
                         if (assemblyCostCalculated > 0) {
                             assemblyCost += assemblyCostCalculated;
-                            assemblyText += `Сборка и установка - ${formatPrice(assemblyCostCalculated)} рублей\n`;
+                            assemblyText += `\nСборка и установка - ${formatPrice(assemblyCostCalculated)} рублей`;
                             if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость сборки: ${assemblyCostCalculated} руб.`);
                         } else {
                             alert(`Не найдена стоимость сборки для формы "${form}", ширины "${width}М" и длины "${length} м".`);
@@ -1344,7 +1302,7 @@
                             const woodPrice = parseFloat(document.getElementById('on-wood').getAttribute('data-price'));
                             if (woodPrice) {
                                 foundationCost += woodPrice;
-                                foundationText += `Монтаж на брус клиента - ${formatPrice(woodPrice)} рублей\n`;
+                                foundationText += `\nМонтаж на брус клиента - ${formatPrice(woodPrice)} рублей`;
                                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость монтажа на брус: ${woodPrice} руб.`);
                             } else {
                                 alert(`Не найдена стоимость монтажа на брус.`);
@@ -1356,7 +1314,7 @@
                             const concretePrice = parseFloat(document.getElementById('on-concrete').getAttribute('data-price'));
                             if (concretePrice) {
                                 foundationCost += concretePrice;
-                                foundationText += `Монтаж на бетон клиента - ${formatPrice(concretePrice)} рублей\n`;
+                                foundationText += `\nМонтаж на бетон клиента - ${formatPrice(concretePrice)} рублей`;
                                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость монтажа на бетон: ${concretePrice} руб.`);
                             } else {
                                 alert(`Не найдена стоимость монтажа на бетон.`);
@@ -1414,22 +1372,25 @@
                 let summaryText = `Итоговая стоимость теплицы: ${formatPrice(finalTotalPrice)} рублей\n`;
                 summaryText += `${basePriceText}\n`;
                 if (assemblyText) {
-                    summaryText += `${assemblyText}`;
+                    summaryText += `${assemblyText}\n`;
                 }
                 if (foundationText) {
-                    summaryText += `${foundationText}`;
+                    summaryText += `${foundationText}\n`;
                 }
                 if (additionalProductsText) {
-                    summaryText += `Дополнительные товары:\n${additionalProductsText}\n`;
+                    summaryText += `\nДополнительные товары:\n${additionalProductsText}\n`;
                 }
                 if (deliveryPrice > 0) {
                     summaryText += `Доставка - ${formatPrice(deliveryPrice)} рублей\n`;
                 }
                 summaryText += `\nИтоговая стоимость - ${formatPrice(finalTotalPrice)} рублей`;
 
-                // Выводим итоговую стоимость в коммерческое предложение
-                // Формируем коммерческое предложение с добавлением формы и всех параметров
-                generateCommercialOffer(form, frame, width, length, height, polycarbonate, arcStep, adjustedSnowLoad, bracingChecked, groundHooksChecked, assemblyChecked, onWoodChecked, onConcreteChecked, additionalProducts, basePrice, assemblyCost, foundationCost, additionalProductsCost, deliveryPrice, finalTotalPrice);
+                // Выводим итоговую стоимость
+                document.getElementById("summary").innerText = summaryText;
+                if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость отображена.");
+
+                // Генерация коммерческого предложения с необходимыми параметрами
+                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText);
             }
 
             // Функция расчёта доставки
@@ -1568,75 +1529,78 @@
 
             /**
              * Функция формирования коммерческого предложения
-             * @param {string} form - Форма теплицы
-             * @param {string} frame - Каркас
-             * @param {number} width - Ширина
-             * @param {number} length - Длина
-             * @param {number} height - Высота
-             * @param {string} polycarbonate - Тип поликарбоната
-             * @param {number} arcStep - Шаг дуг
-             * @param {number} adjustedSnowLoad - Снеговая нагрузка после корректировок
-             * @param {boolean} bracingChecked - Выбрана ли опция бруса
-             * @param {boolean} groundHooksChecked - Выбрана ли опция штырей
-             * @param {boolean} assemblyChecked - Выбрана ли опция сборки
-             * @param {boolean} onWoodChecked - Выбрана ли опция монтажа на брус
-             * @param {boolean} onConcreteChecked - Выбрана ли опция монтажа на бетон
-             * @param {array} additionalProducts - Массив дополнительных продуктов
-             * @param {number} basePrice - Базовая стоимость теплицы
+             * @param {number} basePrice - Стоимость теплицы
              * @param {number} assemblyCost - Стоимость сборки
-             * @param {number} foundationCost - Стоимость основания
+             * @param {number} foundationCost - Стоимость основания (брус)
+             * @param {array} additionalProducts - Массив дополнительных продуктов
              * @param {number} additionalProductsCost - Стоимость дополнительных товаров
              * @param {number} deliveryPrice - Стоимость доставки
-             * @param {number} finalTotalPrice - Итоговая стоимость
+             * @param {number} finalTotalPrice - Итоговая стоимость с доставкой
+             * @param {object} selectedEntry - Выбранная запись из currentCityData
+             * @param {string} basePriceText - Текстовая часть стоимости базовой теплицы
+             * @param {string} assemblyText - Текстовая часть стоимости сборки
+             * @param {string} foundationText - Текстовая часть стоимости основания
+             * @param {string} additionalProductsText - Текстовая часть дополнительных товаров
              */
-            function generateCommercialOffer(form, frame, width, length, height, polycarbonate, arcStep, adjustedSnowLoad, bracingChecked, groundHooksChecked, assemblyChecked, onWoodChecked, onConcreteChecked, additionalProducts, basePrice, assemblyCost, foundationCost, additionalProductsCost, deliveryPrice, finalTotalPrice) {
+            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText) {
                 if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
 
-                // Получаем название теплицы из базы данных
-                const baseName = availableForms[form].find(item => item.frame === frame && item.name.includes(`${width}М`) && item.name.includes(`${length}М`) && item.name.includes(`${height}М`))?.name || form;
+                // Извлечение дополнительных характеристик
+                const snowLoad = selectedEntry.snow_load ? selectedEntry.snow_load : "Не указано";
+                const height = selectedEntry.height ? selectedEntry.height : "Не указано";
+                const horizontalTies = selectedEntry.horizontal_ties ? selectedEntry.horizontal_ties : "Не указано";
+                const equipment = selectedEntry.equipment || "Не указано";
 
-                // Формируем название модели с учетом формы
-                const modelName = baseName.toUpperCase();
+                // Логирование для отладки
+                if (DEBUG) console.log({ snowLoad, height, horizontalTies, equipment });
+
+                // Получаем название теплицы из базы данных
+                const baseName = selectedEntry.form_name.toUpperCase();
+
+                // Если в названии уже есть слово "ТЕПЛИЦА", не добавляем его повторно
+                const cleanName = baseName.startsWith("ТЕПЛИЦА") ? baseName : `ТЕПЛИЦА ${baseName}`;
+
+                // Формируем модель теплицы без добавления формы, так как она уже включена в form_name
+                const modelName = cleanName;
+
+                // Получаем значения параметров для коммерческого предложения
+                const frameValue = document.getElementById("frame").value;
+                const widthValue = document.getElementById("width").value;
+                const lengthValue = document.getElementById("length").value;
+                const arcStepValue = document.getElementById("arcStep").value;
+                const polycarbonateValue = document.getElementById("polycarbonate").value;
 
                 // Формирование текста КП
                 let commercialOffer = `${modelName}\n\n` +
-                    `Каркас: ${frame}\n` +
-                    `Ширина: ${formatPrice(width)} м\n` +
-                    `Длина: ${formatPrice(length)} м\n` +
-                    `Высота: ${formatPrice(height)} м\n` +
-                    `Шаг дуг: ${formatPrice(arcStep)} м\n` +
-                    `Поликарбонат с УФ защитой: ${polycarbonate}\n` +
-                    `Снеговая нагрузка: ${formatPrice(adjustedSnowLoad)} кг/м²\n`;
-
-                // Горизонтальные стяжки (предполагается, что это количество)
-                // Из данных базы, если есть поле horizontal_ties
-                const horizontalTies = selectedEntry.horizontal_ties || "Не указано";
-                commercialOffer += `Горизонтальные стяжки: ${horizontalTies} шт\n`;
-
-                // Комплектация (предполагается, что это строка)
-                const equipment = selectedEntry.equipment || "Не указано";
-                commercialOffer += `Комплектация: ${equipment}\n\n`;
-
-                commercialOffer += `${basePriceText}\n`;
+                    `Каркас: ${frameValue}\n` +
+                    `Ширина: ${formatPrice(widthValue)} м\n` +
+                    `Длина: ${formatPrice(lengthValue)} м\n` +
+                    `Высота: ${height}\n` +
+                    `Шаг дуги: ${arcStepValue} м\n` +
+                    `Поликарбонат с УФ защитой: ${polycarbonateValue}\n` +
+                    `Снеговая нагрузка: ${snowLoad}\n` +
+                    `Горизонтальные стяжки: ${horizontalTies}\n` +
+                    `Комплектация: ${equipment}\n\n` +
+                    `${basePriceText}\n`;
 
                 // Добавление сборки
                 if (assemblyText) {
-                    commercialOffer += `${assemblyText}`;
+                    commercialOffer += `${assemblyText}\n`;
                 }
 
                 // Добавление основания из бруса
                 if (foundationText) {
-                    commercialOffer += `${foundationText}`;
+                    commercialOffer += `${foundationText}\n`;
                 }
 
                 // Добавление дополнительных товаров
                 if (additionalProductsText) {
-                    commercialOffer += `${additionalProductsText}\n`;
+                    commercialOffer += `\nДополнительные товары:\n${additionalProductsText}\n`;
                 }
 
                 // Добавление стоимости доставки
                 if (deliveryPrice > 0) {
-                    commercialOffer += `Доставка - ${formatPrice(deliveryPrice)} рублей\n`;
+                    commercialOffer += `\nДоставка - ${formatPrice(deliveryPrice)} рублей\n`;
                 }
 
                 // Итоговая стоимость
