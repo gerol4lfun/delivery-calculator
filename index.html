@@ -83,7 +83,8 @@
             flex-wrap: wrap;
         }
         .block {
-            flex: 1 1 45%;
+            /* Было flex: 1 1 45%; теперь делаем 3 колонки, каждая ~ 1/3 */
+            flex: 1 1 30%; /* <-- ИЗМЕНЕНО: чтобы влезало три колонки */
             padding: 20px;
             border-right: 1px solid #ddd;
             box-sizing: border-box;
@@ -180,7 +181,7 @@
             color: #000; /* Сделать цену черной */
             white-space: nowrap; /* Предотвращает перенос цен на новую строку */
         }
-        #result, #summary, #commercial-offer {
+        #result, #map {
             margin-top: 20px;
             font-size: 16px;
             color: #007BFF;
@@ -200,19 +201,30 @@
             font-weight: bold;
             white-space: pre-wrap; /* Чтобы переносы строк \n работали */
         }
-        /* Дополнительные стили */
-
         /* Убедимся, что чекбоксы в additional-services имеют такой же размер, как и в additional-products */
         .additional-services input[type="checkbox"] {
             width: 16px;
             height: 16px;
             margin-right: 10px; /* Добавляем отступ справа для согласованности */
         }
-
         /* Удаление тире между названием и ценой с помощью псевдоэлемента */
         .product-label .product-name::after {
             content: "";
             margin-right: 0px; /* Убираем отступ, если был добавлен ранее */
+        }
+
+        /* ---------------------- */
+        /* Стили для КП (textarea) */
+        /* ---------------------- */
+        #commercial-offer {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 400px; /* Чтобы было достаточно место */
+            box-sizing: border-box;
+            resize: vertical; /* Позволяем тянуть textarea */
+            margin-top: 20px; /* Небольшой отступ сверху */
         }
     </style>
 </head>
@@ -300,7 +312,7 @@
                     </select>
                 </div>
 
-                <!-- Дополнительные услуги -->
+                <!-- Дополнительные услуги и товары -->
                 <div class="additional-services">
                     <div class="checkbox-group-large">
                         <label><input type="checkbox" id="bracing"> Брус</label>
@@ -314,7 +326,6 @@
                     </div>
                 </div>
 
-                <!-- Дополнительные товары -->
                 <div class="additional-products">
                     <h3>Дополнительные товары:</h3>
                     
@@ -386,19 +397,20 @@
                 <button onclick="calculateGreenhouseCost()">Рассчитать стоимость теплицы</button>
             </div>
 
-            <!-- Блок итогового расчета -->
+            <!-- Блок "итоговый расчет" УДАЛЁН по вашему требованию
             <div class="block">
                 <h2>Итоговый расчет</h2>
                 <div class="summary" id="summary">
                     Здесь будет выводиться итоговая сумма и детали расчета.
                 </div>
             </div>
+            -->
 
             <!-- Блок коммерческого предложения -->
             <div class="block">
                 <h2>Коммерческое предложение</h2>
                 <textarea id="commercial-offer" rows="20" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" readonly>
-                    Здесь будет ваше коммерческое предложение.
+                Здесь будет ваше коммерческое предложение.
                 </textarea>
                 <button onclick="copyCommercialOffer()">Скопировать КП</button>
             </div>
@@ -419,7 +431,7 @@
 
             // Функция нормализации строк (убирает пробелы и приводит к нижнему регистру)
             function normalizeString(str) {
-                if (!str) return ""; // Проверяем, что значение существует
+                if (!str) return "";
                 return str.trim().toLowerCase();
             }
 
@@ -684,10 +696,8 @@
             // Функция определения категории на основе имени формы
             function getFormCategory(formName) {
                 if (!formName || typeof formName !== "string") return "Прочие";
-
                 const normalizedFormName = normalizeString(formName);
                 const category = formNameToCategory[normalizedFormName];
-
                 if (category) {
                     return category;
                 } else {
@@ -760,7 +770,6 @@
                 resetDropdown('polycarbonate', 'Сначала выберите город');
                 resetDropdown('arcStep', 'Выберите шаг');
                 resetAdditionalOptions();
-                document.getElementById("summary").innerHTML = "Здесь будет выводиться итоговая сумма и детали расчета.";
                 document.getElementById("commercial-offer").value = "Здесь будет ваше коммерческое предложение.";
                 document.getElementById("result").innerText = "";
                 if (mapInstance && currentRoute) {
@@ -872,9 +881,29 @@
                 const polycarbonateDropdown = document.getElementById('polycarbonate');
                 polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
 
-                const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
+                // Старая логика: берем все типы, без упорядочивания
+                // const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
 
+                // <-- ИЗМЕНЕНО: упорядочим поликарбонат в порядке: Стандарт 4 мм / Люкс 4 мм / Премиум 6 мм / Без поликарбоната
+                const rawPolys = currentCityData.map(g => g.polycarbonate_type).filter(Boolean);
+                const uniquePoly = [...new Set(rawPolys)];
+                const preferredOrder = ["Стандарт 4 мм", "Люкс 4 мм", "Премиум 6 мм", "Без поликарбоната"];
+
+                // Сначала добавляем по порядку, если есть
+                const orderedPolys = [];
+                preferredOrder.forEach(poly => {
+                    if (uniquePoly.includes(poly)) {
+                        orderedPolys.push(poly);
+                    }
+                });
+                // Всё остальное в конец
                 uniquePoly.forEach(poly => {
+                    if (!preferredOrder.includes(poly)) {
+                        orderedPolys.push(poly);
+                    }
+                });
+
+                orderedPolys.forEach(poly => {
                     const option = document.createElement('option');
                     option.value = poly;
                     option.textContent = poly;
@@ -900,7 +929,7 @@
                 const formDropdown = document.getElementById('form');
                 formDropdown.innerHTML = '<option value="">Выберите форму</option>';
                 formsAvailable.forEach(form => {
-                    if (form && form !== "Прочие") { // Исключаем пустые и ненужные категории
+                    if (form && form !== "Прочие") {
                         const option = document.createElement('option');
                         option.value = form;
                         option.textContent = form;
@@ -1049,11 +1078,36 @@
                 }
 
                 // Получаем уникальные значения каркаса
-                const uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
+                let uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
 
-                if (DEBUG) console.log("Уникальные каркасы:", uniqueFrames);
+                // <-- ИЗМЕНЕНО: убираем всё, кроме упоминаний "20х20", "40х20", "20х20+20х20", "40х20+20х20", и сортируем
+                const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20"];
 
-                // Заполняем выпадающий список каркаса
+                uniqueFrames = uniqueFrames.map(fr => {
+                    // Выдёргиваем нужную часть
+                    const match = fr.match(/(20х20\+20х20|40х20\+20х20|20х20|40х20)/i);
+                    return match ? match[0] : fr;
+                });
+
+                // Убираем дубли
+                uniqueFrames = [...new Set(uniqueFrames)];
+
+                // Сортируем по приоритетному порядку
+                uniqueFrames.sort((a, b) => {
+                    const iA = frameOrder.indexOf(a);
+                    const iB = frameOrder.indexOf(b);
+                    // если не нашли — ставим в конец
+                    if (iA === -1 && iB === -1) {
+                        // Сравним просто строки
+                        return a.localeCompare(b);
+                    } else if (iA === -1) {
+                        return 1;
+                    } else if (iB === -1) {
+                        return -1;
+                    }
+                    return iA - iB;
+                });
+
                 uniqueFrames.forEach(frame => {
                     frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
                 });
@@ -1117,7 +1171,6 @@
                     console.log("[ASSEMBLY_CATEGORY] Форма:", form);
                     console.log("[ASSEMBLY_CATEGORY] Ширина:", width);
                 }
-
                 // Возвращаем строку ширины с "М", например, "2.5М", "3М"
                 return `${width}М`;
             }
@@ -1129,7 +1182,6 @@
                     if (DEBUG) console.log(`[CALCULATE_COST] Стоимость сборки не найдена для формы "${form}", категории "${assemblyCategory}" и длины "${length}" м.`);
                     return 0;
                 }
-
                 const price = assemblyPrices[form][assemblyCategory][length];
                 if (DEBUG) console.log(`[CALCULATE_COST] Найдена стоимость сборки: ${price} руб.`);
                 return price;
@@ -1167,7 +1219,7 @@
                         getFormCategory(item.form_name) === form &&
                         parseFloat(item.width) === width &&
                         parseFloat(item.length) === length &&
-                        normalizeString(item.frame_description) === normalizeString(frame) &&
+                        normalizeString(item.frame_description).includes(normalizeString(frame)) &&
                         normalizeString(item.polycarbonate_type) === normalizeString(polycarbonate)
                     );
                 });
@@ -1197,21 +1249,22 @@
                 let additionalProductsText = "";
                 let deliveryText = "";
 
-                // Расчёт стоимости базовой теплицы с учётом шага дуг
-                if (arcStep === 1) {
-                    // Шаг 1 м: используем базовую цену
-                    basePrice = selectedEntry.price;
-                    basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
-                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Цена теплицы без добавок: ${basePrice} руб.`);
-                } else if (arcStep === 0.65) {
-                    // Шаг 0.65 м: рассчитываем дополнительную стоимость
+                // Берём базовую цену
+                basePrice = selectedEntry.price;
+                basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
+
+                // Получим снеговую нагрузку
+                let snowLoad = selectedEntry.snow_load || 0;
+
+                // Если шаг дуг 0.65 м — наценка (увеличиваем базовую стоимость) + повышаем snowLoad
+                if (arcStep === 0.65) {
                     // Находим базовую цену для "Стандарт 4мм"
                     const baseEntry = currentCityData.find(item => {
                         return (
                             getFormCategory(item.form_name) === form &&
                             parseFloat(item.width) === width &&
                             parseFloat(item.length) === length &&
-                            normalizeString(item.frame_description) === normalizeString(frame) &&
+                            normalizeString(item.frame_description).includes(normalizeString(frame)) &&
                             normalizeString(item.polycarbonate_type) === "стандарт 4мм"
                         );
                     });
@@ -1224,17 +1277,23 @@
 
                     const basePriceStandard = baseEntry.price;
                     const additionalCost = 0.25 * basePriceStandard;
+                    // Прибавляем к базовой цене
+                    basePrice += additionalCost;
 
-                    // Цена выбранного типа поликарбоната
-                    basePrice = selectedEntry.price;
+                    // Меняем текст basePriceText сразу
                     basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
-                    assemblyCost += additionalCost;
-                    assemblyText += `\nДополнение за шаг 0.65 м: +${formatPrice(Math.ceil(additionalCost / 10) * 10)} рублей`;
-                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Дополнительная стоимость за шаг 0.65 м: ${additionalCost} руб.`);
-                } else {
-                    alert("Некорректный шаг между дугами.");
-                    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Некорректный arcStep:", arcStep);
-                    return;
+
+                    // Увеличиваем снеговую нагрузку (например, +25%)
+                    snowLoad = Math.round(snowLoad * 1.25);
+                }
+
+                // Если поликарбонат Люкс 4 мм => +10% к снеговой нагрузке
+                if (normalizeString(polycarbonate) === normalizeString("люкс 4 мм")) {
+                    snowLoad = Math.round(snowLoad * 1.1);
+                }
+                // Если Премиум 6 мм => +20%
+                if (normalizeString(polycarbonate) === normalizeString("премиум 6 мм")) {
+                    snowLoad = Math.round(snowLoad * 1.2);
                 }
 
                 // Дополнительные услуги
@@ -1357,10 +1416,7 @@
                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Общая стоимость после округления: ${finalTotalPrice} руб.`);
 
                 // Получаем стоимость доставки из блока доставки
-                // Предполагаем, что пользователь уже рассчитал доставку и deliveryCost обновлена
-                // Если доставка не была рассчитана, deliveryCost останется 0
                 const deliveryPrice = deliveryCost;
-
                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Стоимость доставки: ${deliveryPrice} руб.`);
 
                 // Итоговая стоимость с доставкой
@@ -1368,7 +1424,7 @@
 
                 if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Итоговая стоимость с доставкой: ${finalTotalPrice} руб.`);
 
-                // Формирование итогового резюме
+                // Формирование итогового резюме (которое теперь будет лишь в КП)
                 let summaryText = `Итоговая стоимость теплицы: ${formatPrice(finalTotalPrice)} рублей\n`;
                 summaryText += `${basePriceText}\n`;
                 if (assemblyText) {
@@ -1385,12 +1441,11 @@
                 }
                 summaryText += `\nИтоговая стоимость - ${formatPrice(finalTotalPrice)} рублей`;
 
-                // Выводим итоговую стоимость
-                document.getElementById("summary").innerText = summaryText;
-                if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость отображена.");
+                // Вместо вывода в блок "summary" (удалён), теперь только в КП
+                if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Итоговая стоимость:", summaryText);
 
-                // Генерация коммерческого предложения с необходимыми параметрами
-                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText);
+                // Генерация коммерческого предложения
+                generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText, snowLoad);
             }
 
             // Функция расчёта доставки
@@ -1492,6 +1547,71 @@
                 }
             }
 
+            // Функция формирования коммерческого предложения (добавили параметр snowLoad)
+            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText, snowLoad) {
+                if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
+
+                // Извлечение дополнительных характеристик
+                const height = selectedEntry.height ? selectedEntry.height : "Не указано";
+                const horizontalTies = selectedEntry.horizontal_ties ? selectedEntry.horizontal_ties : "Не указано";
+                const equipment = selectedEntry.equipment || "Не указано";
+
+                // Получаем название теплицы из базы данных
+                const baseName = selectedEntry.form_name.toUpperCase();
+                // Если в названии уже есть слово "ТЕПЛИЦА", не добавляем его повторно
+                const cleanName = baseName.startsWith("ТЕПЛИЦА") ? baseName : `ТЕПЛИЦА ${baseName}`;
+
+                const frameValue = document.getElementById("frame").value;
+                const widthValue = document.getElementById("width").value;
+                const lengthValue = document.getElementById("length").value;
+                const arcStepValue = document.getElementById("arcStep").value;
+                const polycarbonateValue = document.getElementById("polycarbonate").value;
+
+                // Формирование текста КП
+                let commercialOffer = `${cleanName}\n\n` +
+                    `Каркас: ${frameValue}\n` +
+                    `Ширина: ${widthValue} м\n` +
+                    `Длина: ${lengthValue} м\n` +
+                    `Высота: ${height}\n` +
+                    `Шаг дуги: ${arcStepValue} м\n` +
+                    `Поликарбонат с УФ защитой: ${polycarbonateValue}\n` +
+                    `Снеговая нагрузка: ${snowLoad}\n` +
+                    `Горизонтальные стяжки: ${horizontalTies}\n` +
+                    `Комплектация: ${equipment}\n\n` +
+                    `${basePriceText}\n`;
+
+                if (assemblyText) {
+                    commercialOffer += `${assemblyText}\n`;
+                }
+                if (foundationText) {
+                    commercialOffer += `${foundationText}\n`;
+                }
+                if (additionalProductsText) {
+                    commercialOffer += `\nДополнительные товары:\n${additionalProductsText}\n`;
+                }
+                if (deliveryPrice > 0) {
+                    commercialOffer += `\nДоставка - ${formatPrice(deliveryPrice)} рублей\n`;
+                }
+                commercialOffer += `\nИтоговая стоимость - ${formatPrice(finalTotalPrice)} рублей`;
+
+                if (DEBUG) console.log(`[GENERATE_OFFICE] Коммерческое предложение сформировано:\n${commercialOffer}`);
+
+                // Выводим сформированное КП в textarea
+                document.getElementById("commercial-offer").value = commercialOffer;
+            }
+
+            // Функция копирования КП
+            function copyCommercialOffer() {
+                const offerText = document.getElementById("commercial-offer");
+                offerText.select();
+                offerText.setSelectionRange(0, 99999); // Для мобильных устройств
+
+                document.execCommand("copy");
+
+                alert("Коммерческое предложение скопировано!");
+                if (DEBUG) console.log("Коммерческое предложение скопировано.");
+            }
+
             // Инициализация при загрузке страницы
             window.onload = async function() {
                 const savedLogin = localStorage.getItem('savedLogin');
@@ -1524,104 +1644,13 @@
                     checkbox.addEventListener('change', calculateGreenhouseCost);
                 });
 
+                const arcStepElement = document.getElementById('arcStep');
+                arcStepElement.addEventListener('change', calculateGreenhouseCost);
+
+                const polycarbonateElement = document.getElementById('polycarbonate');
+                polycarbonateElement.addEventListener('change', calculateGreenhouseCost);
+
                 if (DEBUG) console.log("Обработчики событий для дополнительных опций добавлены.");
-            }
-
-            /**
-             * Функция формирования коммерческого предложения
-             * @param {number} basePrice - Стоимость теплицы
-             * @param {number} assemblyCost - Стоимость сборки
-             * @param {number} foundationCost - Стоимость основания (брус)
-             * @param {array} additionalProducts - Массив дополнительных продуктов
-             * @param {number} additionalProductsCost - Стоимость дополнительных товаров
-             * @param {number} deliveryPrice - Стоимость доставки
-             * @param {number} finalTotalPrice - Итоговая стоимость с доставкой
-             * @param {object} selectedEntry - Выбранная запись из currentCityData
-             * @param {string} basePriceText - Текстовая часть стоимости базовой теплицы
-             * @param {string} assemblyText - Текстовая часть стоимости сборки
-             * @param {string} foundationText - Текстовая часть стоимости основания
-             * @param {string} additionalProductsText - Текстовая часть дополнительных товаров
-             */
-            function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText) {
-                if (DEBUG) console.log("[GENERATE_OFFICE] Начало формирования коммерческого предложения.");
-
-                // Извлечение дополнительных характеристик
-                const snowLoad = selectedEntry.snow_load ? selectedEntry.snow_load : "Не указано";
-                const height = selectedEntry.height ? selectedEntry.height : "Не указано";
-                const horizontalTies = selectedEntry.horizontal_ties ? selectedEntry.horizontal_ties : "Не указано";
-                const equipment = selectedEntry.equipment || "Не указано";
-
-                // Логирование для отладки
-                if (DEBUG) console.log({ snowLoad, height, horizontalTies, equipment });
-
-                // Получаем название теплицы из базы данных
-                const baseName = selectedEntry.form_name.toUpperCase();
-
-                // Если в названии уже есть слово "ТЕПЛИЦА", не добавляем его повторно
-                const cleanName = baseName.startsWith("ТЕПЛИЦА") ? baseName : `ТЕПЛИЦА ${baseName}`;
-
-                // Формируем модель теплицы без добавления формы, так как она уже включена в form_name
-                const modelName = cleanName;
-
-                // Получаем значения параметров для коммерческого предложения
-                const frameValue = document.getElementById("frame").value;
-                const widthValue = document.getElementById("width").value;
-                const lengthValue = document.getElementById("length").value;
-                const arcStepValue = document.getElementById("arcStep").value;
-                const polycarbonateValue = document.getElementById("polycarbonate").value;
-
-                // Формирование текста КП
-                let commercialOffer = `${modelName}\n\n` +
-                    `Каркас: ${frameValue}\n` +
-                    `Ширина: ${formatPrice(widthValue)} м\n` +
-                    `Длина: ${formatPrice(lengthValue)} м\n` +
-                    `Высота: ${height}\n` +
-                    `Шаг дуги: ${arcStepValue} м\n` +
-                    `Поликарбонат с УФ защитой: ${polycarbonateValue}\n` +
-                    `Снеговая нагрузка: ${snowLoad}\n` +
-                    `Горизонтальные стяжки: ${horizontalTies}\n` +
-                    `Комплектация: ${equipment}\n\n` +
-                    `${basePriceText}\n`;
-
-                // Добавление сборки
-                if (assemblyText) {
-                    commercialOffer += `${assemblyText}\n`;
-                }
-
-                // Добавление основания из бруса
-                if (foundationText) {
-                    commercialOffer += `${foundationText}\n`;
-                }
-
-                // Добавление дополнительных товаров
-                if (additionalProductsText) {
-                    commercialOffer += `\nДополнительные товары:\n${additionalProductsText}\n`;
-                }
-
-                // Добавление стоимости доставки
-                if (deliveryPrice > 0) {
-                    commercialOffer += `\nДоставка - ${formatPrice(deliveryPrice)} рублей\n`;
-                }
-
-                // Итоговая стоимость
-                commercialOffer += `\nИтоговая стоимость - ${formatPrice(finalTotalPrice)} рублей`;
-
-                if (DEBUG) console.log(`[GENERATE_OFFICE] Коммерческое предложение сформировано:\n${commercialOffer}`);
-
-                // Выводим сформированное КП в textarea
-                document.getElementById("commercial-offer").value = commercialOffer;
-            }
-
-            // Функция копирования КП
-            function copyCommercialOffer() {
-                const offerText = document.getElementById("commercial-offer");
-                offerText.select();
-                offerText.setSelectionRange(0, 99999); // Для мобильных устройств
-
-                document.execCommand("copy");
-
-                alert("Коммерческое предложение скопировано!");
-                if (DEBUG) console.log("Коммерческое предложение скопировано.");
             }
         </script>
     </div>
