@@ -1077,36 +1077,33 @@
                     return;
                 }
 
-                // Получаем уникальные значения каркаса
-                let uniqueFrames = [...new Set(filteredData.map(item => item.frame_description))].sort();
+                const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20", "40х20+40х20"];
 
-                // <-- ИЗМЕНЕНО: убираем всё, кроме упоминаний "20х20", "40х20", "20х20+20х20", "40х20+20х20", и сортируем
-                const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20"];
+let uniqueFrames = [...new Set(filteredData.map(item => {
+    const match = item.frame_description.match(/(20х20\+20х20|40х20\+20х20|40х20\+40х20|20х20|40х20)/i);
+    if (DEBUG) console.log(`Найден каркас: ${item.frame_description} -> ${match ? match[0] : "не найдено"}`);
+    return match ? match[0] : item.frame_description;
+}))];
 
-                uniqueFrames = uniqueFrames.map(fr => {
-                    // Выдёргиваем нужную часть
-                    const match = fr.match(/(20х20\+20х20|40х20\+20х20|20х20|40х20)/i);
-                    return match ? match[0] : fr;
-                });
+// Убираем дубликаты
+uniqueFrames = [...new Set(uniqueFrames)];
 
-                // Убираем дубли
-                uniqueFrames = [...new Set(uniqueFrames)];
+// Сортируем по приоритету
+uniqueFrames.sort((a, b) => {
+    const iA = frameOrder.indexOf(a);
+    const iB = frameOrder.indexOf(b);
+    if (iA === -1 && iB === -1) {
+        return a.localeCompare(b); // Если не в списке, сортируем как строки
+    } else if (iA === -1) {
+        return 1; // Если A не в списке, отправляем в конец
+    } else if (iB === -1) {
+        return -1; // Если B не в списке, отправляем в конец
+    }
+    return iA - iB;
+});
 
-                // Сортируем по приоритетному порядку
-                uniqueFrames.sort((a, b) => {
-                    const iA = frameOrder.indexOf(a);
-                    const iB = frameOrder.indexOf(b);
-                    // если не нашли — ставим в конец
-                    if (iA === -1 && iB === -1) {
-                        // Сравним просто строки
-                        return a.localeCompare(b);
-                    } else if (iA === -1) {
-                        return 1;
-                    } else if (iB === -1) {
-                        return -1;
-                    }
-                    return iA - iB;
-                });
+// Логируем итоговый список каркасов
+if (DEBUG) console.log("Итоговый список каркасов:", uniqueFrames);
 
                 uniqueFrames.forEach(frame => {
                     frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
