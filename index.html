@@ -1070,37 +1070,41 @@
 
                 if (DEBUG) console.log(`Данные после фильтрации по форме (${form}), ширине (${width}) и длине (${length}):`, filteredData);
 
-                // Проверка на пустые данные
-                if (filteredData.length === 0) {
-                    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
-                    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Нет теплиц с формой ${form}, шириной ${width} м и длиной ${length} м`);
-                    return;
-                }
+               // Проверка на пустые данные
+if (filteredData.length === 0) {
+    alert("Теплица с указанными параметрами не найдена. Попробуйте выбрать другие параметры.");
+    if (DEBUG) console.log(`[CALCULATE_GREENHOUSE] Нет теплиц с формой ${form}, шириной ${width} м и длиной ${length} м`);
+    return;
+}
 
+// Задаём порядок сортировки каркасов
 const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20", "40х20+40х20"];
+
+// Очищаем выпадающий список перед добавлением новых элементов
+frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
 
 // Получаем уникальные значения каркаса
 let uniqueFrames = [...new Set(filteredData.map(item => {
-    // Удаляем слова "оцинкованная труба" и пробелы
+    // Убираем слова "оцинкованная труба" и пробелы
     let cleanDescription = item.frame_description.replace(/оцинкованная труба/gi, "").trim();
 
-    // Ищем ВСЕ возможные комбинации, а не только первое совпадение
-    let matches = cleanDescription.match(/(20х20\+20х20|40х20\+20х20|40х20\+40х20|20х20|40х20)/gi);
+    // Ищем все комбинации каркасов в одной строке
+    const matches = cleanDescription.match(/(20х20\+20х20|40х20\+20х20|40х20\+40х20|20х20|40х20)/gi);
 
-    // Логируем найденные комбинации
+    // Логируем найденные результаты
     if (DEBUG) console.log(`Найден каркас: ${item.frame_description} -> ${matches}`);
 
-    // Возвращаем все найденные варианты или оригинальную строку
+    // Возвращаем все найденные варианты в одну строку или исходную строку
     return matches ? matches.join(",") : cleanDescription;
 }))];
 
-// Убираем дубликаты
+// Разделяем сложные комбинации (например, "20х20, 40х20") на отдельные элементы
 uniqueFrames = [...new Set(uniqueFrames.flatMap(f => f.split(",")))];
 
 // Сортируем по приоритету
 uniqueFrames.sort((a, b) => {
-    const iA = frameOrder.indexOf(a);
-    const iB = frameOrder.indexOf(b);
+    const iA = frameOrder.indexOf(a.trim());
+    const iB = frameOrder.indexOf(b.trim());
     if (iA === -1 && iB === -1) {
         return a.localeCompare(b); // Если не в списке, сортируем как строки
     } else if (iA === -1) {
@@ -1114,18 +1118,18 @@ uniqueFrames.sort((a, b) => {
 // Логируем итоговый список каркасов
 if (DEBUG) console.log("Итоговый список каркасов:", uniqueFrames);
 
-                uniqueFrames.forEach(frame => {
-                    frameSelect.innerHTML += `<option value="${frame}">${frame}</option>`;
-                });
+// Добавляем в выпадающий список уникальные и отсортированные каркасы
+uniqueFrames.forEach(frame => {
+    frameSelect.innerHTML += `<option value="${frame.trim()}">${frame.trim()}</option>`;
+});
 
-                if (DEBUG) console.log("Выпадающий список каркаса обновлен.");
+if (DEBUG) console.log("Выпадающий список каркаса обновлен.");
 
-                // Сброс шага дуг
-                resetDropdown('arcStep', 'Выберите шаг');
+// Сброс шага дуг
+resetDropdown('arcStep', 'Выберите шаг');
 
-                // Сброс дополнительных опций
-                resetAdditionalOptions();
-            }
+// Сброс дополнительных опций
+resetAdditionalOptions();
 
             // Функция обработки изменения каркаса
             function onFrameChange() {
