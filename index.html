@@ -1077,19 +1077,27 @@
                     return;
                 }
 
+const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20", "40х20+40х20"];
+
 // Получаем уникальные значения каркаса
 let uniqueFrames = [...new Set(filteredData.map(item => {
-    // Исправленная регулярка: извлекаем все подходящие комбинации
-    const match = item.frame_description.match(/(20х20\+20х20|40х20\+20х20|40х20\+40х20|20х20|40х20)/i);
-    if (DEBUG) console.log(`Найден каркас: ${item.frame_description} -> ${match ? match[0] : "не найдено"}`);
-    return match ? match[0] : item.frame_description;
+    // Удаляем слова "оцинкованная труба" и пробелы
+    let cleanDescription = item.frame_description.replace(/оцинкованная труба/gi, "").trim();
+
+    // Ищем ВСЕ возможные комбинации, а не только первое совпадение
+    let matches = cleanDescription.match(/(20х20\+20х20|40х20\+20х20|40х20\+40х20|20х20|40х20)/gi);
+
+    // Логируем найденные комбинации
+    if (DEBUG) console.log(`Найден каркас: ${item.frame_description} -> ${matches}`);
+
+    // Возвращаем все найденные варианты или оригинальную строку
+    return matches ? matches.join(",") : cleanDescription;
 }))];
 
 // Убираем дубликаты
-uniqueFrames = [...new Set(uniqueFrames)];
+uniqueFrames = [...new Set(uniqueFrames.flatMap(f => f.split(",")))];
 
 // Сортируем по приоритету
-const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20", "40х20+40х20"];
 uniqueFrames.sort((a, b) => {
     const iA = frameOrder.indexOf(a);
     const iB = frameOrder.indexOf(b);
