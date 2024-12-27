@@ -1086,7 +1086,9 @@ function onLengthChange() {
     // Получаем уникальные значения каркаса
     let uniqueFrames = [...new Set(filteredData.map(item => {
         let cleanDescription = item.frame_description.replace(/оцинкованная труба/gi, "").trim();
-        const matches = cleanDescription.match(/(20х20\+20х20|40х20\+20х20|40х20\+40х20|20х20|40х20)/gi);
+        // Ищем комбинации:
+     const matches = cleanDescription.match(
+        /(20х20\s*\+\s*20х20|40х20\s*\+\s*20х20|40х20\s*\+\s*40х20|20х20|40х20)/gi);
         if (DEBUG) console.log(`Найден каркас: ${item.frame_description} -> ${matches}`);
         return matches ? matches.join(",") : cleanDescription;
     }))];
