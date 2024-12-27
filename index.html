@@ -1138,24 +1138,22 @@ function onFrameChange() {
     resetDropdown('arcStep', 'Выберите шаг');
 
     // Сброс дополнительных опций
-    resetAdditionalOptions();
-}
+    resetAdditionalOptions(); 
+} // <-- Добавлена ЗАКРЫВАЮЩАЯ скобка здесь!
 
 // Функция сброса выпадающих списков
 function resetDropdown(elementId, placeholderText) {
-
-                const dropdown = document.getElementById(elementId);
-                if (dropdown) {
-                    if (elementId === 'arcStep') {
-                        // Устанавливаем на дефолтное значение без сброса опций
-                        dropdown.value = "";
-                        if (DEBUG) console.log(`Выпадающий список ${elementId} установлен на дефолтное значение "${placeholderText}".`);
-                    } else {
-                        dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
-                        if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
-                    }
-                }
-            }
+    const dropdown = document.getElementById(elementId);
+    if (dropdown) {
+        if (elementId === 'arcStep') {
+            dropdown.value = "";
+            if (DEBUG) console.log(`Выпадающий список ${elementId} установлен на дефолтное значение "${placeholderText}".`);
+        } else {
+            dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+            if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
+        }
+    }
+}
 
             // Функция сброса дополнительных опций
             function resetAdditionalOptions() {
