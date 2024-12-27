@@ -1079,8 +1079,9 @@
 
                 const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20", "40х20+40х20"];
 
+// Убираем слова и извлекаем только размеры
 let uniqueFrames = [...new Set(filteredData.map(item => {
-    const match = item.frame_description.match(/(20х20\+20х20|40х20\+20х20|40х20\+40х20|20х20|40х20)/i);
+    const match = item.frame_description.match(/(\d{2}х\d{2}(\+\d{2}х\d{2})?)/i); // ищем комбинации
     if (DEBUG) console.log(`Найден каркас: ${item.frame_description} -> ${match ? match[0] : "не найдено"}`);
     return match ? match[0] : item.frame_description;
 }))];
