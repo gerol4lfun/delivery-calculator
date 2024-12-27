@@ -1131,17 +1131,19 @@ resetDropdown('arcStep', 'Выберите шаг');
 // Сброс дополнительных опций
 resetAdditionalOptions();
 
-            // Функция обработки изменения каркаса
-            function onFrameChange() {
-                if (DEBUG) console.log("Каркас изменен.");
-                // Сброс шага дуг
-                resetDropdown('arcStep', 'Выберите шаг');
-                // Сброс дополнительных опций
-                resetAdditionalOptions();
-            }
+// Функция обработки изменения каркаса
+function onFrameChange() {
+    if (DEBUG) console.log("Каркас изменен.");
+    // Сброс шага дуг
+    resetDropdown('arcStep', 'Выберите шаг');
 
-            // Функция сброса выпадающих списков
-            function resetDropdown(elementId, placeholderText) {
+    // Сброс дополнительных опций
+    resetAdditionalOptions();
+}
+
+// Функция сброса выпадающих списков
+function resetDropdown(elementId, placeholderText) {
+
                 const dropdown = document.getElementById(elementId);
                 if (dropdown) {
                     if (elementId === 'arcStep') {
