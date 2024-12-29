@@ -1266,8 +1266,12 @@ function resetDropdown(elementId, placeholderText) {
                 basePrice = selectedEntry.price;
                 basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
 
-                // Получим снеговую нагрузку
-                let snowLoad = selectedEntry.snow_load || 0;
+               // Получим снеговую нагрузку (например, "825 кг/м2" -> вытащим 825)
+let rawSnowLoad = selectedEntry.snow_load || "";
+rawSnowLoad = rawSnowLoad.replace(/[^\d.]/g, "");  // Удалим всё, кроме цифр и точки
+let snowLoad = parseFloat(rawSnowLoad);
+if (isNaN(snowLoad)) snowLoad = 0;
+
 
                 // Если шаг дуг 0.65 м — наценка (увеличиваем базовую стоимость) + повышаем snowLoad
                 if (arcStep === 0.65) {
