@@ -829,11 +829,13 @@
                 if (DEBUG) console.log("Города после сортировки и приоритезации:", finalCities);
 
                 // Обновляем выпадающий список
-                const cityDropdown = document.getElementById('city');
-                cityDropdown.innerHTML = '<option value="">Выберите город</option>';
-                finalCities.forEach(city => {
-                    cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
-                });
+const cityDropdown = document.getElementById('city');
+// Используем disabled + selected:
+cityDropdown.innerHTML = '<option value="" disabled selected>Выберите город</option>';
+
+finalCities.forEach(city => {
+    cityDropdown.innerHTML += `<option value="${city}">${city}</option>`;
+});
 
                 if (DEBUG) console.log("Выпадающий список городов обновлен.");
             }
@@ -880,40 +882,40 @@
 
                 if (DEBUG) console.log(`Данные текущего города (${city}) присвоены currentCityData.`);
 
-                // 1. Обновляем выпадающий список поликарбоната
-                const polycarbonateDropdown = document.getElementById('polycarbonate');
-                polycarbonateDropdown.innerHTML = '<option value="">Выберите поликарбонат</option>';
+          // 1. Обновляем выпадающий список поликарбоната
+const polycarbonateDropdown = document.getElementById('polycarbonate');
 
-                // Старая логика: берем все типы, без упорядочивания
-                // const uniquePoly = [...new Set(currentCityData.map(g => g.polycarbonate_type).filter(Boolean))];
+// Заменяем '<option value="">Выберите поликарбонат</option>' на disabled/selected
+polycarbonateDropdown.innerHTML = '<option value="" disabled selected>Выберите поликарбонат</option>';
 
-                // <-- ИЗМЕНЕНО: упорядочим поликарбонат в порядке: Стандарт 4 мм / Люкс 4 мм / Премиум 6 мм / Без поликарбоната
-                const rawPolys = currentCityData.map(g => g.polycarbonate_type).filter(Boolean);
-                const uniquePoly = [...new Set(rawPolys)];
-                const preferredOrder = ["Стандарт 4 мм", "Люкс 4 мм", "Премиум 6 мм", "Без поликарбоната"];
+// <-- ИЗМЕНЕНО: упорядочим поликарбонат в порядке: Стандарт 4 мм / Люкс 4 мм / Премиум 6 мм / Без поликарбоната
+const rawPolys = currentCityData.map(g => g.polycarbonate_type).filter(Boolean);
+const uniquePoly = [...new Set(rawPolys)];
+const preferredOrder = ["Стандарт 4 мм", "Люкс 4 мм", "Премиум 6 мм", "Без поликарбоната"];
 
-                // Сначала добавляем по порядку, если есть
-                const orderedPolys = [];
-                preferredOrder.forEach(poly => {
-                    if (uniquePoly.includes(poly)) {
-                        orderedPolys.push(poly);
-                    }
-                });
-                // Всё остальное в конец
-                uniquePoly.forEach(poly => {
-                    if (!preferredOrder.includes(poly)) {
-                        orderedPolys.push(poly);
-                    }
-                });
+// Сначала добавляем по порядку, если есть
+const orderedPolys = [];
+preferredOrder.forEach(poly => {
+    if (uniquePoly.includes(poly)) {
+        orderedPolys.push(poly);
+    }
+});
+// Всё остальное в конец
+uniquePoly.forEach(poly => {
+    if (!preferredOrder.includes(poly)) {
+        orderedPolys.push(poly);
+    }
+});
 
-                orderedPolys.forEach(poly => {
-                    const option = document.createElement('option');
-                    option.value = poly;
-                    option.textContent = poly;
-                    polycarbonateDropdown.appendChild(option);
-                });
+// Добавляем упорядоченные варианты
+orderedPolys.forEach(poly => {
+    const option = document.createElement('option');
+    option.value = poly;
+    option.textContent = poly;
+    polycarbonateDropdown.appendChild(option);
+});
 
-                if (DEBUG) console.log("Выпадающий список поликарбоната обновлен.");
+if (DEBUG) console.log("Выпадающий список поликарбоната обновлен.");
 
                 // 2. Фильтруем формы на основе availableForms
                 const formCategories = Object.keys(availableForms);
