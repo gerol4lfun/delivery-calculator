@@ -1263,57 +1263,64 @@ function resetDropdown(elementId, placeholderText) {
                 let deliveryText = "";
 
                 // Берём базовую цену
-                basePrice = selectedEntry.price;
-                basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
+basePrice = selectedEntry.price;
+basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
 
-               // Получим снеговую нагрузку (например, "825 кг/м2" -> вытащим 825)
-let rawSnowLoad = selectedEntry.snow_load || "";
-rawSnowLoad = rawSnowLoad.replace(/[^\d.]/g, "");  // Удалим всё, кроме цифр и точки
-let snowLoad = parseFloat(rawSnowLoad);
-if (isNaN(snowLoad)) snowLoad = 0;
+// 1) Вытаскиваем из базы текст, например "284 кг/м2"
+let originalSnowLoadText = selectedEntry.snow_load || "0 кг/м2";
 
+// 2) Извлекаем только число (например "284") для расчётов
+let rawSnowLoad = originalSnowLoadText.replace(/[^\d.]/g, ""); 
+let snowLoadNum = parseFloat(rawSnowLoad);
+if (isNaN(snowLoadNum)) {
+  snowLoadNum = 0;
+}
 
-                // Если шаг дуг 0.65 м — наценка (увеличиваем базовую стоимость) + повышаем snowLoad
-                if (arcStep === 0.65) {
-                    // Находим базовую цену для "Стандарт 4мм"
-                    const baseEntry = currentCityData.find(item => {
-                        return (
-                            getFormCategory(item.form_name) === form &&
-                            parseFloat(item.width) === width &&
-                            parseFloat(item.length) === length &&
-                            normalizeString(item.frame_description).includes(normalizeString(frame)) &&
-                            normalizeString(item.polycarbonate_type) === "стандарт 4мм"
-                        );
-                    });
+// 3) Шаг дуг 0.65 м => +25% к нагрузке, + добавка к basePrice
+if (arcStep === 0.65) {
+    // Находим базовую цену для "Стандарт 4мм"
+    const baseEntry = currentCityData.find(item => {
+        return (
+            getFormCategory(item.form_name) === form &&
+            parseFloat(item.width) === width &&
+            parseFloat(item.length) === length &&
+            normalizeString(item.frame_description).includes(normalizeString(frame)) &&
+            normalizeString(item.polycarbonate_type) === "стандарт 4мм"
+        );
+    });
 
-                    if (!baseEntry) {
-                        alert('Не найдена базовая цена для покрытия "Стандарт 4мм".');
-                        if (DEBUG) console.log('[CALCULATE_GREENHOUSE] Не найдена baseEntry для "стандарт 4мм".');
-                        return;
-                    }
+    if (!baseEntry) {
+        alert('Не найдена базовая цена для покрытия "Стандарт 4мм".');
+        if (DEBUG) console.log('[CALCULATE_GREENHOUSE] Не найдена baseEntry для "стандарт 4мм".');
+        return;
+    }
 
-                    const basePriceStandard = baseEntry.price;
-                    const additionalCost = 0.25 * basePriceStandard;
-                    // Прибавляем к базовой цене
-                    basePrice += additionalCost;
-                    
-                    basePrice = Math.ceil(basePrice / 10) * 10;
+    const basePriceStandard = baseEntry.price;
+    const additionalCost = 0.25 * basePriceStandard;
 
-                    // Меняем текст basePriceText сразу
-                    basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
+    // Прибавляем к базовой цене
+    basePrice += additionalCost;
+    // Округляем до ближайшего 10
+    basePrice = Math.ceil(basePrice / 10) * 10;
+    basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
 
-                    // Увеличиваем снеговую нагрузку (например, +25%)
-                    snowLoad = Math.round(snowLoad * 1.25);
-                }
+    // Увеличиваем снеговую нагрузку на 25%
+    snowLoadNum = Math.round(snowLoadNum * 1.25);
+}
 
-                // Если поликарбонат Люкс 4 мм => +10% к снеговой нагрузке
-                if (normalizeString(polycarbonate) === normalizeString("люкс 4 мм")) {
-                    snowLoad = Math.round(snowLoad * 1.1);
-                }
-                // Если Премиум 6 мм => +20%
-                if (normalizeString(polycarbonate) === normalizeString("премиум 6 мм")) {
-                    snowLoad = Math.round(snowLoad * 1.2);
-                }
+// 4) При поликарбонате Люкс => +10% к нагрузке, Премиум => +20%
+//   Важно, чтобы в базе было "Люкс 4мм" и "Премиум 6мм" (или учесть все варианты).
+const polyStr = normalizeString(polycarbonate);
+if (polyStr === "люкс 4 мм" || polyStr === "люкс 4мм") {
+    snowLoadNum = Math.round(snowLoadNum * 1.1);
+}
+if (polyStr === "премиум 6 мм" || polyStr === "премиум 6мм") {
+    snowLoadNum = Math.round(snowLoadNum * 1.2);
+}
+
+// 5) Формируем строку для КП, например "355 кг/м2"
+let snowLoadFinalText = `${snowLoadNum} кг/м2`;
+
 
                 // Дополнительные услуги
                 const bracingChecked = document.getElementById('bracing').checked;
