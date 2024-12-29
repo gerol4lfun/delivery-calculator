@@ -1671,6 +1671,9 @@ let snowLoadFinalText = `${snowLoadNum} кг/м2`;
             async function initializeCalculator() {
                 await loadCities();
                 addAdditionalProductsEventListeners();
+
+                document.getElementById("polycarbonate").addEventListener("change", calculateGreenhouseCost);
+                
                 if (DEBUG) console.log("Инициализация калькулятора завершена.");
             }
 
