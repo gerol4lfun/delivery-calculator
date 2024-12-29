@@ -894,18 +894,13 @@ const uniquePoly = [...new Set(rawPolys)];
 const preferredOrder = ["Стандарт 4 мм", "Люкс 4 мм", "Премиум 6 мм", "Без поликарбоната"];
 
 // Сначала добавляем по порядку, если есть
-const orderedPolys = [];
-preferredOrder.forEach(poly => {
-    if (uniquePoly.includes(poly)) {
-        orderedPolys.push(poly);
-    }
-});
-// Всё остальное в конец
-uniquePoly.forEach(poly => {
-    if (!preferredOrder.includes(poly)) {
-        orderedPolys.push(poly);
-    }
-});
+// Фильтруем и сортируем строго по порядку
+const orderedPolys = preferredOrder.filter(poly => uniquePoly.includes(poly));
+
+// Добавляем остальные в конец (если есть непредусмотренные значения)
+const extraPolys = uniquePoly.filter(poly => !preferredOrder.includes(poly));
+orderedPolys.push(...extraPolys);
+
 
 // Добавляем упорядоченные варианты
 orderedPolys.forEach(poly => {
