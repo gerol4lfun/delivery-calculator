@@ -1292,6 +1292,8 @@ function resetDropdown(elementId, placeholderText) {
                     const additionalCost = 0.25 * basePriceStandard;
                     // Прибавляем к базовой цене
                     basePrice += additionalCost;
+                    
+                    basePrice = Math.ceil(basePrice / 10) * 10;
 
                     // Меняем текст basePriceText сразу
                     basePriceText = `Стоимость с учетом скидки - ${formatPrice(basePrice)} рублей`;
