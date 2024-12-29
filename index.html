@@ -259,81 +259,61 @@
 
             <!-- Блок теплицы -->
             <div class="block">
-                <h2>Стоимость теплицы</h2>
-                
-                <div class="parameters">
-    <label for="city">Город:</label>
-    <select id="city">
-        <!-- placeholder -->
-        <option hidden disabled selected value="">
-            Выберите город
-        </option>
-        <!-- Остальные опции (города) добавятся из JS -->
-    </select>
-</div>
+    <h2>Стоимость теплицы</h2>
 
-<div class="parameters">
-    <label for="form">Форма теплицы:</label>
-    <select id="form" onchange="onFormChange()">
-        <!-- placeholder -->
-        <option hidden disabled selected value="">
-            Сначала выберите город
-        </option>
-        <!-- JS заполнит позже -->
-    </select>
-</div>
+    <div class="parameters">
+        <label for="city">Город:</label>
+        <select id="city">
+            <!-- placeholder, не будет выбрано для расчёта -->
+            <option value="" disabled selected>Выберите город</option>
+            <!-- Остальное (список городов) добавит ваш JavaScript -->
+        </select>
+    </div>
 
-<div class="parameters">
-    <label for="width">Ширина (м):</label>
-    <select id="width" onchange="onWidthChange()">
-        <!-- placeholder -->
-        <option hidden disabled selected value="">
-            Выберите ширину
-        </option>
-    </select>
-</div>
+    <div class="parameters">
+        <label for="form">Форма теплицы:</label>
+        <select id="form" onchange="onFormChange()">
+            <!-- placeholder -->
+            <option value="" disabled selected>Сначала выберите город</option>
+        </select>
+    </div>
 
-<div class="parameters">
-    <label for="length">Длина (м):</label>
-    <select id="length" onchange="onLengthChange()">
-        <!-- placeholder -->
-        <option hidden disabled selected value="">
-            Выберите длину
-        </option>
-    </select>
-</div>
+    <div class="parameters">
+        <label for="width">Ширина (м):</label>
+        <select id="width" onchange="onWidthChange()">
+            <option value="" disabled selected>Выберите ширину</option>
+        </select>
+    </div>
 
-<div class="parameters">
-    <label for="frame">Каркас:</label>
-    <select id="frame" onchange="onFrameChange()">
-        <!-- placeholder -->
-        <option hidden disabled selected value="">
-            Выберите каркас
-        </option>
-    </select>
-</div>
+    <div class="parameters">
+        <label for="length">Длина (м):</label>
+        <select id="length" onchange="onLengthChange()">
+            <option value="" disabled selected>Выберите длину</option>
+        </select>
+    </div>
 
-<div class="parameters">
-    <label for="polycarbonate">Поликарбонат:</label>
-    <select id="polycarbonate">
-        <!-- placeholder -->
-        <option hidden disabled selected value="">
-            Сначала выберите город
-        </option>
-    </select>
-</div>
+    <div class="parameters">
+        <label for="frame">Каркас:</label>
+        <select id="frame" onchange="onFrameChange()">
+            <option value="" disabled selected>Выберите каркас</option>
+        </select>
+    </div>
 
-<div class="parameters">
-    <label for="arcStep">Шаг между дугами:</label>
-    <select id="arcStep">
-        <!-- placeholder -->
-        <option hidden disabled selected value="">
-            Выберите шаг
-        </option>
-        <option value="1">1 м</option>
-        <option value="0.65">0.65 м</option>
-    </select>
-</div>
+    <div class="parameters">
+        <label for="polycarbonate">Поликарбонат:</label>
+        <select id="polycarbonate">
+            <option value="" disabled selected>Сначала выберите город</option>
+        </select>
+    </div>
+
+    <div class="parameters">
+        <label for="arcStep">Шаг между дугами:</label>
+        <select id="arcStep">
+            <option value="" disabled selected>Выберите шаг</option>
+            <option value="1">1 м</option>
+            <option value="0.65">0.65 м</option>
+        </select>
+    </div>
 
                 <!-- Дополнительные услуги и товары -->
                 <div class="additional-services">
