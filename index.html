@@ -1268,12 +1268,18 @@ basePriceText = `Стоимость с учетом скидки - ${formatPrice
 
 // 1) Вытаскиваем из базы текст, например "284 кг/м2"
 let originalSnowLoadText = selectedEntry.snow_load || "0 кг/м2";
+console.log("[SNOWLOAD_PARSE] originalSnowLoadText =", originalSnowLoadText);
 
 // 2) Извлекаем только число (например "284") для расчётов
 let rawSnowLoad = originalSnowLoadText.replace(/[^\d.]/g, ""); 
+console.log("[SNOWLOAD_PARSE] rawSnowLoad =", rawSnowLoad);
+
 let snowLoadNum = parseFloat(rawSnowLoad);
+console.log("[SNOWLOAD_PARSE] snowLoadNum после parseFloat =", snowLoadNum);
+
 if (isNaN(snowLoadNum)) {
   snowLoadNum = 0;
+  console.log("[SNOWLOAD_PARSE] snowLoadNum было NaN, установлено в 0");
 }
 
 // 3) Шаг дуг 0.65 м => +25% к нагрузке, + добавка к basePrice
@@ -1306,6 +1312,7 @@ if (arcStep === 0.65) {
 
     // Увеличиваем снеговую нагрузку на 25%
     snowLoadNum = Math.round(snowLoadNum * 1.25);
+    console.log("[SNOWLOAD_CALC] После шага дуг 0.65 м (+25%) snowLoadNum =", snowLoadNum);
 }
 
 // 4) При поликарбонате Люкс => +10% к нагрузке, Премиум => +20%
@@ -1313,13 +1320,16 @@ if (arcStep === 0.65) {
 const polyStr = normalizeString(polycarbonate);
 if (polyStr === "люкс 4 мм" || polyStr === "люкс 4мм") {
     snowLoadNum = Math.round(snowLoadNum * 1.1);
+    console.log("[SNOWLOAD_CALC] После поликарбоната Люкс (+10%) snowLoadNum =", snowLoadNum);
 }
 if (polyStr === "премиум 6 мм" || polyStr === "премиум 6мм") {
     snowLoadNum = Math.round(snowLoadNum * 1.2);
+    console.log("[SNOWLOAD_CALC] После поликарбоната Премиум (+20%) snowLoadNum =", snowLoadNum);
 }
 
 // 5) Формируем строку для КП, например "355 кг/м2"
 let snowLoadFinalText = `${snowLoadNum} кг/м2`;
+                console.log("[SNOWLOAD_FINAL] snowLoadFinalText =", snowLoadFinalText);
 
 
                 // Дополнительные услуги
