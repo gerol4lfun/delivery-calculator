@@ -1196,38 +1196,44 @@ function resetDropdown(elementId, placeholderText) {
             }
 
             // Функция расчёта стоимости теплицы
-            async function calculateGreenhouseCost() {
-                const city = document.getElementById("city").value;
-                const form = document.getElementById("form").value;
-                const width = parseFloat(document.getElementById("width").value);
-                const length = parseFloat(document.getElementById("length").value);
-                const frame = document.getElementById("frame").value;
-                const polycarbonate = document.getElementById("polycarbonate").value;
-                const arcStep = parseFloat(document.getElementById("arcStep").value);
+async function calculateGreenhouseCost(event = null) { // <-- Добавлен параметр event с дефолтным значением
+    const city = document.getElementById("city").value.trim();  // Убираем пробелы
+    const form = document.getElementById("form").value.trim();
+    const width = parseFloat(document.getElementById("width").value);
+    const length = parseFloat(document.getElementById("length").value);
+    const frame = document.getElementById("frame").value.trim();
+    const polycarbonate = document.getElementById("polycarbonate").value.trim();
+    const arcStep = parseFloat(document.getElementById("arcStep").value);
 
-                if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Начало расчёта стоимости теплицы.");
+    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Начало расчёта стоимости теплицы.");
 
-              // Проверка на заполнение всех обязательных полей
-const isFormComplete = city && form && !isNaN(width) && !isNaN(length) && frame && polycarbonate && !isNaN(arcStep);
+    // Логируем данные для проверки
+    console.log("[CHECK_FIELDS] Город:", city);
+    console.log("[CHECK_FIELDS] Форма:", form);
+    console.log("[CHECK_FIELDS] Ширина:", width);
+    console.log("[CHECK_FIELDS] Длина:", length);
+    console.log("[CHECK_FIELDS] Каркас:", frame);
+    console.log("[CHECK_FIELDS] Поликарбонат:", polycarbonate);
+    console.log("[CHECK_FIELDS] Шаг дуг:", arcStep);
 
-// Если поля не заполнены, проверяем, было ли изменение поликарбоната
-const isPolycarbonateChange = event && event.target && event.target.id === "polycarbonate";
+    // Проверка на заполнение всех обязательных полей
+    const isFormComplete =
+        city && form && !isNaN(width) && !isNaN(length) && frame && polycarbonate && !isNaN(arcStep);
 
-// Если форма не заполнена, но это не изменение поликарбоната, показываем предупреждение
-if (!isFormComplete) {
-    if (!isPolycarbonateChange) {
+    // Если поля не заполнены, проверяем изменение поликарбоната
+    const isPolycarbonateChange =
+        event && event.target && event.target.id === "polycarbonate";
+
+    if (!isFormComplete) {
+        if (isPolycarbonateChange) {
+            console.log("[CALCULATE_GREENHOUSE] Изменён поликарбонат, расчёт пока невозможен.");
+            return; // Не показываем alert при изменении поликарбоната
+        }
+
         alert("Пожалуйста, заполните все обязательные поля.");
+        console.log("[CALCULATE_GREENHOUSE] Не все обязательные поля заполнены.");
+        return;
     }
-    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] Не все обязательные поля заполнены.");
-    return;
-}
-
-// Используем уже загруженные данные currentCityData
-if (!currentCityData || currentCityData.length === 0) {
-    alert("Данные для текущего города не загружены. Попробуйте снова.");
-    if (DEBUG) console.log("[CALCULATE_GREENHOUSE] currentCityData пуст или не загружены.");
-    return;
-}
 
                 // Фильтрация вручную для выбранной комбинации
                 const selectedEntry = currentCityData.find(item => {
