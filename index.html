@@ -930,17 +930,21 @@ if (DEBUG) console.log("Выпадающий список поликарбона
 
                 if (DEBUG) console.log("Формы после сортировки по приоритету:", formsAvailable);
 
-                // 3. Обновляем выпадающий список форм теплиц
-                const formDropdown = document.getElementById('form');
-                formDropdown.innerHTML = '<option value="">Выберите форму</option>';
-                formsAvailable.forEach(form => {
-                    if (form && form !== "Прочие") {
-                        const option = document.createElement('option');
-                        option.value = form;
-                        option.textContent = form;
-                        formDropdown.appendChild(option);
-                    }
-                });
+             // 3. Обновляем выпадающий список форм теплиц
+const formDropdown = document.getElementById('form');
+// СТАЛО:
+formDropdown.innerHTML = '<option value="" disabled selected>Выберите форму</option>';
+
+formsAvailable.forEach(form => {
+    if (form && form !== "Прочие") {
+        const option = document.createElement('option');
+        option.value = form;
+        option.textContent = form;
+        formDropdown.appendChild(option);
+    }
+});
+
+if (DEBUG) console.log("Выпадающий список форм теплиц обновлен.");
 
                 if (DEBUG) console.log("Выпадающий список форм теплиц обновлен.");
 
@@ -961,7 +965,8 @@ if (DEBUG) console.log("Выпадающий список поликарбона
                 if (DEBUG) console.log(`Выбрана форма теплицы: ${form}`);
 
                 const widthSelect = document.getElementById("width");
-                widthSelect.innerHTML = '<option value="">Выберите ширину</option>';
+// СТАЛО:
+widthSelect.innerHTML = '<option value="" disabled selected>Выберите ширину</option>';
 
                 if (!form) {
                     return;
@@ -1010,8 +1015,9 @@ if (DEBUG) console.log("Выпадающий список поликарбона
 
                 if (DEBUG) console.log(`Выбрана ширина: ${width} м для формы: ${form}`);
 
-                const lengthSelect = document.getElementById("length");
-                lengthSelect.innerHTML = '<option value="">Выберите длину</option>';
+               const lengthSelect = document.getElementById("length");
+// СТАЛО:
+lengthSelect.innerHTML = '<option value="" disabled selected>Выберите длину</option>';
 
                 if (isNaN(width)) {
                     return;
@@ -1061,7 +1067,8 @@ function onLengthChange() {
     if (DEBUG) console.log(`Выбрана длина: ${length} м для формы: ${form} и ширины: ${width} м`);
 
     const frameSelect = document.getElementById("frame");
-    frameSelect.innerHTML = '<option value="">Выберите каркас</option>';
+// СТАЛО:
+frameSelect.innerHTML = '<option value="" disabled selected>Выберите каркас</option>';
 
     if (isNaN(length)) {
         return;
@@ -1144,7 +1151,8 @@ function resetDropdown(elementId, placeholderText) {
             dropdown.value = "";
             if (DEBUG) console.log(`Выпадающий список ${elementId} установлен на дефолтное значение "${placeholderText}".`);
         } else {
-            dropdown.innerHTML = `<option value="">${placeholderText}</option>`;
+            // СТАЛО:
+            dropdown.innerHTML = `<option value="" disabled selected>${placeholderText}</option>`;
             if (DEBUG) console.log(`Выпадающий список ${elementId} сброшен с текстом "${placeholderText}".`);
         }
     }
