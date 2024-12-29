@@ -1271,16 +1271,14 @@ let originalSnowLoadText = selectedEntry.snow_load || "0 кг/м2";
 console.log("[SNOWLOAD_PARSE] originalSnowLoadText =", originalSnowLoadText);
 
 // 2) Извлекаем только число (например "284") для расчётов
-let rawSnowLoad = originalSnowLoadText.replace(/[^\d.]/g, ""); 
-console.log("[SNOWLOAD_PARSE] rawSnowLoad =", rawSnowLoad);
-
-let snowLoadNum = parseFloat(rawSnowLoad);
-console.log("[SNOWLOAD_PARSE] snowLoadNum после parseFloat =", snowLoadNum);
+let rawSnowLoad = originalSnowLoadText.match(/\d+(\.\d+)?/); // Находим число
+let snowLoadNum = rawSnowLoad ? parseFloat(rawSnowLoad[0]) : 0; // Преобразуем в число
 
 if (isNaN(snowLoadNum)) {
   snowLoadNum = 0;
-  console.log("[SNOWLOAD_PARSE] snowLoadNum было NaN, установлено в 0");
 }
+
+if (DEBUG) console.log(`[SNOWLOAD_INIT] Начальное значение snowLoadNum = ${snowLoadNum}`);
 
 // 3) Шаг дуг 0.65 м => +25% к нагрузке, + добавка к basePrice
 if (arcStep === 0.65) {
