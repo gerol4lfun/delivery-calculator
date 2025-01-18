@@ -20,7 +20,7 @@
             // Пользователи
             const users = [
                 { login: "admin", password: "Admin#2024" },
-                { login: "Manager1", password: "Mng2#Strong1" },
+                { login: "Manager1", password: "Mng1!Secure" },
                 { login: "Manager2", password: "Mng2#Strong" },
                 { login: "Manager3", password: "Mng3!Complex" },
                 { login: "Manager4", password: "Mng4#Robust" },
@@ -47,41 +47,41 @@
                 "Прочие": 11
             };
 
-            // Массив регионов доставки с ключевыми словами
-const deliveryRegions = [
-    { keywords: ["москва", "msk", "московская область"] },
-    { keywords: ["санкт-петербург", "spb", "питер", "ленинградская область"] },
-    { keywords: ["белгород", "belgorod", "белгородская область"] },
-    { keywords: ["великий новгород", "новгород", "новгородская область"] },
-    { keywords: ["владимир", "vladimir", "владимирская область"] },
-    { keywords: ["вологда", "vologda", "вологодская область"] },
-    { keywords: ["воронеж", "voronezh", "воронежская область"] },
-    { keywords: ["екатеринбург", "ekaterinburg", "свердловская область"] },
-    { keywords: ["иваново", "ivanovo", "ивановская область"] },
-    { keywords: ["йошкар-ола", "yoshkar-ola", "марий эл", "республика марий эл"] },
-    { keywords: ["казань", "kazan", "татарстан", "республика татарстан"] },
-    { keywords: ["калуга", "kaluga", "калужская область"] },
-    { keywords: ["кемерово", "kemerovo", "кемеровская область", "кузбасс"] },
-    { keywords: ["кострома", "kostroma", "костромская область"] },
-    { keywords: ["краснодар", "krasnodar", "краснодарский край", "кубань"] },
-    { keywords: ["курск", "kursk", "курская область"] },
-    { keywords: ["липецк", "lipetsk", "липецкая область"] },
-    { keywords: ["майкоп", "maykop", "адыгея", "республика адыгея"] },
-    { keywords: ["набережные челны", "nab-chelny", "челны", "республика татарстан"] },
-    { keywords: ["нижний новгород", "nizh-novgorod", "нн", "нижегородская область"] },
-    { keywords: ["новосибирск", "novosibirsk", "новосибирская область"] },
-    { keywords: ["орел", "orel", "орловская область"] },
-    { keywords: ["рязань", "ryazan", "рязанская область"] },
-    { keywords: ["ставрополь", "stavropol", "ставропольский край"] },
-    { keywords: ["тамбов", "tambov", "тамбовская область"] },
-    { keywords: ["тверь", "tver", "тверская область"] },
-    { keywords: ["тула", "tula", "тульская область"] },
-    { keywords: ["ульяновск", "ulyanovsk", "ульяновская область"] },
-    { keywords: ["чебоксары", "cheboksary", "чувашия", "республика чувашия"] },
-    { keywords: ["челябинск", "chelyabinsk", "челябинская область"] },
-    { keywords: ["черкесск", "cherkessk", "карачай-черкесия", "карачаево-черкесская республика"] },
-    { keywords: ["ярославль", "yaroslavl", "ярославская область"] }
-];
+            // Регионы доставки
+            const deliveryRegions = [
+                { city: "Москва", region: "Московская область" },
+                { city: "Санкт-Петербург", region: "Ленинградская область" },
+                { city: "Белгород", region: "Белгородская область" },
+                { city: "Великий Новгород", region: "Новгородская область" },
+                { city: "Владимир", region: "Владимирская область" },
+                { city: "Вологда", region: "Вологодская область" },
+                { city: "Воронеж", region: "Воронежская область" },
+                { city: "Екатеринбург", region: "Свердловская область" },
+                { city: "Иваново", region: "Ивановская область" },
+                { city: "Йошкар-Ола", region: "Республика Марий Эл" },
+                { city: "Казань", region: "Республика Татарстан" },
+                { city: "Калуга", region: "Калужская область" },
+                { city: "Кемерово", region: "Кемеровская область" },
+                { city: "Кострома", region: "Костромская область" },
+                { city: "Краснодар", region: "Краснодарский край" },
+                { city: "Курск", region: "Курская область" },
+                { city: "Липецк", region: "Липецкая область" },
+                { city: "Майкоп", region: "Республика Адыгея" },
+                { city: "Набережные Челны", region: "Республика Татарстан" },
+                { city: "Нижний Новгород", region: "Нижегородская область" },
+                { city: "Новосибирск", region: "Новосибирская область" },
+                { city: "Орёл", region: "Орловская область" },
+                { city: "Рязань", region: "Рязанская область" },
+                { city: "Ставрополь", region: "Ставропольский край" },
+                { city: "Тамбов", region: "Тамбовская область" },
+                { city: "Тверь", region: "Тверская область" },
+                { city: "Тула", region: "Тульская область" },
+                { city: "Ульяновск", region: "Ульяновская область" },
+                { city: "Чебоксары", region: "Чувашская Республика" },
+                { city: "Челябинск", region: "Челябинская область" },
+                { city: "Черкесск", region: "Карачаево-Черкесская Республика" },
+                { city: "Ярославль", region: "Ярославская область" }
+            ];
 
             // Города для карты
             const citiesForMap = [
@@ -962,103 +962,92 @@ if (assemblyChecked) {
                 generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText, snowLoadFinalText);
             }
 
+            // Функция расчёта доставки
             async function calculateDelivery() {
-    const addressInput = document.getElementById("address");
-    const address = addressInput.value.trim().toLowerCase();
-    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+                const addressInput = document.getElementById("address");
+                const address = addressInput.value.trim().toLowerCase();
+                const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
 
-    if (!address) {
-        document.getElementById('result').innerText = "Введите адрес!";
-        return;
-    }
+                if (!address) {
+                    document.getElementById('result').innerText = "Введите адрес!";
+                    return;
+                }
 
-    try {
-        const res = await ymaps.geocode(address, { results: 1 });
-        const geoObject = res.geoObjects.get(0);
+                try {
+                    const res = await ymaps.geocode(address, { results: 1 });
+                    const geoObject = res.geoObjects.get(0);
 
-        if (!geoObject) {
-            document.getElementById('result').innerText = "Адрес не найден!";
-            return;
-        }
+                    if (!geoObject) {
+                        document.getElementById('result').innerText = "Адрес не найден!";
+                        return;
+                    }
 
-        // Извлекаем населённые пункты и административные области,
-        // приводим их к нижнему регистру для упрощённого сравнения.
-        let localities = geoObject.getLocalities().map(loc => loc.toLowerCase());
-        let administrativeAreas = geoObject.getAdministrativeAreas().map(area => area.toLowerCase());
+                    const localities = geoObject.getLocalities().map(locality => normalizeString(locality));
+                    const administrativeAreas = geoObject.getAdministrativeAreas().map(area => normalizeString(area));
 
-        // Для отладки: выводим полученные данные
-        console.log("Localities:", localities);
-        console.log("Administrative Areas:", administrativeAreas);
+                    const isInDeliveryRegion = deliveryRegions.some(region => 
+                        localities.includes(normalizeString(region.city)) || administrativeAreas.includes(normalizeString(region.region))
+                    );
 
-        // Проверяем, содержит ли хотя бы одно ключевое слово из массива deliveryRegions
-        // любое слово из localities или administrativeAreas
-        const isInDeliveryRegion = deliveryRegions.some(regionEntry => {
-            return regionEntry.keywords.some(keyword =>
-                localities.some(loc => loc.includes(keyword)) ||
-                administrativeAreas.some(area => area.includes(keyword))
-            );
-        });
+                    if (!isInDeliveryRegion) {
+                        document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
+                        return;
+                    }
 
-        if (!isInDeliveryRegion) {
-            document.getElementById('result').innerText = "Доставка в этот регион не осуществляется.";
-            return;
-        }
+                    const coords = geoObject.geometry.getCoordinates();
+                    const destinationLat = coords[0];
+                    const destinationLon = coords[1];
 
-        const coords = geoObject.geometry.getCoordinates();
-        const destinationLat = coords[0];
-        const destinationLon = coords[1];
+                    let nearestCity = null;
+                    let minDistance = Infinity;
 
-        let nearestCity = null;
-        let minDistance = Infinity;
+                    citiesForMap.forEach(city => {
+                        const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000; // В км
+                        if (cityDistance < minDistance) {
+                            minDistance = cityDistance;
+                            nearestCity = city;
+                        }
+                    });
 
-        // Поиск ближайшего города из массива citiesForMap
-        citiesForMap.forEach(city => {
-            const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000; // расстояние в км
-            if (cityDistance < minDistance) {
-                minDistance = cityDistance;
-                nearestCity = city;
+                    if (!nearestCity) {
+                        document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+                        return;
+                    }
+
+                    mapInstance.setCenter(nearestCity.coords, 7);
+
+                    if (currentRoute) {
+                        mapInstance.geoObjects.remove(currentRoute);
+                    }
+
+                    try {
+                        const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
+                        currentRoute = route;
+                        mapInstance.geoObjects.add(route);
+
+                        const distanceInKm = route.getLength() / 1000;
+                        const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
+
+                        let cost;
+                        if (deliveryType === "withoutAssembly") {
+                            cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
+                        } else {
+                            cost = Math.max(1000, 40 * distanceFromBoundary);
+                        }
+
+                        const roundedCost = Math.ceil(cost / 50) * 50;
+
+                        deliveryCost = roundedCost; // Обновляем глобальную переменную
+
+                        document.getElementById('result').innerText = `Стоимость доставки: ${formatPrice(roundedCost)} рублей (${nearestCity.name})`;
+                    } catch (routeError) {
+                        document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
+                    }
+
+                } catch (geocodeError) {
+                    document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
+                }
             }
-        });
-
-        if (!nearestCity) {
-            document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
-            return;
-        }
-
-        mapInstance.setCenter(nearestCity.coords, 7);
-
-        if (currentRoute) {
-            mapInstance.geoObjects.remove(currentRoute);
-        }
-
-        try {
-            const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
-            currentRoute = route;
-            mapInstance.geoObjects.add(route);
-
-            const distanceInKm = route.getLength() / 1000;
-            const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
-
-            let cost;
-            if (deliveryType === "withoutAssembly") {
-                cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-            } else {
-                cost = Math.max(1000, 40 * distanceFromBoundary);
-            }
-
-            const roundedCost = Math.ceil(cost / 50) * 50;
-
-            deliveryCost = roundedCost; // сохраняем стоимость доставки в глобальной переменной
-
-            document.getElementById('result').innerText = `Стоимость доставки: ${formatPrice(roundedCost)} рублей (${nearestCity.name})`;
-        } catch (routeError) {
-            document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-        }
-
-    } catch (geocodeError) {
-        document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
-    }
-}
 
             // Функция формирования коммерческого предложения
             function generateCommercialOffer(basePrice, assemblyCost, foundationCost, additionalProducts, additionalProductsCost, deliveryPrice, finalTotalPrice, selectedEntry, basePriceText, assemblyText, foundationText, additionalProductsText, snowLoadFinalText) {
