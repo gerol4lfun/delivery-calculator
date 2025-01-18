@@ -59,7 +59,6 @@
       <!-- Блок стоимости теплицы -->
       <div class="block">
         <h2>Стоимость теплицы</h2>
-
         <div class="parameters">
           <label for="city">Город:</label>
           <select id="city" onchange="onCityChange()">
@@ -112,7 +111,7 @@
             <label><input type="checkbox" id="ground-hooks" onchange="calculateGreenhouseCost()"> Штыри</label>
           </div>
         </div>
-        
+                
         <!-- Здесь перемещаем кнопки для расчёта и сброса стоимости теплицы -->
         <div class="btn-group">
           <!-- Синяя кнопка для стоимости теплицы -->
@@ -125,8 +124,8 @@
         <p class="centered-heading"><strong>Монтаж на фундамент клиента</strong></p>
         <!-- Вертикальная группа для чекбоксов монтажа -->
         <div class="checkbox-group-large">
-          <label><input type="checkbox"> На брус 1.500&nbsp;рублей</label>
-          <label><input type="checkbox"> На бетон 2.000&nbsp;рублей</label>
+          <label><input type="checkbox" id="on-wood" data-price="1500"> На брус +1.500 рублей</label>
+          <label><input type="checkbox" id="on-concrete" data-price="2000"> На бетон +2.000 рублей</label>
         </div>
         
         <!-- Блок "Дополнительные товары" остается внутри блока -->
