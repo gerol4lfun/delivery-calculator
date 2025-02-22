@@ -18,19 +18,20 @@
             }
 
             // Пользователи
-            const users = [
-                { login: "admin", password: "Admin#2024" },
-                { login: "Manager1", password: "Mng2#Strong1" },
-                { login: "Manager2", password: "Mng2#Strong" },
-                { login: "Manager3", password: "Mng3!Complex" },
-                { login: "Manager4", password: "Mng4#Robust" },
-                { login: "Manager5", password: "Mng5!Power" },
-                { login: "Manager6", password: "Mng6#Safety" },
-                { login: "Manager7", password: "Mng7!Stable" },
-                { login: "Manager8", password: "Mng8#Access" },
-                { login: "Manager9", password: "Mng9!Control" },
-                { login: "Manager10", password: "Mng10#Secure" }
-            ];
+const users = [
+    { login: "admin", password: "Adm!nXr42#7G" },
+    { login: "Manager1", password: "Mngr1@Lp9$Rt" },
+    { login: "Manager2", password: "Mngr2#Qs8&Xy" },
+    { login: "Manager3", password: "Mngr3!Zp7*Wk" },
+    { login: "Manager4", password: "Mngr4@Yt6$Vd" },
+    { login: "Manager5", password: "Mngr5#Kf5&Jh" },
+    { login: "Manager6", password: "Mngr6!Bn4*Zq" },
+    { login: "Manager7", password: "Mngr7@Wm3$Xp" },
+    { login: "Manager8", password: "Mngr8#Cd2&Nv" },
+    { login: "Manager9", password: "Mngr9!Xk1*Gy" },
+    { login: "Manager10", password: "Mngr10@Vt0$Qp" }
+];
+
 
             // Приоритеты форм (чем меньше число, тем выше в списке)
             const formPriority = {
