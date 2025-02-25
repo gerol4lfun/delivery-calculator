@@ -818,7 +818,7 @@ async function calculateGreenhouseCost(event = null) {
 
     // 3) Шаг дуг 0.65 м => +25% к нагрузке, + добавка к basePrice
     if (arcStep === 0.65) {
-        // Находим базовую цену для "Стандарт 4 мм" с учётом возможных вариаций написания
+        // Находим базовую цену для "Стандарт 4мм" с учётом возможных вариантов написания
         const baseEntry = currentCityData.find(item => {
             return (
                 getFormCategory(item.form_name) === form &&
@@ -902,47 +902,47 @@ async function calculateGreenhouseCost(event = null) {
         }
     }
 
-    // Расчёт стоимости сборки или монтажа на фундамент клиента
-    if (assemblyChecked) {
-        const assemblyCategory = getAssemblyCategory(form, width); // Получаем категорию сборки
-        if (assemblyCategory) {
-            const assemblyCostCalculated = calculateAssemblyCost(form, assemblyCategory, length);
-            if (assemblyCostCalculated > 0) {
-                assemblyCost += assemblyCostCalculated;
-                assemblyText += `\nСборка и установка - ${formatPrice(assemblyCostCalculated)} рублей`;
-            } else {
-                alert(`Не найдена стоимость сборки для формы "${form}", ширины "${width}М" и длины "${length} м".`);
-                return;
-            }
+    // Расчёт стоимости сборки (если выбрана)
+if (assemblyChecked) {
+    const assemblyCategory = getAssemblyCategory(form, width); // Получаем категорию сборки
+    if (assemblyCategory) {
+        const assemblyCostCalculated = calculateAssemblyCost(form, assemblyCategory, length);
+        if (assemblyCostCalculated > 0) {
+            assemblyCost += assemblyCostCalculated;
+            assemblyText += `\nСборка и установка - ${formatPrice(assemblyCostCalculated)} рублей`;
         } else {
-            alert(`Категория сборки для формы "${form}" и ширины "${width}М" не определена.`);
+            alert(`Не найдена стоимость сборки для формы "${form}", ширины "${width}М" и длины "${length} м".`);
             return;
         }
     } else {
-        // Если сборка не выбрана, проверяем монтаж на фундамент клиента
-        if (onWoodChecked || onConcreteChecked) {
-            if (onWoodChecked) {
-                const woodPrice = onWoodCheckbox ? parseFloat(onWoodCheckbox.getAttribute('data-price')) : 0;
-                if (woodPrice) {
-                    foundationCost += woodPrice;
-                    foundationText += `\nМонтаж на брус клиента - ${formatPrice(woodPrice)} рублей`;
-                } else {
-                    alert(`Не найдена стоимость монтажа на брус.`);
-                    return;
-                }
-            }
-            if (onConcreteChecked) {
-                const concretePrice = onConcreteCheckbox ? parseFloat(onConcreteCheckbox.getAttribute('data-price')) : 0;
-                if (concretePrice) {
-                    foundationCost += concretePrice;
-                    foundationText += `\nМонтаж на бетон клиента - ${formatPrice(concretePrice)} рублей`;
-                } else {
-                    alert(`Не найдена стоимость монтажа на бетон.`);
-                    return;
-                }
-            }
-        }
+        alert(`Категория сборки для формы "${form}" и ширины "${width}М" не определена.`);
+        return;
     }
+}
+
+// Расчёт стоимости монтажа на фундамент клиента (если выбрана опция "на брус")
+if (onWoodChecked) {
+    const woodPrice = onWoodCheckbox ? parseFloat(onWoodCheckbox.getAttribute('data-price')) : 0;
+    if (woodPrice) {
+        foundationCost += woodPrice;
+        foundationText += `\nМонтаж на брус клиента - ${formatPrice(woodPrice)} рублей`;
+    } else {
+        alert(`Не найдена стоимость монтажа на брус.`);
+        return;
+    }
+}
+
+// Расчёт стоимости монтажа на фундамент клиента (если выбрана опция "на бетон")
+if (onConcreteChecked) {
+    const concretePrice = onConcreteCheckbox ? parseFloat(onConcreteCheckbox.getAttribute('data-price')) : 0;
+    if (concretePrice) {
+        foundationCost += concretePrice;
+        foundationText += `\nМонтаж на бетон клиента - ${formatPrice(concretePrice)} рублей`;
+    } else {
+        alert(`Не найдена стоимость монтажа на бетон.`);
+        return;
+    }
+}
 
     // Дополнительные товары
     const additionalProducts = [];
@@ -1059,36 +1059,38 @@ async function calculateDelivery() {
             document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
             return;
         }
-
+        
         mapInstance.setCenter(nearestCity.coords, 7);
-
+        
+        // Автоматически установить найденный город в выпадающем списке "Город"
+        const citySelect = document.getElementById('city');
+        let found = false;
+        for (let i = 0; i < citySelect.options.length; i++) {
+            // Сравниваем значение опции и nearestCity.name, убирая лишние пробелы и приводя к нижнему регистру
+            if (citySelect.options[i].value.trim().toLowerCase() === nearestCity.name.trim().toLowerCase()) {
+                 citySelect.selectedIndex = i;
+                 found = true;
+                 break;
+            }
+        }
+        if (!found) {
+            console.warn("Ближайший город не найден в списке опций");
+        }
+        
+        // Обновляем остальные параметры, основываясь на выбранном городе
+        onCityChange();
+        
         if (currentRoute) {
             mapInstance.geoObjects.remove(currentRoute);
         }
-
+        
         try {
             const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
             currentRoute = route;
             mapInstance.geoObjects.add(route);
-
-            const distanceInKm = route.getLength() / 1000;
-            const distanceFromBoundary = Math.max(distanceInKm - nearestCity.boundaryDistance, 0);
-
-            let cost;
-            if (deliveryType === "withoutAssembly") {
-                cost = Math.max(1000, 500 + 40 * distanceFromBoundary);
-            } else {
-                cost = Math.max(1000, 40 * distanceFromBoundary);
-            }
-
-            const roundedCost = Math.ceil(cost / 50) * 50;
-
-            deliveryCost = roundedCost; // сохраняем стоимость доставки в глобальной переменной
-
-            document.getElementById('result').innerText = `Стоимость доставки: ${formatPrice(roundedCost)} рублей (${nearestCity.name})`;
         } catch (routeError) {
             document.getElementById('result').innerText = "Ошибка при расчёте маршрута.";
-        }
+        }        
 
     } catch (geocodeError) {
         document.getElementById('result').innerText = "Ошибка при расчёте. Попробуйте снова.";
