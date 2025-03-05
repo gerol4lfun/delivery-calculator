@@ -1043,22 +1043,41 @@ async function calculateDelivery() {
         const destinationLat = coords[0];
         const destinationLon = coords[1];
 
-        let nearestCity = null;
-        let minDistance = Infinity;
+        let cityDistances = [];
 
-        // Поиск ближайшего города из массива citiesForMap
-        citiesForMap.forEach(city => {
-            const cityDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000; // расстояние в км
-            if (cityDistance < minDistance) {
-                minDistance = cityDistance;
-                nearestCity = city;
-            }
-        });
+// Шаг 1: Вычисляем прямые расстояния до всех городов
+citiesForMap.forEach(city => {
+    const geoDistance = ymaps.coordSystem.geo.getDistance(city.coords, [destinationLat, destinationLon]) / 1000; // расстояние в км
+    cityDistances.push({ city: city, geoDistance: geoDistance });
+});
 
-        if (!nearestCity) {
-            document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
-            return;
+// Сортируем города по прямому расстоянию и берём топ-5 ближайших
+cityDistances.sort((a, b) => a.geoDistance - b.geoDistance);
+const topCities = cityDistances.slice(0, 5); // Берём 5 ближайших городов
+
+// Шаг 2: Теперь строим маршруты для этих 5 городов и выбираем наименьший
+let nearestCity = null;
+let minRouteDistance = Infinity;
+
+for (const entry of topCities) {
+    try {
+        const route = await ymaps.route([entry.city.coords, [destinationLat, destinationLon]]);
+        const routeDistance = route.getLength() / 1000; // расстояние по дорогам в км
+        
+        if (routeDistance < minRouteDistance) {
+            minRouteDistance = routeDistance;
+            nearestCity = entry.city;
         }
+    } catch (error) {
+        console.error("Ошибка построения маршрута для города", entry.city.name, error);
+    }
+}
+
+// Проверяем, нашёлся ли ближайший город
+if (!nearestCity) {
+    document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
+    return;
+}
         
         mapInstance.setCenter(nearestCity.coords, 7);
         
