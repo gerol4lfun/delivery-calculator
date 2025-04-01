@@ -18,9 +18,9 @@ function normalizeString(str) {
     // Заменяем обычные и неразрывные пробелы на пустую строку
     return str.trim().toLowerCase().replace(/[\s\u00A0]+/g, "");
 }
-            
 
-            // Пользователи
+
+// Пользователи
 const users = [
     { login: "admin", password: "Adm!nXr42#7G" },
     { login: "Manager1", password: "Mngr1@Lp9$Rt" },
@@ -229,13 +229,13 @@ const availableForms = {
         { name: "ТЕПЛИЦА ЦАРСКАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
     ],
     "Домиком": [
-        { name: "ТЕПЛИЦА ДОМИК ЛЮКС 2.5М", frame: "40х20" },
-        { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3М", frame: "40х20" },
-        { name: "ТЕПЛИЦА ДОМИК ЛЮКС 3.5М", frame: "40х20" },
-        { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
-        { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3М", frame: "40х20+20х20" },
-        { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
-        { name: "ТЕПЛИЦА ДОМИК ПРЕМИУМ 4М", frame: "40х20+20х20" }
+        { name: "ТЕПЛИЦА ДВОРЦОВАЯ ЛЮКС 2.5М", frame: "40х20" },
+        { name: "ТЕПЛИЦА ДВОРЦОВАЯ ЛЮКС 3М", frame: "40х20" },
+        { name: "ТЕПЛИЦА ДВОРЦОВАЯ ЛЮКС 3.5М", frame: "40х20" },
+        { name: "ТЕПЛИЦА ДВОРЦОВАЯ ПРЕМИУМ 2.5М", frame: "40х20+20х20" },
+        { name: "ТЕПЛИЦА ДВОРЦОВАЯ ПРЕМИУМ 3М", frame: "40х20+20х20" },
+        { name: "ТЕПЛИЦА ДВОРЦОВАЯ ПРЕМИУМ 3.5М", frame: "40х20+20х20" },
+        { name: "ТЕПЛИЦА ДВОРЦОВАЯ ПРЕМИУМ 4М", frame: "40х20+20х20" }
     ],
     "Пристенная": [
         { name: "ТЕПЛИЦА ПРИСТЕННАЯ ЛЮКС 2.5М", frame: "40х20" },
@@ -620,40 +620,40 @@ function onLengthChange() {
     const frameOrder = ["20х20", "40х20", "20х20+20х20", "40х20+20х20", "40х20+40х20"];
 
     // Получаем уникальные значения каркаса
-let uniqueFrames = [...new Set(filteredData.map(item => {
-    // Отладочное логирование: вывод названия и исходного описания
-    console.log("Обрабатывается элемент:", item["Название"], "исходное описание:", item.frame_description);
+    let uniqueFrames = [...new Set(filteredData.map(item => {
+        // Отладочное логирование: вывод названия и исходного описания
+        console.log("Обрабатывается элемент:", item["Название"], "исходное описание:", item.frame_description);
 
-    // Нормализуем описание:
-    // 1. Удаляем слово "двойная" (с любыми пробелами после него)
-    // 2. Удаляем "оцинкованная труба" (без учета регистра)
-    // 3. Удаляем символы "мм"
-    let cleanDescription = item.frame_description
-        .replace(/двойная\s*/gi, "")  // добавлено удаление слова "двойная"
-        .replace(/оцинкованная труба/gi, "")
-        .replace(/мм/gi, "")
-        .trim();
+        // Нормализуем описание:
+        // 1. Удаляем слово "двойная" (с любыми пробелами после него)
+        // 2. Удаляем "оцинкованная труба" (без учета регистра)
+        // 3. Удаляем символы "мм"
+        let cleanDescription = item.frame_description
+            .replace(/двойная\s*/gi, "")  // добавлено удаление слова "двойная"
+            .replace(/оцинкованная труба/gi, "")
+            .replace(/мм/gi, "")
+            .trim();
 
-    // Убираем лишние пробелы вокруг знака "+"
-    cleanDescription = cleanDescription.replace(/\s*\+\s*/g, "+");
-    console.log("Нормализованное описание после правки:", cleanDescription);
+        // Убираем лишние пробелы вокруг знака "+"
+        cleanDescription = cleanDescription.replace(/\s*\+\s*/g, "+");
+        console.log("Нормализованное описание после правки:", cleanDescription);
 
-    // Если строка содержит "+", значит, это составной каркас – возвращаем её целиком
-    if (cleanDescription.includes('+')) {
-        console.log("Составной каркас обнаружен, возвращаем:", cleanDescription);
-        return cleanDescription;
-    }
+        // Если строка содержит "+", значит, это составной каркас – возвращаем её целиком
+        if (cleanDescription.includes('+')) {
+            console.log("Составной каркас обнаружен, возвращаем:", cleanDescription);
+            return cleanDescription;
+        }
 
-    // Если нет знака "+", ищем простое совпадение для "20х20" или "40х20"
-    const matches = cleanDescription.match(/(20х20|40х20)/gi);
-    if (matches) {
-        console.log("Найденные совпадения:", matches);
-    } else {
-        console.log("Совпадений не найдено, возвращаем:", cleanDescription);
-    }
+        // Если нет знака "+", ищем простое совпадение для "20х20" или "40х20"
+        const matches = cleanDescription.match(/(20х20|40х20)/gi);
+        if (matches) {
+            console.log("Найденные совпадения:", matches);
+        } else {
+            console.log("Совпадений не найдено, возвращаем:", cleanDescription);
+        }
 
-    return matches ? matches.join(",") : cleanDescription;
-}))];
+        return matches ? matches.join(",") : cleanDescription;
+    }))];
 
     uniqueFrames = [...new Set(uniqueFrames.flatMap(f => f.split(",")))];
 
@@ -903,46 +903,46 @@ async function calculateGreenhouseCost(event = null) {
     }
 
     // Расчёт стоимости сборки (если выбрана)
-if (assemblyChecked) {
-    const assemblyCategory = getAssemblyCategory(form, width); // Получаем категорию сборки
-    if (assemblyCategory) {
-        const assemblyCostCalculated = calculateAssemblyCost(form, assemblyCategory, length);
-        if (assemblyCostCalculated > 0) {
-            assemblyCost += assemblyCostCalculated;
-            assemblyText += `\nСборка и установка - ${formatPrice(assemblyCostCalculated)} рублей`;
+    if (assemblyChecked) {
+        const assemblyCategory = getAssemblyCategory(form, width); // Получаем категорию сборки
+        if (assemblyCategory) {
+            const assemblyCostCalculated = calculateAssemblyCost(form, assemblyCategory, length);
+            if (assemblyCostCalculated > 0) {
+                assemblyCost += assemblyCostCalculated;
+                assemblyText += `\nСборка и установка - ${formatPrice(assemblyCostCalculated)} рублей`;
+            } else {
+                alert(`Не найдена стоимость сборки для формы "${form}", ширины "${width}М" и длины "${length} м".`);
+                return;
+            }
         } else {
-            alert(`Не найдена стоимость сборки для формы "${form}", ширины "${width}М" и длины "${length} м".`);
+            alert(`Категория сборки для формы "${form}" и ширины "${width}М" не определена.`);
             return;
         }
-    } else {
-        alert(`Категория сборки для формы "${form}" и ширины "${width}М" не определена.`);
-        return;
     }
-}
 
-// Расчёт стоимости монтажа на фундамент клиента (если выбрана опция "на брус")
-if (onWoodChecked) {
-    const woodPrice = onWoodCheckbox ? parseFloat(onWoodCheckbox.getAttribute('data-price')) : 0;
-    if (woodPrice) {
-        foundationCost += woodPrice;
-        foundationText += `\nМонтаж на брус клиента - ${formatPrice(woodPrice)} рублей`;
-    } else {
-        alert(`Не найдена стоимость монтажа на брус.`);
-        return;
+    // Расчёт стоимости монтажа на фундамент клиента (если выбрана опция "на брус")
+    if (onWoodChecked) {
+        const woodPrice = onWoodCheckbox ? parseFloat(onWoodCheckbox.getAttribute('data-price')) : 0;
+        if (woodPrice) {
+            foundationCost += woodPrice;
+            foundationText += `\nМонтаж на брус клиента - ${formatPrice(woodPrice)} рублей`;
+        } else {
+            alert(`Не найдена стоимость монтажа на брус.`);
+            return;
+        }
     }
-}
 
-// Расчёт стоимости монтажа на фундамент клиента (если выбрана опция "на бетон")
-if (onConcreteChecked) {
-    const concretePrice = onConcreteCheckbox ? parseFloat(onConcreteCheckbox.getAttribute('data-price')) : 0;
-    if (concretePrice) {
-        foundationCost += concretePrice;
-        foundationText += `\nМонтаж на бетон клиента - ${formatPrice(concretePrice)} рублей`;
-    } else {
-        alert(`Не найдена стоимость монтажа на бетон.`);
-        return;
+    // Расчёт стоимости монтажа на фундамент клиента (если выбрана опция "на бетон")
+    if (onConcreteChecked) {
+        const concretePrice = onConcreteCheckbox ? parseFloat(onConcreteCheckbox.getAttribute('data-price')) : 0;
+        if (concretePrice) {
+            foundationCost += concretePrice;
+            foundationText += `\nМонтаж на бетон клиента - ${formatPrice(concretePrice)} рублей`;
+        } else {
+            alert(`Не найдена стоимость монтажа на бетон.`);
+            return;
+        }
     }
-}
 
     // Дополнительные товары
     const additionalProducts = [];
@@ -1063,7 +1063,7 @@ for (const entry of topCities) {
     try {
         const route = await ymaps.route([entry.city.coords, [destinationLat, destinationLon]]);
         const routeDistance = route.getLength() / 1000; // расстояние по дорогам в км
-        
+
         if (routeDistance < minRouteDistance) {
             minRouteDistance = routeDistance;
             nearestCity = entry.city;
@@ -1078,17 +1078,17 @@ if (!nearestCity) {
     document.getElementById('result').innerText = "Ошибка: ближайший город не найден.";
     return;
 }
-        
+
         mapInstance.setCenter(nearestCity.coords, 7);
-        
+
         // Автоматически установить найденный город в выпадающем списке "Город"
         document.getElementById('city').value = nearestCity.name;
         // Обновить остальные параметры на основе выбранного города
         onCityChange();
-        
+
         if (currentRoute) {
             mapInstance.geoObjects.remove(currentRoute);
-        }        
+        }
 
         try {
             const route = await ymaps.route([nearestCity.coords, [destinationLat, destinationLon]]);
@@ -1364,4 +1364,3 @@ ymaps.ready(() => {
         }
     });
 });
-
